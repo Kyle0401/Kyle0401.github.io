@@ -84,6 +84,12 @@ function getCookie(name) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+    var favicon = document.querySelector('link[rel="icon"]');
+    if (favicon) {
+        favicon.href = './static/img/logo-jy.svg';
+        favicon.type = 'image/svg+xml';
+    }
+
     var projectLists = document.querySelectorAll('.projectList');
 
     if (projectLists.length > 0) {
