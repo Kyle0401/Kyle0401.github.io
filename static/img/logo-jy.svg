@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
   <title id="title">JY monogram logo</title>
-  <desc id="desc">A glossy dark-indigo circular monogram with the letters J and Y.</desc>
+  <desc id="desc">A glossy dark-indigo circular monogram with normally oriented letters J and Y.</desc>
   <defs>
     <linearGradient id="bg" x1="90" y1="70" x2="930" y2="950" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#171b37"/>
@@ -12,14 +12,10 @@
       <stop offset="0.42" stop-color="#a06fd9" stop-opacity="0.22"/>
       <stop offset="1" stop-color="#1d213e" stop-opacity="0"/>
     </radialGradient>
-    <linearGradient id="letter" x1="318" y1="241" x2="744" y2="788" gradientUnits="userSpaceOnUse">
+    <linearGradient id="letter" x1="300" y1="235" x2="770" y2="800" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#ffffff"/>
       <stop offset="0.56" stop-color="#f4f0ff"/>
       <stop offset="1" stop-color="#d9d8ff"/>
-    </linearGradient>
-    <linearGradient id="accent" x1="710" y1="300" x2="894" y2="730" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#efb4ff"/>
-      <stop offset="1" stop-color="#7da4ff"/>
     </linearGradient>
     <filter id="shadow" x="-25%" y="-25%" width="150%" height="150%">
       <feDropShadow dx="0" dy="20" stdDeviation="20" flood-color="#0a0d20" flood-opacity="0.45"/>
@@ -34,10 +30,11 @@
   <ellipse cx="304" cy="208" rx="268" ry="108" fill="#ffffff" fill-opacity="0.10" filter="url(#soft)"/>
   <circle cx="824" cy="774" r="194" fill="#f56bba" fill-opacity="0.10" filter="url(#soft)"/>
 
-  <g fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#shadow)">
-    <path d="M379 294v288c0 104 48 157 138 157 88 0 139-55 139-160v-92" stroke="url(#letter)" stroke-width="78"/>
-    <path d="M621 294l119 188 120-188" stroke="url(#letter)" stroke-width="78"/>
-    <path d="M740 482v250" stroke="url(#accent)" stroke-width="78"/>
+  <g fill="none" stroke="url(#letter)" stroke-width="78" stroke-linecap="round" stroke-linejoin="round" filter="url(#shadow)">
+    <!-- Normal J: right-side stem, then a hook curving to the left at the bottom. -->
+    <path d="M486 294v288c0 104-48 157-138 157-88 0-139-55-139-160v-42"/>
+    <!-- Normal Y: two upper arms join at the centre, followed by a vertical lower stem. -->
+    <path d="M594 294l118 188 118-188M712 482v250"/>
   </g>
 
   <path d="M216 787c105 67 233 100 366 90" fill="none" stroke="#ffffff" stroke-opacity="0.18" stroke-width="12" stroke-linecap="round"/>
