@@ -58,8 +58,6 @@ tc_main[0].addEventListener('click', function (event) {
     event.stopPropagation();
 });
 
-
-
 function setCookie(name, value, days) {
     var expires = "";
     if (days) {
@@ -85,35 +83,17 @@ function getCookie(name) {
     return null;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 document.addEventListener('DOMContentLoaded', function () {
+    var siteCardList = document.querySelectorAll('.projectList');
+    var siteCards = siteCardList[0].querySelectorAll('.projectItem');
+    var travelCard = siteCards[2];
 
-
-
-
-
+    travelCard.querySelector('h1').textContent = '旅行';
+    travelCard.querySelector('p').textContent = '记录旅行攻略和见闻';
 
     var html = document.querySelector('html');
     var themeState = getCookie("themeState") || "Light";
     var tanChiShe = document.getElementById("tanChiShe");
-
-
-
-
-
 
     function changeTheme(theme) {
         tanChiShe.src = "./static/svg/snake-" + theme + ".svg";
@@ -122,13 +102,7 @@ document.addEventListener('DOMContentLoaded', function () {
         themeState = theme;
     }
 
-
-
-
-
-
-
-    var Checkbox = document.getElementById('myonoffswitch')
+    var Checkbox = document.getElementById('myonoffswitch');
     Checkbox.addEventListener('change', function () {
         if (themeState == "Dark") {
             changeTheme("Light");
@@ -139,31 +113,11 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-
-
     if (themeState == "Dark") {
         Checkbox.checked = false;
     }
 
     changeTheme(themeState);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   
 
     var fpsElement = document.createElement('div');
     fpsElement.id = 'fps';
@@ -205,22 +159,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
         step();
     })();
-    
-    
-    
+
     //pop('./static/img/tz.jpg')
-    
-    
-    
 });
 
-
-
-
 var pageLoading = document.querySelector("#zyyo-loading");
-window.addEventListener('load', function() {
+window.addEventListener('load', function () {
     setTimeout(function () {
         pageLoading.style.opacity = '0';
     }, 100);
 });
-
