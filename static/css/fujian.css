@@ -18,18 +18,198 @@
     }
 }
 
+/* Phone-first refinements for the Fujian itinerary page. */
 @media (max-width: 600px) {
+    html {
+        -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+        overflow-x: hidden;
+    }
+
+    .travel-shell {
+        width: calc(100% - 24px);
+        padding: 16px 0 48px;
+    }
+
+    .topbar {
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 18px;
+    }
+
+    .brand {
+        min-width: 0;
+        font-size: 14px;
+    }
+
+    .brand-mark {
+        flex: 0 0 32px;
+        width: 32px;
+        height: 32px;
+        border-radius: 10px;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+        white-space: nowrap;
+    }
+
+    .hero {
+        padding: 28px 22px;
+        border-radius: 20px;
+    }
+
+    .hero::before {
+        top: -188px;
+        right: -142px;
+    }
+
+    .hero::after {
+        right: -112px;
+        bottom: -235px;
+    }
+
+    .eyebrow {
+        margin-bottom: 10px;
+        font-size: 11px;
+        letter-spacing: 0.11em;
+    }
+
+    .hero h1 {
+        font-size: 32px;
+        line-height: 1.18;
+    }
+
+    .hero-meta {
+        gap: 8px;
+        margin-top: 20px;
+    }
+
+    .pill {
+        padding: 7px 10px;
+        font-size: 12px;
+    }
+
+    .content-grid {
+        margin-top: 16px;
+    }
+
+    .card,
+    .day-card {
+        padding: 18px;
+        border-radius: 18px;
+    }
+
+    .info-grid {
+        gap: 10px;
+        margin-top: 16px;
+    }
+
+    .info-item {
+        min-height: 0;
+        padding: 14px;
+        border-radius: 13px;
+    }
+
+    .info-item strong {
+        font-size: 14px;
+    }
+
+    .section {
+        margin-top: 32px;
+    }
+
+    .section-heading {
+        align-items: flex-start;
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+
+    .section-heading h2 {
+        font-size: 23px;
+    }
+
+    .placeholder {
+        margin-top: 0;
+        padding: 7px 10px;
+        font-size: 12px;
+    }
+
+    .route-box {
+        padding: 14px;
+    }
+
     .timeline {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: 1fr;
+        gap: 10px;
+        margin-top: 0;
     }
 
-    .timeline li:nth-child(3)::after {
-        display: block;
+    .timeline li {
+        min-height: 0;
+        padding: 14px 14px 14px 16px;
+        border-left: 4px solid var(--travel-accent);
+        border-radius: 13px;
     }
 
-    .timeline li:nth-child(2)::after,
-    .timeline li:nth-child(4)::after,
-    .timeline li:nth-child(6)::after {
+    .timeline li:not(:last-child)::after {
+        display: none;
+    }
+
+    .timeline span {
+        margin-top: 5px;
+        font-size: 13px;
+    }
+
+    .day-grid {
+        gap: 14px;
+    }
+
+    .day-card h3 {
+        font-size: 19px;
+    }
+
+    .plan-list {
+        gap: 9px;
+        margin-top: 16px;
+    }
+
+    .plan-row {
+        grid-template-columns: 54px minmax(0, 1fr);
+        gap: 8px;
+    }
+
+    .plan-value {
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .two-column {
+        gap: 14px;
+    }
+
+    .budget-item {
+        align-items: flex-start;
+        padding: 12px 0;
+    }
+
+    .page-footer {
+        margin-top: 40px;
+        padding: 0 8px;
+        line-height: 1.65;
+    }
+}
+
+@media (max-width: 375px) {
+    .hero h1 {
+        font-size: 29px;
+    }
+
+    .brand span:last-child {
         display: none;
     }
 }
