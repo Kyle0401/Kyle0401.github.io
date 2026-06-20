@@ -1,4 +1,8 @@
 /* Fujian itinerary: D0 arrival plus D1-D6 main route */
+.content-grid-single {
+    grid-template-columns: minmax(0, 1fr);
+}
+
 .timeline {
     grid-template-columns: repeat(7, minmax(0, 1fr));
 }
