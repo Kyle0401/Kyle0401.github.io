@@ -41,12 +41,12 @@ function toggleClass(selector, className) {
 }
 
 function pop(imageURL) {
-    var tcMainElement = document.querySelector(".tc-img");
+    var tcMainElement = document.querySelector('.tc-img');
     if (imageURL) {
         tcMainElement.src = imageURL;
     }
-    toggleClass(".tc-main", "active");
-    toggleClass(".tc", "active");
+    toggleClass('.tc-main', 'active');
+    toggleClass('.tc', 'active');
 }
 
 var tc = document.getElementsByClassName('tc');
@@ -59,17 +59,17 @@ tc_main[0].addEventListener('click', function (event) {
 });
 
 function setCookie(name, value, days) {
-    var expires = "";
+    var expires = '';
     if (days) {
         var date = new Date();
         date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
-        expires = "; expires=" + date.toUTCString();
+        expires = '; expires=' + date.toUTCString();
     }
-    document.cookie = name + "=" + value + expires + "; path=/";
+    document.cookie = name + '=' + value + expires + '; path=/';
 }
 
 function getCookie(name) {
-    var nameEQ = name + "=";
+    var nameEQ = name + '=';
     var cookies = document.cookie.split(';');
     for (var i = 0; i < cookies.length; i++) {
         var cookie = cookies[i];
@@ -84,36 +84,56 @@ function getCookie(name) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    var siteCardList = document.querySelectorAll('.projectList');
-    var siteCards = siteCardList[0].querySelectorAll('.projectItem');
-    var travelCard = siteCards[2];
+    var projectLists = document.querySelectorAll('.projectList');
 
-    travelCard.querySelector('h1').textContent = '旅行';
-    travelCard.querySelector('p').textContent = '记录旅行攻略和见闻';
+    if (projectLists.length > 0) {
+        var siteCards = projectLists[0].querySelectorAll('.projectItem');
+
+        if (siteCards.length > 2) {
+            var travelCard = siteCards[2];
+            travelCard.querySelector('h1').textContent = '旅行';
+            travelCard.querySelector('p').textContent = '记录旅行攻略和见闻';
+            travelCard.setAttribute('role', 'link');
+            travelCard.setAttribute('tabindex', '0');
+            travelCard.style.cursor = 'pointer';
+
+            function openTravelDirectory() {
+                window.location.href = './travel/';
+            }
+
+            travelCard.addEventListener('click', openTravelDirectory);
+            travelCard.addEventListener('keydown', function (event) {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    openTravelDirectory();
+                }
+            });
+        }
+    }
 
     var html = document.querySelector('html');
-    var themeState = getCookie("themeState") || "Light";
-    var tanChiShe = document.getElementById("tanChiShe");
+    var themeState = getCookie('themeState') || 'Light';
+    var tanChiShe = document.getElementById('tanChiShe');
 
     function changeTheme(theme) {
-        tanChiShe.src = "./static/svg/snake-" + theme + ".svg";
+        tanChiShe.src = './static/svg/snake-' + theme + '.svg';
         html.dataset.theme = theme;
-        setCookie("themeState", theme, 365);
+        setCookie('themeState', theme, 365);
         themeState = theme;
     }
 
     var Checkbox = document.getElementById('myonoffswitch');
     Checkbox.addEventListener('change', function () {
-        if (themeState == "Dark") {
-            changeTheme("Light");
-        } else if (themeState == "Light") {
-            changeTheme("Dark");
+        if (themeState == 'Dark') {
+            changeTheme('Light');
+        } else if (themeState == 'Light') {
+            changeTheme('Dark');
         } else {
-            changeTheme("Dark");
+            changeTheme('Dark');
         }
     });
 
-    if (themeState == "Dark") {
+    if (themeState == 'Dark') {
         Checkbox.checked = false;
     }
 
@@ -159,11 +179,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         step();
     })();
-
-    //pop('./static/img/tz.jpg')
 });
 
-var pageLoading = document.querySelector("#zyyo-loading");
+var pageLoading = document.querySelector('#zyyo-loading');
 window.addEventListener('load', function () {
     setTimeout(function () {
         pageLoading.style.opacity = '0';
