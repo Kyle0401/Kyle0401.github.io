@@ -1,7 +1,7 @@
 console.log('%cCopyright © 2024 zyyo.net',
     'background-color: #ff00ff; color: white; font-size: 24px; font-weight: bold; padding: 10px;'
 );
-console.log('%c   /\\_/\\', 'color: #8B4513; font-size: 20px;');
+console.log('%c   /\_/\\', 'color: #8B4513; font-size: 20px;');
 console.log('%c  ( o.o )', 'color: #8B4513; font-size: 20px;');
 console.log(' %c  > ^ <', 'color: #8B4513; font-size: 20px;');
 console.log('  %c /  ~ \\', 'color: #8B4513; font-size: 20px;');
@@ -90,6 +90,14 @@ document.addEventListener('DOMContentLoaded', function () {
         favicon.type = 'image/svg+xml';
     }
 
+    var sectionTitles = document.querySelectorAll('main > .title');
+    var sectionLabels = ['Site', 'Project', 'Skills'];
+    sectionTitles.forEach(function (title, index) {
+        if (sectionLabels[index]) {
+            title.textContent = sectionLabels[index];
+        }
+    });
+
     var projectLists = document.querySelectorAll('.projectList');
 
     if (projectLists.length > 0) {
@@ -112,6 +120,28 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (event.key === 'Enter' || event.key === ' ') {
                     event.preventDefault();
                     openTravelDirectory();
+                }
+            });
+        }
+
+        if (siteCards.length > 3) {
+            var learningCard = siteCards[3];
+            learningCard.querySelector('h1').textContent = '学习记录';
+            learningCard.querySelector('p').textContent = '记录计算机知识的学习';
+            learningCard.querySelector('.projectItemRight img').alt = '学习记录图标';
+            learningCard.setAttribute('role', 'link');
+            learningCard.setAttribute('tabindex', '0');
+            learningCard.style.cursor = 'pointer';
+
+            function openLearningDirectory() {
+                window.location.href = './learning/';
+            }
+
+            learningCard.addEventListener('click', openLearningDirectory);
+            learningCard.addEventListener('keydown', function (event) {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    openLearningDirectory();
                 }
             });
         }
