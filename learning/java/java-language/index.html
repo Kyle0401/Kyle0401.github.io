@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="JAVA语言学习：方法 main()、屏幕输出、变量与数据类型、编译器与注释">
+    <title>JAVA语言学习 · 学习记录 · Kyle</title>
+    <link rel="icon" type="image/svg+xml" href="../../../static/img/logo-jy.svg">
+    <link rel="stylesheet" href="../../../static/css/java-note.css">
+    <style>
+        .java-pipeline { margin: 24px 0 30px; padding: 22px; overflow: hidden; color: #f7f7f7; background: #222326; border-radius: 16px; }
+        .pipeline-track { display: grid; grid-template-columns: minmax(150px, 1fr) minmax(120px, .82fr) minmax(150px, 1fr) minmax(120px, .82fr) minmax(150px, 1fr); align-items: center; gap: 22px; }
+        .pipeline-node { display: grid; min-height: 128px; padding: 16px; place-items: center; border: 3px solid #48d675; border-radius: 6px; color: #f3f3f3; font-size: clamp(16px, 2vw, 24px); line-height: 1.65; text-align: center; }
+        .pipeline-node.source { border-color: #ff7a3d; }
+        .pipeline-node.machine { border-color: #58e9eb; }
+        .pipeline-arrow { position: relative; padding: 22px 35px 22px 20px; color: #c26aff; background: #3c2b51; clip-path: polygon(0 0, 84% 0, 100% 50%, 84% 100%, 0 100%, 9% 50%); font-family: "Cascadia Code", Consolas, monospace; font-size: clamp(14px, 1.7vw, 20px); font-weight: 700; text-align: center; }
+        .java-pipeline figcaption { margin-top: 20px; color: #f1f1f1; font-family: "KaiTi", "STKaiti", serif; font-size: 20px; font-style: italic; text-align: center; }
+        @media (max-width: 820px) { .pipeline-track { grid-template-columns: 1fr; gap: 12px; } .pipeline-arrow { width: min(260px, 90%); margin: 0 auto; clip-path: polygon(0 0, 100% 0, 100% 72%, 50% 100%, 0 72%); padding: 16px 20px 28px; } .pipeline-node { min-height: 92px; } }
+    </style>
+</head>
+<body>
+    <header class="note-topbar">
+        <a class="note-brand" href="../../../" aria-label="返回 Kyle 主页">
+            <span class="note-brand-mark">K</span>
+            <span>Kyle · Learning Records</span>
+        </a>
+        <a class="note-back" href="../">← 返回 JAVA学习</a>
+    </header>
+
+    <div class="note-layout">
+        <aside class="toc" id="toc" aria-label="文章目录">
+            <p class="toc-title">On this page</p>
+        </aside>
+
+        <main class="note-main">
+            <nav class="breadcrumb" aria-label="面包屑导航">
+                <a href="../../../">主页</a><span>/</span>
+                <a href="../../">学习记录</a><span>/</span>
+                <a href="../">JAVA学习</a><span>/</span>
+                <span>JAVA语言学习</span>
+            </nav>
+
+            <article class="article" id="article">
+                <div id="article-content"><p>正在加载笔记…</p></div>
+                <footer class="article-footer">
+                    <span>学习记录 · JAVA语言学习</span>
+                    <a href="../">返回 JAVA学习目录 →</a>
+                </footer>
+            </article>
+        </main>
+    </div>
+
+    <script>
+        (function () {
+            var contentNode = document.getElementById('article-content');
+            var tocNode = document.getElementById('toc');
+
+            function escapeHtml(value) {
+                return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            }
+
+            function inline(value) {
+                return escapeHtml(value)
+                    .replace(/`([^`]+)`/g, '<code>$1</code>')
+                    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+            }
+
+            function splitTableRow(line) {
+                return line.trim().replace(/^\||\|$/g, '').split('|').map(function (cell) {
+                    return cell.trim();
+                });
+            }
+
+            function isBlockStart(line, nextLine) {
+                return /^#{1,6}\s+/.test(line) || /^```/.test(line) || /^-{3,}\s*$/.test(line) || /^>\s*\[!(IMPORTANT|CAUTION)\]/.test(line) || /^-\s+/.test(line) || (/^\|/.test(line) && /^\|?\s*:?-{3,}/.test(nextLine || '')) || /^!\[.*?\]\(.+?\)$/.test(line);
+            }
+
+            function renderPipeline() {
+                return '<figure class="java-pipeline">' +
+                    '<div class="pipeline-track">' +
+                        '<div class="pipeline-node source">用 Java 编写的程序</div>' +
+                        '<div class="pipeline-arrow">Java-编译器</div>' +
+                        '<div class="pipeline-node">由特殊代码（字节码）构成的程序</div>' +
+                        '<div class="pipeline-arrow">Java 虚拟机</div>' +
+                        '<div class="pipeline-node machine">由机器码构成的程序</div>' +
+                    '</div><figcaption>Java 的编译阶段</figcaption></figure>';
+            }
+
+            function parseMarkdown(markdown) {
+                var lines = markdown.replace(/\r\n?/g, '\n').split('\n');
+                var html = [];
+                var i = 0;
+
+                while (i < lines.length) {
+                    var line = lines[i];
+                    var nextLine = lines[i + 1] || '';
+
+                    if (!line.trim()) {
+                        i++;
+                        continue;
+                    }
+
+                    if (/^```/.test(line)) {
+                        var language = line.replace(/^```/, '').trim() || 'text';
+                        var code = [];
+                        i++;
+                        while (i < lines.length && !/^```/.test(lines[i])) {
+                            code.push(lines[i]);
+                            i++;
+                        }
+                        if (i < lines.length) i++;
+                        html.push('<pre><code class="language-' + escapeHtml(language) + '">' + escapeHtml(code.join('\n')) + '</code></pre>');
+                        continue;
+                    }
+
+                    if (/^!\[.*?\]\(.+?\)$/.test(line)) {
+                        html.push(renderPipeline());
+                        i++;
+                        continue;
+                    }
+
+                    if (/^-{3,}\s*$/.test(line)) {
+                        html.push('<hr>');
+                        i++;
+                        continue;
+                    }
+
+                    if (/^>\s*\[!(IMPORTANT|CAUTION)\]/.test(line)) {
+                        var kind = line.match(/^>\s*\[!(IMPORTANT|CAUTION)\]/)[1].toLowerCase();
+                        var callout = [];
+                        i++;
+                        while (i < lines.length && (lines[i].startsWith('>') || !lines[i].trim())) {
+                            if (lines[i].startsWith('>')) {
+                                var message = lines[i].replace(/^>\s?/, '');
+                                if (message) callout.push(message);
+                            }
+                            i++;
+                        }
+                        html.push('<div class="callout ' + (kind === 'caution' ? 'caution' : '') + '"><div><p>' + inline(callout.join(' ')) + '</p></div></div>');
+                        continue;
+                    }
+
+                    var heading = line.match(/^(#{1,6})\s+(.+)$/);
+                    if (heading) {
+                        var level = heading[1].length;
+                        html.push('<h' + level + '>' + inline(heading[2]) + '</h' + level + '>');
+                        i++;
+                        continue;
+                    }
+
+                    if (/^\|/.test(line) && /^\|?\s*:?-{3,}/.test(nextLine)) {
+                        var headers = splitTableRow(line);
+                        i += 2;
+                        var rows = [];
+                        while (i < lines.length && /^\|/.test(lines[i])) {
+                            rows.push(splitTableRow(lines[i]));
+                            i++;
+                        }
+                        var table = '<div class="table-wrap"><table><thead><tr>' + headers.map(function (cell) { return '<th>' + inline(cell) + '</th>'; }).join('') + '</tr></thead><tbody>';
+                        rows.forEach(function (row) {
+                            table += '<tr>' + headers.map(function (_, index) { return '<td>' + inline(row[index] || '') + '</td>'; }).join('') + '</tr>';
+                        });
+                        html.push(table + '</tbody></table></div>');
+                        continue;
+                    }
+
+                    if (/^-\s+/.test(line)) {
+                        var items = [];
+                        while (i < lines.length && /^-\s+/.test(lines[i])) {
+                            items.push(lines[i].replace(/^-\s+/, ''));
+                            i++;
+                        }
+                        html.push('<ul>' + items.map(function (item) { return '<li>' + inline(item) + '</li>'; }).join('') + '</ul>');
+                        continue;
+                    }
+
+                    var paragraph = [];
+                    while (i < lines.length && lines[i].trim() && !isBlockStart(lines[i], lines[i + 1] || '')) {
+                        paragraph.push(lines[i].trim());
+                        i++;
+                    }
+                    if (paragraph.length) {
+                        html.push('<p>' + inline(paragraph.join(' ')) + '</p>');
+                    } else {
+                        i++;
+                    }
+                }
+
+                return html.join('');
+            }
+
+            function buildToc() {
+                var headings = Array.prototype.slice.call(contentNode.querySelectorAll('h2'));
+                tocNode.innerHTML = '<p class="toc-title">On this page</p>';
+                headings.forEach(function (heading, index) {
+                    var label = heading.textContent;
+                    var id = 'section-' + (index + 1);
+                    heading.id = id;
+                    heading.innerHTML = '<span class="section-index">' + String(index + 1).padStart(2, '0') + '</span>' + heading.innerHTML;
+                    var link = document.createElement('a');
+                    link.href = '#' + id;
+                    link.textContent = label;
+                    tocNode.appendChild(link);
+                });
+            }
+
+            fetch('./JAVA学习.md')
+                .then(function (response) {
+                    if (!response.ok) throw new Error('笔记文件读取失败');
+                    return response.text();
+                })
+                .then(function (markdown) {
+                    contentNode.innerHTML = parseMarkdown(markdown);
+                    buildToc();
+                })
+                .catch(function () {
+                    contentNode.innerHTML = '<h1>JAVA学习</h1><div class="article-divider"></div><p>笔记文件暂时无法读取。</p>';
+                });
+        })();
+    </script>
+</body>
+</html>
