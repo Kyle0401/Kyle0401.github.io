@@ -29,15 +29,12 @@
 内置4套白天主题修改办法
 
 
-
 每套主题的结构都为html{
     
 }
 
 只有最下面的会生效,也就是将你要设置的主题剪切到最下面
 */
-
-
 
 
 
@@ -147,4 +144,32 @@ html {
     --back_filter: 19px;
     --back_filter_color: #00000030;
     --fill:#ffffff;
+}
+
+/* 主题开关：与其他图标按钮保持一致，悬停时才显示文字。 */
+.switch {
+    width: 55px !important;
+    gap: 0 !important;
+    padding: 0 !important;
+    justify-content: center !important;
+}
+
+.switchLabel {
+    display: none !important;
+    white-space: nowrap;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.switch:hover {
+    width: 95px !important;
+    gap: 6px !important;
+    padding: 0 8px !important;
+    justify-content: space-between !important;
+    transform: translateY(-2px);
+}
+
+.switch:hover .switchLabel {
+    display: block !important;
 }
