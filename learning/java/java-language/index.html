@@ -11,6 +11,23 @@
         .java-diagram { width: 100%; max-width: 100%; margin: 24px 0 30px; }
         .java-diagram img { display: block; width: 100%; max-width: 100%; height: auto; object-fit: contain; }
 
+        /* Java code blocks: IntelliJ IDEA Darcula-inspired local syntax highlighting. */
+        .article pre.code-block { position: relative; padding-top: 34px; background: #2b2b2b; border: 1px solid rgba(255,255,255,.08); box-shadow: 0 12px 26px rgba(24,31,49,.14); }
+        .article pre.code-block::before { position: absolute; top: 10px; left: 15px; padding: 3px 8px; color: #a9b7c6; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.08); border-radius: 5px; font-family: "Cascadia Code", "JetBrains Mono", Consolas, monospace; font-size: 10px; font-weight: 800; letter-spacing: .1em; line-height: 1.2; content: attr(data-language); }
+        .article pre.code-block[data-language="java"]::before { content: "JAVA"; color: #ffc66d; }
+        .article pre.code-block code { color: #a9b7c6; font-variant-ligatures: none; }
+        .java-token.keyword { color: #cc7832; font-weight: 700; }
+        .java-token.type { color: #ffc66d; }
+        .java-token.string { color: #6a8759; }
+        .java-token.character { color: #6a8759; }
+        .java-token.comment { color: #808080; font-style: italic; }
+        .java-token.number { color: #6897bb; }
+        .java-token.literal { color: #cc7832; font-weight: 700; }
+        .java-token.annotation { color: #bbb529; }
+        .java-token.method { color: #ffc66d; }
+        .java-token.class-name { color: #a9b7c6; font-weight: 700; }
+        .java-token.operator { color: #a9b7c6; }
+
         #toc-links > ul,
         #toc-links ul { margin: 0; padding: 0; list-style: none; }
         .toc-tree { width: 100%; }
@@ -113,6 +130,127 @@
                 return /^#{1,6}\s+/.test(line) || /^```/.test(line) || /^-{3,}\s*$/.test(line) || /^>\s*\[!(IMPORTANT|CAUTION)\]/.test(line) || /^-\s+/.test(line) || (/^\|/.test(line) && /^\|?\s*:?-{3,}/.test(nextLine || '')) || /^!\[.*?\]\(.+?\)$/.test(line);
             }
 
+            function token(name, value) {
+                return '<span class="java-token ' + name + '">' + escapeHtml(value) + '</span>';
+            }
+
+            function highlightJava(source) {
+                var keywords = {
+                    'abstract': 1, 'assert': 1, 'break': 1, 'case': 1, 'catch': 1, 'class': 1, 'const': 1, 'continue': 1, 'default': 1,
+                    'do': 1, 'else': 1, 'enum': 1, 'extends': 1, 'final': 1, 'finally': 1, 'for': 1, 'goto': 1, 'if': 1,
+                    'implements': 1, 'import': 1, 'instanceof': 1, 'interface': 1, 'new': 1, 'package': 1, 'private': 1, 'protected': 1,
+                    'public': 1, 'return': 1, 'static': 1, 'strictfp': 1, 'super': 1, 'switch': 1, 'synchronized': 1, 'this': 1,
+                    'throw': 1, 'throws': 1, 'transient': 1, 'try': 1, 'volatile': 1, 'while': 1
+                };
+                var types = {
+                    'boolean': 1, 'byte': 1, 'char': 1, 'double': 1, 'float': 1, 'int': 1, 'long': 1, 'short': 1, 'void': 1,
+                    'Boolean': 1, 'Byte': 1, 'Character': 1, 'Double': 1, 'Float': 1, 'Integer': 1, 'Long': 1, 'Short': 1,
+                    'String': 1, 'Object': 1, 'System': 1, 'Math': 1, 'Class': 1, 'Exception': 1, 'RuntimeException': 1,
+                    'Throwable': 1, 'List': 1, 'ArrayList': 1, 'Map': 1, 'HashMap': 1, 'Set': 1, 'HashSet': 1,
+                    'Scanner': 1, 'Arrays': 1, 'Collections': 1
+                };
+                var literals = { 'true': 1, 'false': 1, 'null': 1 };
+                var output = '';
+                var index = 0;
+                var length = source.length;
+
+                while (index < length) {
+                    var current = source.charAt(index);
+                    var next = source.charAt(index + 1);
+
+                    if (current === '/' && next === '/') {
+                        var lineEnd = source.indexOf('\n', index);
+                        if (lineEnd === -1) lineEnd = length;
+                        output += token('comment', source.slice(index, lineEnd));
+                        index = lineEnd;
+                        continue;
+                    }
+
+                    if (current === '/' && next === '*') {
+                        var blockEnd = source.indexOf('*/', index + 2);
+                        if (blockEnd === -1) blockEnd = length - 2;
+                        output += token('comment', source.slice(index, blockEnd + 2));
+                        index = blockEnd + 2;
+                        continue;
+                    }
+
+                    if (current === '"' || current === "'") {
+                        var quote = current;
+                        var stringEnd = index + 1;
+                        while (stringEnd < length) {
+                            if (source.charAt(stringEnd) === '\\') {
+                                stringEnd += 2;
+                                continue;
+                            }
+                            if (source.charAt(stringEnd) === quote) {
+                                stringEnd++;
+                                break;
+                            }
+                            stringEnd++;
+                        }
+                        output += token(quote === '"' ? 'string' : 'character', source.slice(index, stringEnd));
+                        index = stringEnd;
+                        continue;
+                    }
+
+                    if (current === '@' && /[A-Za-z_$]/.test(next || '')) {
+                        var annotationEnd = index + 1;
+                        while (annotationEnd < length && /[\w$]/.test(source.charAt(annotationEnd))) annotationEnd++;
+                        output += token('annotation', source.slice(index, annotationEnd));
+                        index = annotationEnd;
+                        continue;
+                    }
+
+                    if (/[A-Za-z_$]/.test(current)) {
+                        var wordEnd = index + 1;
+                        while (wordEnd < length && /[\w$]/.test(source.charAt(wordEnd))) wordEnd++;
+                        var word = source.slice(index, wordEnd);
+                        var after = wordEnd;
+                        while (after < length && /\s/.test(source.charAt(after))) after++;
+                        var before = index - 1;
+                        while (before >= 0 && /\s/.test(source.charAt(before))) before--;
+                        var previousWord = source.slice(Math.max(0, before - 12), before + 1);
+
+                        if (keywords[word]) {
+                            output += token('keyword', word);
+                        } else if (types[word]) {
+                            output += token('type', word);
+                        } else if (literals[word]) {
+                            output += token('literal', word);
+                        } else if (/\b(class|interface|enum)\s*$/.test(previousWord)) {
+                            output += token('class-name', word);
+                        } else if (source.charAt(after) === '(') {
+                            output += token('method', word);
+                        } else {
+                            output += escapeHtml(word);
+                        }
+                        index = wordEnd;
+                        continue;
+                    }
+
+                    if (/\d/.test(current)) {
+                        var numberEnd = index + 1;
+                        while (numberEnd < length && /[\d._xXa-fA-FbBlLfFdDeE+-]/.test(source.charAt(numberEnd))) numberEnd++;
+                        output += token('number', source.slice(index, numberEnd));
+                        index = numberEnd;
+                        continue;
+                    }
+
+                    if (/[-+*/%=!<>&|?:]/.test(current)) {
+                        output += token('operator', current);
+                    } else {
+                        output += escapeHtml(current);
+                    }
+                    index++;
+                }
+
+                return output;
+            }
+
+            function isJavaBlock(language, source) {
+                return /^(java|jdk|javac)$/i.test(language) || /\b(public\s+(static\s+)?void|System\.out|class\s+\w+)\b/.test(source);
+            }
+
             function renderPipeline() {
                 return '<figure class="figure java-diagram">' +
                     '<img src="./assets/image-20260613032810576.png" alt="Java 的编译阶段" loading="lazy">' +
@@ -143,7 +281,11 @@
                             i++;
                         }
                         if (i < lines.length) i++;
-                        html.push('<pre><code class="language-' + escapeHtml(language) + '">' + escapeHtml(code.join('\n')) + '</code></pre>');
+                        var sourceCode = code.join('\n');
+                        var javaBlock = isJavaBlock(language, sourceCode);
+                        var renderedCode = javaBlock ? highlightJava(sourceCode) : escapeHtml(sourceCode);
+                        var displayLanguage = javaBlock ? 'java' : language.toLowerCase();
+                        html.push('<pre class="code-block" data-language="' + escapeHtml(displayLanguage) + '"><code class="language-' + escapeHtml(displayLanguage) + '">' + renderedCode + '</code></pre>');
                         continue;
                     }
 
