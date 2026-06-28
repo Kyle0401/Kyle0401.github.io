@@ -11,26 +11,23 @@
         .java-diagram { width: 100%; max-width: 100%; margin: 24px 0 30px; }
         .java-diagram img { display: block; width: 100%; max-width: 100%; height: auto; object-fit: contain; }
 
-        .toc-tree,
-        .toc-tree ul { margin: 0; padding: 0; list-style: none; }
+        #toc-links > ul,
+        #toc-links ul { margin: 0; padding: 0; list-style: none; }
         .toc-tree { width: 100%; }
-        .toc-children { margin: 2px 0 6px 10px !important; padding-left: 9px !important; border-left: 1px solid #e1e6f1; }
+        .toc-children { margin: 2px 0 6px 2px; padding-left: 8px; border-left: 1px solid #e1e6f1; }
         .toc-row { display: flex; align-items: flex-start; min-width: 0; }
-        .toc-link { flex: 1 1 auto; min-width: 0; }
-        .toc-item-toggle { flex: 0 0 20px; width: 20px; height: 31px; margin: 0; padding: 0; color: #7b879a; background: transparent; border: 0; cursor: pointer; font-size: 15px; line-height: 1; transition: color .2s ease, transform .2s ease; }
+        .toc-link { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; word-break: normal; }
+        .toc-item-toggle { flex: 0 0 16px; width: 16px; height: 30px; margin: 0 2px 0 0; padding: 0; color: #7b879a; background: transparent; border: 0; cursor: pointer; font-size: 13px; line-height: 1; transition: color .2s ease, transform .2s ease; }
         .toc-item-toggle:hover { color: var(--note-accent-deep); }
         .toc-item-toggle.is-placeholder { visibility: hidden; pointer-events: none; }
         .toc-item.is-collapsed > .toc-children { display: none; }
         .toc-item.is-collapsed > .toc-row .toc-item-toggle { transform: rotate(-90deg); }
-        .toc-level-1 > .toc-row .toc-link { color: #35415b; font-weight: 800; }
-        .toc-level-2 > .toc-row .toc-link { font-weight: 700; }
+        .toc-level-1 > .toc-row .toc-link { color: #35415b; font-size: 14px; font-weight: 800; }
+        .toc-level-2 > .toc-row .toc-link { color: #435066; font-size: 13px; font-weight: 700; }
         .toc-level-3 > .toc-row .toc-link,
         .toc-level-4 > .toc-row .toc-link,
         .toc-level-5 > .toc-row .toc-link,
-        .toc-level-6 > .toc-row .toc-link { font-size: 12px; }
-        @media (max-width: 940px) {
-            .toc-children { margin-left: 8px !important; }
-        }
+        .toc-level-6 > .toc-row .toc-link { color: #657084; font-size: 12.5px; font-weight: 500; }
     </style>
 </head>
 <body>
@@ -73,6 +70,10 @@
         </main>
     </div>
 
+    <script src="./assets/diagram-part-01.js"></script>
+    <script src="./assets/diagram-part-02.js"></script>
+    <script src="./assets/diagram-part-03.js"></script>
+    <script src="./assets/diagram-part-04.js"></script>
     <script>
         (function () {
             var contentNode = document.getElementById('article-content');
@@ -222,12 +223,29 @@
                 return html.join('');
             }
 
+            function applyUploadedDiagram() {
+                var parts = window.__javaDiagramParts || [];
+                var image = contentNode.querySelector('.java-diagram img');
+                if (!image || parts.length !== 4) return;
+
+                var encodedImage = parts.join('');
+                if (encodedImage.length !== 9500) return;
+
+                var dataUrl = 'data:image/png;base64,' + encodedImage;
+                var verifier = new Image();
+                verifier.onload = function () {
+                    image.src = dataUrl;
+                };
+                verifier.src = dataUrl;
+            }
+
             function buildToc() {
                 var headings = Array.prototype.slice.call(contentNode.querySelectorAll('h1, h2, h3, h4, h5, h6'));
                 var rootList = document.createElement('ul');
                 var stack = [{ level: 0, list: rootList }];
                 var h2Index = 0;
 
+                rootList.className = 'toc-tree';
                 tocLinksNode.innerHTML = '';
 
                 headings.forEach(function (heading, index) {
@@ -305,6 +323,7 @@
                 })
                 .then(function (markdown) {
                     contentNode.innerHTML = parseMarkdown(markdown);
+                    applyUploadedDiagram();
                     buildToc();
                 })
                 .catch(function () {
