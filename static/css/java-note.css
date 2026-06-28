@@ -102,11 +102,39 @@ td code { white-space: nowrap; }
 .article-footer { display: flex; justify-content: space-between; gap: 14px; margin-top: 52px; padding-top: 22px; border-top: 1px solid var(--note-line); color: var(--note-muted); font-size: 13px; }
 .article-footer a { color: var(--note-accent); font-weight: 700; }
 
+/* 桌面端目录独立滚动：目录标题保持可见，长目录不再随整页延伸。 */
+@media (min-width: 1041px) {
+    .toc {
+        display: flex;
+        flex-direction: column;
+        max-height: calc(100dvh - 116px);
+        min-height: 0;
+    }
+
+    .toc-content {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        scrollbar-gutter: stable;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(91,110,225,.52) transparent;
+        padding: 0 10px 20px 16px;
+    }
+
+    .toc-content::-webkit-scrollbar { width: 7px; }
+    .toc-content::-webkit-scrollbar-track { margin: 7px 0 12px; background: transparent; }
+    .toc-content::-webkit-scrollbar-thumb { background: rgba(91,110,225,.42); border: 2px solid transparent; border-radius: 999px; background-clip: padding-box; }
+    .toc-content::-webkit-scrollbar-thumb:hover { background: rgba(53,72,184,.68); border: 2px solid transparent; background-clip: padding-box; }
+
+    .toc.is-collapsed { max-height: 52px; }
+}
+
 @media (max-width: 1040px) {
     .note-layout,
     .note-layout.toc-collapsed { grid-template-columns: minmax(0, 820px); width: min(100% - 32px, 820px); padding-top: 26px; }
     .toc { position: static; width: 100%; }
-    .toc-content { padding: 0 14px 14px; }
+    .toc-content { overflow: visible; padding: 0 14px 14px; }
     #toc-links .toc-children { margin-left: 1px !important; padding-left: 7px !important; }
     .toc.is-collapsed { width: 100%; }
     .toc.is-collapsed .toc-toggle { justify-content: flex-start; padding: 0 17px; }
