@@ -80,6 +80,7 @@ html[data-theme="Dark"] {
 
 
 
+
 body {
     height: 100%;
     min-height: 100vh;
@@ -141,6 +142,7 @@ body {
         opacity: 0;
     }
 }
+
 
 
 
@@ -410,8 +412,8 @@ body {
     width: 22px;
     height: 22px;
     fill:var(--fill);
-   font-size: 22px;
-    margin-right: 3px;
+    font-size: 22px;
+     margin-right: 3px;
 }
 .switch {
     width: 55px;
@@ -437,13 +439,6 @@ body {
 
 
 
-.switchLabel {
-    display: none;
-    white-space: nowrap;
-    font-size: 13px;
-    font-weight: 700;
-    line-height: 1;
-}
 
 .iconItem:hover {
     width: 95px;
@@ -457,23 +452,9 @@ body {
 }
 
 .switch:hover {
-    width: 95px !important;
-    gap: 6px !important;
-    padding: 0 8px !important;
-    justify-content: space-between !important;
-    transform: translateY(-2px);
+    width: 55px;
+    /* transform: translateY(-2px); */
     background: var(--item_hover_color);
-}
-
-.switch:hover .switchLabel {
-    display: block;
-}
-
-.switch:not(:hover) {
-    width: 55px !important;
-    gap: 0 !important;
-    padding: 0 !important;
-    justify-content: center !important;
 }
 
 .tanChiShe {
@@ -494,183 +475,404 @@ body {
     margin: 20px 0;
     transition: transform 0.4s ease;
 }
-
-.title i ,.title svg {
-    width: 28px;
-    height: 28px;
-    fill: var(--fill);
-    margin-right: 10px;
+.title i ,.title svg{
+    margin-right: 8px;
+    height: 26px;
+    width: 26px;
+   fill:var(--fill);
+}
+.title:hover {
+    transform: translateY(-5px);
 }
 
 .projectList {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 15px;
+    display: flex;
+    flex-wrap: wrap;
 }
 
 .projectItem {
-    position: relative;
+    margin: 7px;
     display: flex;
-    overflow: hidden;
-    min-height: 120px;
-    padding: 20px;
-    border-radius: 12px;
-    backdrop-filter: blur(var(--card_filter));
-    -webkit-backdrop-filter: blur(var(--card_filter));
-    background: var(--item_bg_color);
-    justify-content: space-between;
-    align-items: center;
-    transition: transform 0.2s ease, background-color 0.2s ease;
+    background-color: var(--item_bg_color);
+    border-radius: 8px;
+    padding: 15px;
+    height: 95px;
+    width: calc(25% - 15px);
+    backdrop-filter: blur(var(--card_filter));-webkit-backdrop-filter: blur(var(--card_filter));
+    -webkit-backdrop-filter: blur(var(--card_filter));-webkit-backdrop-filter: blur(var(--card_filter));
+    transition: opacity 0.3s ease, background-color 0.3s ease, border 0.3s ease, transform 0.2s ease;
+
+
 }
 
+.projectItem {
+    display: flex;
+    background-color: var(--item_bg_color);
+    border-radius: 8px;
+    padding: 15px;
+    height: 100px;
+    width: calc(25% - 15px);
+    backdrop-filter: blur(var(--card_filter));-webkit-backdrop-filter: blur(var(--card_filter));
+    transition: opacity 0.5s ease, background-color 0.2s ease, border 0.2s ease, transform 0.3s ease;
+
+}
+
+
 .projectItem:hover {
-    background: var(--item_hover_color);
-    transform: translateY(-4px);
+    box-shadow: 0 8px 16px -4px #2c2d300c;
+    transform: translateY(-2px);
+
 }
 
 .projectItem.pressed {
-    transform: scale(0.97);
+    transform: scale(0.9);
+    /* 缩小到原来的0.9倍 */
+    background-color: var(--item_hover_color);
 }
 
-.projectItemLeft {
-    z-index: 1;
-    max-width: 70%;
+.projectItem:hover .projectItemLeft {
+    width: 100%;
 }
 
-.projectItemLeft h1 {
-    margin: 0;
-    color: var(--item_left_title_color);
-    font-size: 23px;
+.projectItem:hover .projectItemRight {
+    width: 0%;
+}
+
+.projectItem:hover .projectItemRight img {
+    transform: rotate(40deg);
+}
+
+.projectItem:hover h1 {
+    font-size: 18px;
 }
 
 .projectItemLeft p {
-    margin: 10px 0 0;
+    font-size: 12px;
+    margin-top: 15px;
     color: var(--item_left_text_color);
-    font-size: 14px;
-    line-height: 1.45;
 }
 
+
+.projectItemLeft h1 {
+    font-weight: normal;
+    font-size: 16px;
+    margin: 0px;
+
+    transition: font-size 0.4s ease;
+    color: var(--item_left_title_color);
+}
+
+.projectItemLeft {
+    transition: width 0.4s ease;
+    height: 100%;
+    width: 80%;
+}
+
+
 .projectItemRight {
-    position: absolute;
-    right: -14px;
-    bottom: -17px;
-    width: 110px;
-    height: 110px;
-    opacity: 0.9;
+    overflow: hidden;
+    transition: width 0.4s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 20%;
+    height: 100%;
 }
 
 .projectItemRight img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
+
+    height: 39px;
+    width: 39px;
+
 }
 
 .skill {
-    overflow: hidden;
-    border-radius: 15px;
-    backdrop-filter: blur(var(--card_filter));
-    -webkit-backdrop-filter: blur(var(--card_filter));
-    background: var(--item_bg_color);
-}
-
-.skill img {
-    display: block;
+    padding: 25px;
     width: 100%;
 }
 
-#skillWap {
+.skill img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.skill #skillWap {
     display: none;
 }
 
 footer {
+    position: absolute;
+    padding: 10px;
+    text-align: center;
     width: 100%;
-    height: 20px;
+    backdrop-filter: blur(var(--card_filter));
+    -webkit-backdrop-filter: blur(var(--card_filter));
+    background: var(--item_bg_color);
+    color: var(--footer_text_color);
+    font-size: 13px;
+    bottom: 0;
 }
 
-.tc {
-    position: fixed;
-    z-index: 1000;
-    top: 0;
-    left: 0;
-    display: none;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.55);
-    justify-content: center;
-    align-items: center;
-}
+@media (min-width: 800px) {
 
-.tc.active {
-    display: flex;
-}
-
-.tc-main {
-    width: min(90%, 800px);
-    max-height: 90%;
-    overflow: auto;
-    padding: 16px;
-    background: #ffffff;
-    border-radius: 14px;
-    transform: scale(0.9);
-    opacity: 0;
-    transition: transform 0.2s ease, opacity 0.2s ease;
-}
-
-.tc-main.active {
-    transform: scale(1);
-    opacity: 1;
-}
-
-.tc-img {
-    display: block;
-    width: 100%;
-}
-
-#fps {
-    color: var(--main_text_color);
-    font-size: 12px;
-}
-
-@media screen and (max-width: 800px) {
-    .zyyo-main {
-        display: block;
+    .index-logo {
+        display: none;
     }
+}
 
+@media (max-width: 1150px) {
+    .a {
+        width: calc(50% - 20px);
+    }
+.projectItem{
+    margin: 10px;
+}
+    .b {
+
+        width: calc(50% - 20px);
+
+
+    }
+}
+
+@media (max-width: 800px) {
     .zyyo-left {
         display: none;
     }
 
+    .a .projectItemRight {
+        display: none;
+
+    }
+
+    .a .projectItemRight img {
+        display: none;
+
+    }
+
+    .a .projectItemLeft {
+        width: 100%;
+    }
+
+    .a {
+
+        width: calc(50% - 18px);
+  margin: 9px;
+
+    }
+
+    .b {
+        height: 110px;
+        margin: 8px 15px;
+        width: calc(100% - 30px);
+    }
+
+
+
     .zyyo-right {
         width: 100%;
-        padding: 15px;
-    }
-
-    .index-logo {
-        width: 40%;
-        max-width: 150px;
-    }
-
-    .welcome {
-        font-size: 47px;
-    }
-
-    .description {
-        font-size: 17px;
     }
 
     .tanChiShe {
         width: 100%;
     }
 
-    .projectList {
-        grid-template-columns: 1fr;
+    .description {
+        font-size: 4vw;
     }
 
-    #skillPc {
+    .welcome {
+        font-size: 10vw;
+        margin: 2vw 0;
+
+    }
+    .iconContainer {
+  
+     margin-top: 4vw;
+
+}
+.projectItem{
+    padding: 10px;
+}
+    .projectItemLeft p {
+        font-size: 13px;
+    }
+
+    .projectItemLeft h1 {
+
+        font-size: 18px;
+    }
+
+    .projectItem:hover h1 {
+
+        font-size: 20px;
+
+    }
+
+    .skill #skillWap {
+        display: block;
+    }
+
+    .skill #skillPc {
         display: none;
     }
 
-    #skillWap {
-        display: block;
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+.tc {
+    position: fixed;
+   
+    display: flex;
+    visibility: hidden;
+    width: 100vw;
+    height: 100vh;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    background: rgba(20, 20, 20, 0.5);
+    z-index: 99999;
+    align-items: center;
+    top: 0;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.tc-main {
+    z-index: 100000;
+    
+    width: 80%;
+    max-width: 300px;
+    min-height: 200px;
+    background-color: #ffffff;
+    border-radius: 15px;
+
+    display: flex;
+    transition: transform 0.2s linear;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transform: translateY(30%) scale(0.5);
+
+}
+
+.tc-img {
+    width: 100%;
+    height: 100%;
+}
+
+.tc.active {
+    visibility: visible;
+}
+
+.tc-main.active {
+
+    transform: translateY(0) scale(1);
+
+}
+
+
+
+
+
+
+
+
+
+.onoffswitch {
+    position: relative;
+    width: 38px;
+    height: 20px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.onoffswitch-checkbox {
+    display: none;
+}
+
+.onoffswitch-label {
+    display: block;
+    overflow: hidden;
+    cursor: pointer;
+    height: 100%;
+    border-radius: 50px;
+}
+
+.onoffswitch-inner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 200%;
+    height: 100%;
+    margin-left: -100%;
+    transition: margin 0.2s ease-in 0s;
+}
+
+.onoffswitch-inner:before,
+.onoffswitch-inner:after {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    float: left;
+    width: 50%;
+    height: 100%;
+    padding: 0;
+    font-size: 12px;
+    color: white;
+    font-family: Trebuchet, Arial, sans-serif;
+    font-weight: bold;
+    box-sizing: border-box;
+}
+
+.onoffswitch-inner:before {
+    content: "";
+    background-color: rgb(110 110 110 / 50%);
+    color: #FFFFFF;
+    text-align: left;
+}
+
+.onoffswitch-inner:after {
+    content: "";
+    background-color: #272727;
+    color: #FAFAFA;
+    text-align: right;
+}
+
+.onoffswitch-switch {
+    display: block;
+    height: 70%;
+    aspect-ratio: 1/1;
+    background: #FFFFFF;
+    position: absolute;
+    top: 12.5%;
+    bottom: 12.5%;
+    right: 5px;
+
+    border-radius: 20px;
+    transition: right 0.2s ease-in 0s;
+}
+
+.onoffswitch-checkbox:checked+.onoffswitch-label .onoffswitch-inner {
+    margin-left: 0;
+}
+
+.onoffswitch-checkbox:checked+.onoffswitch-label .onoffswitch-switch {
+    right: 50%;
 }
