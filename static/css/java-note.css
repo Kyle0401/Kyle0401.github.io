@@ -72,10 +72,26 @@ td code { white-space: nowrap; }
 .callout.caution::before { background: #d69b1c; }
 .callout p { margin: 0; }
 .figure { margin: 24px 0 30px; padding: 13px; background: #f8f9fc; border: 1px solid var(--note-line); border-radius: 16px; }
-.figure img { display: block; width: 100%; height: auto; border-radius: 10px; }
+.figure img { display: block; width: 100%; max-width: 100%; height: auto; border-radius: 10px; }
 .figure figcaption { padding: 11px 5px 2px; color: var(--note-muted); font-size: 13px; text-align: center; }
 .article-footer { display: flex; justify-content: space-between; gap: 14px; margin-top: 52px; padding-top: 22px; border-top: 1px solid var(--note-line); color: var(--note-muted); font-size: 13px; }
 .article-footer a { color: var(--note-accent); font-weight: 700; }
+
+/* JAVA 编译流程：使用原始 PNG，随正文宽度等比例缩放，避免裁切。 */
+.java-pipeline {
+    width: 100% !important;
+    max-width: 100% !important;
+    aspect-ratio: 1645 / 288;
+    margin: 24px 0 30px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background: url("../../learning/java/java-language/assets/image-20260613032810576.png") center / contain no-repeat !important;
+    background-color: transparent !important;
+    border-radius: 10px !important;
+}
+.java-pipeline .pipeline-track,
+.java-pipeline figcaption { display: none !important; }
+
 @media (max-width: 940px) {
     .note-layout,
     .note-layout.toc-collapsed { grid-template-columns: minmax(0, 820px); width: min(100% - 32px, 820px); padding-top: 26px; }
