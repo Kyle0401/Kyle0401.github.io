@@ -90,6 +90,26 @@ document.addEventListener('DOMContentLoaded', function () {
         favicon.type = 'image/svg+xml';
     }
 
+    var mailButton = document.querySelector('.iconItem[aria-label="Mail"]');
+    if (mailButton) {
+        mailButton.setAttribute('role', 'button');
+        mailButton.setAttribute('tabindex', '0');
+        mailButton.setAttribute('title', '点击查看邮箱');
+        mailButton.style.cursor = 'pointer';
+
+        function showMailAddress() {
+            window.prompt('我的邮箱（可直接复制）：', '1154727104@qq.com');
+        }
+
+        mailButton.addEventListener('click', showMailAddress);
+        mailButton.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                showMailAddress();
+            }
+        });
+    }
+
     var sectionTitles = document.querySelectorAll('main > .title');
     var sectionLabels = ['Site', 'Project', 'Skills'];
     sectionTitles.forEach(function (title, index) {
