@@ -190,6 +190,22 @@ document.addEventListener('DOMContentLoaded', function () {
     var html = document.querySelector('html');
     var themeState = getCookie('themeState') || 'Light';
     var tanChiShe = document.getElementById('tanChiShe');
+    var themeSwitch = document.querySelector('.switch');
+
+    if (themeSwitch && !themeSwitch.querySelector('.switchLabel')) {
+        var switchLabel = document.createElement('span');
+        switchLabel.className = 'switchLabel';
+        switchLabel.textContent = '关灯';
+        switchLabel.style.whiteSpace = 'nowrap';
+        switchLabel.style.fontSize = '13px';
+        switchLabel.style.fontWeight = '700';
+        switchLabel.style.lineHeight = '1';
+        themeSwitch.insertBefore(switchLabel, themeSwitch.firstChild);
+        themeSwitch.style.width = '91px';
+        themeSwitch.style.gap = '6px';
+        themeSwitch.style.padding = '0 8px';
+        themeSwitch.style.justifyContent = 'space-between';
+    }
 
     function changeTheme(theme) {
         tanChiShe.src = './static/svg/snake-' + theme + '.svg';
