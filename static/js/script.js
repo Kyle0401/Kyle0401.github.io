@@ -110,6 +110,26 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    var qqButton = document.querySelector('.iconItem[aria-label="QQ"]');
+    if (qqButton) {
+        qqButton.setAttribute('role', 'button');
+        qqButton.setAttribute('tabindex', '0');
+        qqButton.setAttribute('title', '点击查看QQ帐号');
+        qqButton.style.cursor = 'pointer';
+
+        function showQQAccount() {
+            window.prompt('我的QQ帐号（微信同号，可直接复制）：', '1154727104');
+        }
+
+        qqButton.addEventListener('click', showQQAccount);
+        qqButton.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                showQQAccount();
+            }
+        });
+    }
+
     var sectionTitles = document.querySelectorAll('main > .title');
     var sectionLabels = ['Site', 'Project', 'Skills'];
     sectionTitles.forEach(function (title, index) {
