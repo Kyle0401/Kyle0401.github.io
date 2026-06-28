@@ -15,28 +15,47 @@
 html { scroll-behavior: smooth; }
 body { min-width: 320px; margin: 0; color: var(--note-text); background: radial-gradient(circle at 6% 0%, rgba(156, 181, 255, .42), transparent 25rem), var(--note-bg); font-family: "Microsoft YaHei", "PingFang SC", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
 a { color: inherit; text-decoration: none; }
-.note-topbar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; gap: 18px; min-height: 68px; padding: 0 max(24px, calc((100% - 1240px) / 2)); background: rgba(245,247,252,.84); border-bottom: 1px solid rgba(228,233,242,.78); backdrop-filter: blur(14px); }
+.note-topbar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; gap: 18px; min-height: 68px; padding: 0 max(24px, calc((100% - 1300px) / 2)); background: rgba(245,247,252,.84); border-bottom: 1px solid rgba(228,233,242,.78); backdrop-filter: blur(14px); }
 .note-brand { display: inline-flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 800; }
 .note-brand-mark { display: grid; width: 34px; height: 34px; place-items: center; color: #fff; background: linear-gradient(135deg, #5b6ee1, #8c61d7); border-radius: 11px; box-shadow: 0 8px 20px rgba(91,110,225,.25); }
 .note-back { color: var(--note-muted); font-size: 14px; transition: color .2s ease; }
 .note-back:hover { color: var(--note-accent); }
-.note-layout { display: grid; grid-template-columns: 230px minmax(0, 820px); justify-content: center; gap: 28px; width: min(1240px, calc(100% - 48px)); margin: 0 auto; padding: 34px 0 72px; transition: grid-template-columns .25s ease; }
+
+/* 左侧目录预留更宽的内容区，避免多级标题在桌面端过早换行。 */
+.note-layout { display: grid; grid-template-columns: minmax(292px, 330px) minmax(0, 820px); justify-content: center; gap: 30px; width: min(1300px, calc(100% - 48px)); margin: 0 auto; padding: 34px 0 72px; transition: grid-template-columns .25s ease; }
 .note-layout.toc-collapsed { grid-template-columns: 52px minmax(0, 820px); }
-.toc { position: sticky; top: 100px; align-self: start; overflow: hidden; background: rgba(255,255,255,.78); border: 1px solid rgba(255,255,255,.75); border-radius: 18px; box-shadow: 0 10px 28px rgba(35,45,80,.05); transition: width .25s ease, border-radius .25s ease, box-shadow .25s ease; }
+.toc { position: sticky; top: 100px; align-self: start; overflow: hidden; background: rgba(255,255,255,.82); border: 1px solid rgba(255,255,255,.78); border-radius: 18px; box-shadow: 0 10px 28px rgba(35,45,80,.05); transition: width .25s ease, border-radius .25s ease, box-shadow .25s ease; }
 .toc-toggle { display: flex; align-items: center; width: 100%; min-height: 52px; padding: 0 17px; color: var(--note-text); background: transparent; border: 0; cursor: pointer; font: inherit; text-align: left; }
 .toc-toggle:hover { color: var(--note-accent-deep); background: var(--note-soft); }
 .toc-toggle-icon { display: grid; flex: 0 0 18px; width: 18px; height: 18px; place-items: center; font-size: 16px; line-height: 1; }
 .toc-toggle-text { margin-left: 9px; font-size: 13px; font-weight: 800; letter-spacing: .05em; }
 .toc-toggle-chevron { margin-left: auto; color: var(--note-muted); font-size: 15px; line-height: 1; transform: rotate(180deg); transition: transform .2s ease; }
-.toc-content { padding: 0 20px 20px; }
-.toc-title { margin: 0 0 13px; color: var(--note-muted); font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
-.toc a { display: block; padding: 8px 10px; color: #5d687a; border-radius: 9px; font-size: 13px; line-height: 1.45; transition: color .2s ease, background .2s ease; }
+.toc-content { padding: 0 16px 20px; }
+.toc-title { margin: 0 0 11px; color: var(--note-muted); font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.toc a { display: block; padding: 7px 8px; color: #5d687a; border-radius: 9px; font-size: 13px; line-height: 1.45; transition: color .2s ease, background .2s ease; }
 .toc a:hover { color: var(--note-accent-deep); background: var(--note-soft); }
 .toc.is-collapsed { width: 52px; border-radius: 14px; }
 .toc.is-collapsed .toc-toggle { justify-content: center; padding: 0; }
 .toc.is-collapsed .toc-toggle-text,
 .toc.is-collapsed .toc-toggle-chevron,
 .toc.is-collapsed .toc-content { display: none; }
+
+/* 嵌套目录树：移除浏览器默认圆点，并压缩每级缩进。 */
+#toc-links > ul,
+#toc-links ul { margin: 0; padding: 0; list-style: none; }
+#toc-links .toc-row { display: flex; align-items: flex-start; min-width: 0; width: 100%; }
+#toc-links .toc-children { margin: 2px 0 5px 2px !important; padding-left: 8px !important; border-left: 1px solid #e2e7f2; }
+#toc-links .toc-link { flex: 1 1 auto; min-width: 0; padding: 6px 5px; overflow-wrap: anywhere; word-break: normal; font-size: 12.5px; line-height: 1.46; }
+#toc-links .toc-item-toggle { flex: 0 0 16px !important; width: 16px !important; height: 30px !important; margin: 0 2px 0 0; padding: 0; color: #7b879a; background: transparent; border: 0; cursor: pointer; font-size: 13px; line-height: 1; }
+#toc-links .toc-item-toggle:hover { color: var(--note-accent-deep); }
+#toc-links .toc-item-toggle.is-placeholder { visibility: hidden; pointer-events: none; }
+#toc-links .toc-level-1 > .toc-row .toc-link { color: #35415b; font-size: 14px; font-weight: 800; }
+#toc-links .toc-level-2 > .toc-row .toc-link { color: #435066; font-size: 13px; font-weight: 700; }
+#toc-links .toc-level-3 > .toc-row .toc-link,
+#toc-links .toc-level-4 > .toc-row .toc-link,
+#toc-links .toc-level-5 > .toc-row .toc-link,
+#toc-links .toc-level-6 > .toc-row .toc-link { color: #657084; font-size: 12.5px; font-weight: 500; }
+
 .note-main { min-width: 0; }
 .breadcrumb { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 18px; color: var(--note-muted); font-size: 13px; }
 .breadcrumb a:hover { color: var(--note-accent); }
@@ -74,31 +93,21 @@ td code { white-space: nowrap; }
 .figure { margin: 24px 0 30px; padding: 13px; background: #f8f9fc; border: 1px solid var(--note-line); border-radius: 16px; }
 .figure img { display: block; width: 100%; max-width: 100%; height: auto; border-radius: 10px; }
 .figure figcaption { padding: 11px 5px 2px; color: var(--note-muted); font-size: 13px; text-align: center; }
+
+/* 原始 Java 编译流程图：直接由 img 按本身比例撑开容器。 */
+#article-content .java-diagram { width: 100%; max-width: 100%; margin: 24px 0 30px; padding: 0; overflow: hidden; background: transparent; border: 0; border-radius: 12px; }
+#article-content .java-diagram img { display: block; width: 100%; max-width: 100%; height: auto; min-height: 0; object-fit: contain; border-radius: 12px; }
+#article-content .java-diagram figcaption { padding: 10px 5px 0; }
+
 .article-footer { display: flex; justify-content: space-between; gap: 14px; margin-top: 52px; padding-top: 22px; border-top: 1px solid var(--note-line); color: var(--note-muted); font-size: 13px; }
 .article-footer a { color: var(--note-accent); font-weight: 700; }
 
-/* JAVA 编译流程：使用原始 PNG，随正文宽度等比例缩放，避免裁切。 */
-.java-pipeline {
-    width: 100% !important;
-    max-width: 100% !important;
-    aspect-ratio: 1645 / 288;
-    margin: 24px 0 30px !important;
-    padding: 0 !important;
-    overflow: hidden !important;
-    background: url("../../learning/java/java-language/assets/image-20260613032810576.png") center / contain no-repeat !important;
-    background-color: transparent !important;
-    border-radius: 10px !important;
-}
-.java-pipeline .pipeline-track,
-.java-pipeline figcaption { display: none !important; }
-
-@media (max-width: 940px) {
+@media (max-width: 1040px) {
     .note-layout,
     .note-layout.toc-collapsed { grid-template-columns: minmax(0, 820px); width: min(100% - 32px, 820px); padding-top: 26px; }
     .toc { position: static; width: 100%; }
-    .toc-content { display: flex; flex-wrap: wrap; gap: 4px; padding: 0 13px 13px; }
-    .toc-title { width: 100%; margin: 0 0 4px; }
-    .toc a { padding: 6px 8px; font-size: 12px; }
+    .toc-content { padding: 0 14px 14px; }
+    #toc-links .toc-children { margin-left: 1px !important; padding-left: 7px !important; }
     .toc.is-collapsed { width: 100%; }
     .toc.is-collapsed .toc-toggle { justify-content: flex-start; padding: 0 17px; }
 }
