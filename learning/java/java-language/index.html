@@ -8,14 +8,29 @@
     <link rel="icon" type="image/svg+xml" href="../../../static/img/logo-jy.svg">
     <link rel="stylesheet" href="../../../static/css/java-note.css">
     <style>
-        .java-pipeline { width: 100%; max-width: 100%; margin: 24px 0 30px; padding: clamp(12px, 2.8vw, 22px); overflow: hidden; color: #f7f7f7; background: #222326; border-radius: 16px; }
-        .pipeline-track { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(72px, .78fr) minmax(0, 1.15fr) minmax(72px, .78fr) minmax(0, 1.15fr); align-items: center; gap: clamp(8px, 1.7vw, 22px); width: 100%; }
-        .pipeline-node { display: grid; min-width: 0; min-height: clamp(88px, 16vw, 128px); padding: clamp(9px, 1.8vw, 16px); place-items: center; overflow-wrap: anywhere; border: 3px solid #48d675; border-radius: 6px; color: #f3f3f3; font-size: clamp(12px, 1.65vw, 24px); line-height: 1.6; text-align: center; }
-        .pipeline-node.source { border-color: #ff7a3d; }
-        .pipeline-node.machine { border-color: #58e9eb; }
-        .pipeline-arrow { position: relative; min-width: 0; padding: clamp(12px, 2vw, 22px) clamp(18px, 3.1vw, 35px) clamp(12px, 2vw, 22px) clamp(12px, 2.2vw, 20px); overflow-wrap: anywhere; color: #c26aff; background: #3c2b51; clip-path: polygon(0 0, 84% 0, 100% 50%, 84% 100%, 0 100%, 9% 50%); font-family: "Cascadia Code", Consolas, monospace; font-size: clamp(11px, 1.42vw, 20px); font-weight: 700; line-height: 1.35; text-align: center; }
-        .java-pipeline figcaption { margin-top: 20px; color: #f1f1f1; font-family: "KaiTi", "STKaiti", serif; font-size: clamp(16px, 2vw, 20px); font-style: italic; text-align: center; }
-        @media (max-width: 720px) { .pipeline-track { grid-template-columns: 1fr; gap: 12px; } .pipeline-arrow { width: min(280px, 92%); margin: 0 auto; clip-path: polygon(0 0, 100% 0, 100% 72%, 50% 100%, 0 72%); padding: 15px 20px 27px; } .pipeline-node { min-height: 92px; font-size: 16px; } }
+        .java-diagram { width: 100%; max-width: 100%; margin: 24px 0 30px; }
+        .java-diagram img { display: block; width: 100%; max-width: 100%; height: auto; object-fit: contain; }
+
+        .toc-tree,
+        .toc-tree ul { margin: 0; padding: 0; list-style: none; }
+        .toc-tree { width: 100%; }
+        .toc-children { margin: 2px 0 6px 10px !important; padding-left: 9px !important; border-left: 1px solid #e1e6f1; }
+        .toc-row { display: flex; align-items: flex-start; min-width: 0; }
+        .toc-link { flex: 1 1 auto; min-width: 0; }
+        .toc-item-toggle { flex: 0 0 20px; width: 20px; height: 31px; margin: 0; padding: 0; color: #7b879a; background: transparent; border: 0; cursor: pointer; font-size: 15px; line-height: 1; transition: color .2s ease, transform .2s ease; }
+        .toc-item-toggle:hover { color: var(--note-accent-deep); }
+        .toc-item-toggle.is-placeholder { visibility: hidden; pointer-events: none; }
+        .toc-item.is-collapsed > .toc-children { display: none; }
+        .toc-item.is-collapsed > .toc-row .toc-item-toggle { transform: rotate(-90deg); }
+        .toc-level-1 > .toc-row .toc-link { color: #35415b; font-weight: 800; }
+        .toc-level-2 > .toc-row .toc-link { font-weight: 700; }
+        .toc-level-3 > .toc-row .toc-link,
+        .toc-level-4 > .toc-row .toc-link,
+        .toc-level-5 > .toc-row .toc-link,
+        .toc-level-6 > .toc-row .toc-link { font-size: 12px; }
+        @media (max-width: 940px) {
+            .toc-children { margin-left: 8px !important; }
+        }
     </style>
 </head>
 <body>
@@ -98,14 +113,10 @@
             }
 
             function renderPipeline() {
-                return '<figure class="java-pipeline">' +
-                    '<div class="pipeline-track">' +
-                        '<div class="pipeline-node source">用 Java 编写的程序</div>' +
-                        '<div class="pipeline-arrow">Java-编译器</div>' +
-                        '<div class="pipeline-node">由特殊代码（字节码）构成的程序</div>' +
-                        '<div class="pipeline-arrow">Java 虚拟机</div>' +
-                        '<div class="pipeline-node machine">由机器码构成的程序</div>' +
-                    '</div><figcaption>Java 的编译阶段</figcaption></figure>';
+                return '<figure class="figure java-diagram">' +
+                    '<img src="./assets/image-20260613032810576.png" alt="Java 的编译阶段" loading="lazy">' +
+                    '<figcaption>Java 的编译阶段</figcaption>' +
+                    '</figure>';
             }
 
             function parseMarkdown(markdown) {
@@ -212,18 +223,79 @@
             }
 
             function buildToc() {
-                var headings = Array.prototype.slice.call(contentNode.querySelectorAll('h2'));
+                var headings = Array.prototype.slice.call(contentNode.querySelectorAll('h1, h2, h3, h4, h5, h6'));
+                var rootList = document.createElement('ul');
+                var stack = [{ level: 0, list: rootList }];
+                var h2Index = 0;
+
                 tocLinksNode.innerHTML = '';
+
                 headings.forEach(function (heading, index) {
+                    var level = Number(heading.tagName.slice(1));
                     var label = heading.textContent;
                     var id = 'section-' + (index + 1);
                     heading.id = id;
-                    heading.innerHTML = '<span class="section-index">' + String(index + 1).padStart(2, '0') + '</span>' + heading.innerHTML;
+
+                    if (level === 2) {
+                        h2Index++;
+                        heading.innerHTML = '<span class="section-index">' + String(h2Index).padStart(2, '0') + '</span>' + heading.innerHTML;
+                    }
+
+                    while (stack.length > 1 && level <= stack[stack.length - 1].level) {
+                        stack.pop();
+                    }
+
+                    var parent = stack[stack.length - 1];
+                    var item = document.createElement('li');
+                    item.className = 'toc-item toc-level-' + level;
+
+                    var row = document.createElement('div');
+                    row.className = 'toc-row';
+
+                    var itemToggle = document.createElement('button');
+                    itemToggle.type = 'button';
+                    itemToggle.className = 'toc-item-toggle is-placeholder';
+                    itemToggle.setAttribute('aria-hidden', 'true');
+                    itemToggle.tabIndex = -1;
+                    itemToggle.textContent = '⌄';
+
                     var link = document.createElement('a');
+                    link.className = 'toc-link';
                     link.href = '#' + id;
                     link.textContent = label;
-                    tocLinksNode.appendChild(link);
+
+                    var children = document.createElement('ul');
+                    children.className = 'toc-children';
+
+                    row.appendChild(itemToggle);
+                    row.appendChild(link);
+                    item.appendChild(row);
+                    item.appendChild(children);
+                    parent.list.appendChild(item);
+                    stack.push({ level: level, list: children });
                 });
+
+                Array.prototype.slice.call(rootList.querySelectorAll('.toc-item')).forEach(function (item) {
+                    var children = item.lastElementChild;
+                    var itemToggle = item.querySelector(':scope > .toc-row > .toc-item-toggle');
+
+                    if (children && children.children.length > 0) {
+                        itemToggle.classList.remove('is-placeholder');
+                        itemToggle.removeAttribute('aria-hidden');
+                        itemToggle.removeAttribute('tabindex');
+                        itemToggle.setAttribute('aria-expanded', 'true');
+                        itemToggle.setAttribute('aria-label', '收起子目录');
+                        itemToggle.addEventListener('click', function () {
+                            var collapsed = item.classList.toggle('is-collapsed');
+                            itemToggle.setAttribute('aria-expanded', String(!collapsed));
+                            itemToggle.setAttribute('aria-label', collapsed ? '展开子目录' : '收起子目录');
+                        });
+                    } else if (children) {
+                        children.remove();
+                    }
+                });
+
+                tocLinksNode.appendChild(rootList);
             }
 
             fetch('./JAVA学习.md')
