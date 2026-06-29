@@ -102,6 +102,14 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    var descriptions = document.querySelectorAll('.description');
+    if (descriptions.length > 0) {
+        descriptions[0].innerHTML = '👦 <span class="purpleText textBackground">寄</span>算机大<span class="purpleText textBackground">摆子</span>';
+    }
+    if (descriptions.length > 1) {
+        descriptions[1].innerHTML = '📝 <span class="purpleText textBackground">Man</span> proposes, <span class="purpleText textBackground">God</span> disposes';
+    }
+
     var mailButton = document.querySelector('.iconItem[aria-label="Mail"]');
     if (mailButton) {
         mailButton.setAttribute('role', 'button');
