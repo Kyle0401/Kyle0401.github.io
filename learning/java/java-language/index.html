@@ -18,8 +18,7 @@
         .article pre.code-block code { color: #a9b7c6; font-variant-ligatures: none; }
         .java-token.keyword { color: #cc7832; font-weight: 700; }
         .java-token.type { color: #ffc66d; }
-        .java-token.string { color: #6a8759; }
-        .java-token.character { color: #6a8759; }
+        .java-token.string, .java-token.character { color: #6a8759; }
         .java-token.comment { color: #808080; font-style: italic; }
         .java-token.number { color: #6897bb; }
         .java-token.literal { color: #cc7832; font-weight: 700; }
@@ -28,9 +27,13 @@
         .java-token.class-name { color: #a9b7c6; font-weight: 700; }
         .java-token.operator { color: #a9b7c6; }
 
-        #toc-links > ul,
-        #toc-links ul { margin: 0; padding: 0; list-style: none; }
+        #toc-links > ul, #toc-links ul { margin: 0; padding: 0; list-style: none; }
         .toc-tree { width: 100%; }
+        .toc-title-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 0 0 9px; }
+        .toc-title-row .toc-title { margin: 0; }
+        .toc-bulk-toggle { flex: 0 0 auto; padding: 4px 7px; color: #647085; background: #f1f4f9; border: 1px solid #dce3ef; border-radius: 6px; cursor: pointer; font-family: inherit; font-size: 11px; font-weight: 700; line-height: 1.2; transition: color .2s ease, background .2s ease, border-color .2s ease; }
+        .toc-bulk-toggle:hover { color: var(--note-accent-deep); background: #e9eef8; border-color: #cbd6e8; }
+        .toc-bulk-toggle:focus-visible { outline: 2px solid var(--note-accent); outline-offset: 2px; }
         .toc-children { margin: 2px 0 6px 2px; padding-left: 8px; border-left: 1px solid #e1e6f1; }
         .toc-row { display: flex; align-items: flex-start; min-width: 0; }
         .toc-link { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; word-break: normal; }
@@ -41,10 +44,11 @@
         .toc-item.is-collapsed > .toc-row .toc-item-toggle { transform: rotate(-90deg); }
         .toc-level-1 > .toc-row .toc-link { color: #35415b; font-size: 14px; font-weight: 800; }
         .toc-level-2 > .toc-row .toc-link { color: #435066; font-size: 13px; font-weight: 700; }
-        .toc-level-3 > .toc-row .toc-link,
-        .toc-level-4 > .toc-row .toc-link,
-        .toc-level-5 > .toc-row .toc-link,
-        .toc-level-6 > .toc-row .toc-link { color: #657084; font-size: 12.5px; font-weight: 500; }
+        .toc-level-3 > .toc-row .toc-link, .toc-level-4 > .toc-row .toc-link, .toc-level-5 > .toc-row .toc-link, .toc-level-6 > .toc-row .toc-link { color: #657084; font-size: 12.5px; font-weight: 500; }
+
+        @media (max-width: 760px) {
+            .toc-bulk-toggle { padding: 3px 6px; font-size: 10px; }
+        }
     </style>
 </head>
 <body>
@@ -64,7 +68,10 @@
                 <span class="toc-toggle-chevron" aria-hidden="true">⌄</span>
             </button>
             <div class="toc-content" id="toc-content">
-                <p class="toc-title">On this page</p>
+                <div class="toc-title-row">
+                    <p class="toc-title">On this page</p>
+                    <button class="toc-bulk-toggle" id="toc-bulk-toggle" type="button" aria-label="折叠全部子目录">全部折叠</button>
+                </div>
                 <nav id="toc-links" aria-label="文章目录链接"></nav>
             </div>
         </aside>
@@ -97,6 +104,7 @@
             var tocNode = document.getElementById('toc');
             var tocLinksNode = document.getElementById('toc-links');
             var tocToggle = document.getElementById('toc-toggle');
+            var tocBulkToggle = document.getElementById('toc-bulk-toggle');
             var layoutNode = document.getElementById('note-layout');
 
             function setTocCollapsed(collapsed) {
@@ -108,6 +116,43 @@
 
             tocToggle.addEventListener('click', function () {
                 setTocCollapsed(!tocNode.classList.contains('is-collapsed'));
+            });
+
+            function getTocBranchItems() {
+                return Array.prototype.slice.call(tocLinksNode.querySelectorAll('.toc-item')).filter(function (item) {
+                    var children = item.querySelector(':scope > .toc-children');
+                    return children && children.children.length > 0;
+                });
+            }
+
+            function setTocBranchesCollapsed(collapsed) {
+                getTocBranchItems().forEach(function (item) {
+                    var itemToggle = item.querySelector(':scope > .toc-row > .toc-item-toggle');
+                    item.classList.toggle('is-collapsed', collapsed);
+                    if (itemToggle) {
+                        itemToggle.setAttribute('aria-expanded', String(!collapsed));
+                        itemToggle.setAttribute('aria-label', collapsed ? '展开子目录' : '收起子目录');
+                    }
+                });
+                updateBulkToggle();
+            }
+
+            function updateBulkToggle() {
+                var branches = getTocBranchItems();
+                var allCollapsed = branches.length > 0 && branches.every(function (item) {
+                    return item.classList.contains('is-collapsed');
+                });
+                tocBulkToggle.textContent = allCollapsed ? '全部展开' : '全部折叠';
+                tocBulkToggle.setAttribute('aria-label', allCollapsed ? '展开全部子目录' : '折叠全部子目录');
+                tocBulkToggle.disabled = branches.length === 0;
+            }
+
+            tocBulkToggle.addEventListener('click', function () {
+                var branches = getTocBranchItems();
+                var shouldCollapse = !branches.length || !branches.every(function (item) {
+                    return item.classList.contains('is-collapsed');
+                });
+                setTocBranchesCollapsed(shouldCollapse);
             });
 
             function escapeHtml(value) {
@@ -165,7 +210,6 @@
                         index = lineEnd;
                         continue;
                     }
-
                     if (current === '/' && next === '*') {
                         var blockEnd = source.indexOf('*/', index + 2);
                         if (blockEnd === -1) blockEnd = length - 2;
@@ -173,26 +217,18 @@
                         index = blockEnd + 2;
                         continue;
                     }
-
                     if (current === '"' || current === "'") {
                         var quote = current;
                         var stringEnd = index + 1;
                         while (stringEnd < length) {
-                            if (source.charAt(stringEnd) === '\\') {
-                                stringEnd += 2;
-                                continue;
-                            }
-                            if (source.charAt(stringEnd) === quote) {
-                                stringEnd++;
-                                break;
-                            }
+                            if (source.charAt(stringEnd) === '\\') { stringEnd += 2; continue; }
+                            if (source.charAt(stringEnd) === quote) { stringEnd++; break; }
                             stringEnd++;
                         }
                         output += token(quote === '"' ? 'string' : 'character', source.slice(index, stringEnd));
                         index = stringEnd;
                         continue;
                     }
-
                     if (current === '@' && /[A-Za-z_$]/.test(next || '')) {
                         var annotationEnd = index + 1;
                         while (annotationEnd < length && /[\w$]/.test(source.charAt(annotationEnd))) annotationEnd++;
@@ -200,7 +236,6 @@
                         index = annotationEnd;
                         continue;
                     }
-
                     if (/[A-Za-z_$]/.test(current)) {
                         var wordEnd = index + 1;
                         while (wordEnd < length && /[\w$]/.test(source.charAt(wordEnd))) wordEnd++;
@@ -211,23 +246,15 @@
                         while (before >= 0 && /\s/.test(source.charAt(before))) before--;
                         var previousWord = source.slice(Math.max(0, before - 12), before + 1);
 
-                        if (keywords[word]) {
-                            output += token('keyword', word);
-                        } else if (types[word]) {
-                            output += token('type', word);
-                        } else if (literals[word]) {
-                            output += token('literal', word);
-                        } else if (/\b(class|interface|enum)\s*$/.test(previousWord)) {
-                            output += token('class-name', word);
-                        } else if (source.charAt(after) === '(') {
-                            output += token('method', word);
-                        } else {
-                            output += escapeHtml(word);
-                        }
+                        if (keywords[word]) output += token('keyword', word);
+                        else if (types[word]) output += token('type', word);
+                        else if (literals[word]) output += token('literal', word);
+                        else if (/\b(class|interface|enum)\s*$/.test(previousWord)) output += token('class-name', word);
+                        else if (source.charAt(after) === '(') output += token('method', word);
+                        else output += escapeHtml(word);
                         index = wordEnd;
                         continue;
                     }
-
                     if (/\d/.test(current)) {
                         var numberEnd = index + 1;
                         while (numberEnd < length && /[\d._xXa-fA-FbBlLfFdDeE+-]/.test(source.charAt(numberEnd))) numberEnd++;
@@ -235,15 +262,9 @@
                         index = numberEnd;
                         continue;
                     }
-
-                    if (/[-+*/%=!<>&|?:]/.test(current)) {
-                        output += token('operator', current);
-                    } else {
-                        output += escapeHtml(current);
-                    }
+                    output += /[-+*/%=!<>&|?:]/.test(current) ? token('operator', current) : escapeHtml(current);
                     index++;
                 }
-
                 return output;
             }
 
@@ -252,34 +273,22 @@
             }
 
             function renderPipeline() {
-                return '<figure class="figure java-diagram">' +
-                    '<img src="./assets/image-20260613032810576.png" alt="Java 的编译阶段" loading="lazy">' +
-                    '<figcaption>Java 的编译阶段</figcaption>' +
-                    '</figure>';
+                return '<figure class="figure java-diagram"><img src="./assets/image-20260613032810576.png" alt="Java 的编译阶段" loading="lazy"><figcaption>Java 的编译阶段</figcaption></figure>';
             }
 
             function parseMarkdown(markdown) {
                 var lines = markdown.replace(/\r\n?/g, '\n').split('\n');
                 var html = [];
                 var i = 0;
-
                 while (i < lines.length) {
                     var line = lines[i];
                     var nextLine = lines[i + 1] || '';
-
-                    if (!line.trim()) {
-                        i++;
-                        continue;
-                    }
-
+                    if (!line.trim()) { i++; continue; }
                     if (/^```/.test(line)) {
                         var language = line.replace(/^```/, '').trim() || 'text';
                         var code = [];
                         i++;
-                        while (i < lines.length && !/^```/.test(lines[i])) {
-                            code.push(lines[i]);
-                            i++;
-                        }
+                        while (i < lines.length && !/^```/.test(lines[i])) { code.push(lines[i]); i++; }
                         if (i < lines.length) i++;
                         var sourceCode = code.join('\n');
                         var javaBlock = isJavaBlock(language, sourceCode);
@@ -288,19 +297,8 @@
                         html.push('<pre class="code-block" data-language="' + escapeHtml(displayLanguage) + '"><code class="language-' + escapeHtml(displayLanguage) + '">' + renderedCode + '</code></pre>');
                         continue;
                     }
-
-                    if (/^!\[.*?\]\(.+?\)$/.test(line)) {
-                        html.push(renderPipeline());
-                        i++;
-                        continue;
-                    }
-
-                    if (/^-{3,}\s*$/.test(line)) {
-                        html.push('<hr>');
-                        i++;
-                        continue;
-                    }
-
+                    if (/^!\[.*?\]\(.+?\)$/.test(line)) { html.push(renderPipeline()); i++; continue; }
+                    if (/^-{3,}\s*$/.test(line)) { html.push('<hr>'); i++; continue; }
                     if (/^>\s*\[!(IMPORTANT|CAUTION)\]/.test(line)) {
                         var kind = line.match(/^>\s*\[!(IMPORTANT|CAUTION)\]/)[1].toLowerCase();
                         var callout = [];
@@ -315,7 +313,6 @@
                         html.push('<div class="callout ' + (kind === 'caution' ? 'caution' : '') + '"><div><p>' + inline(callout.join(' ')) + '</p></div></div>');
                         continue;
                     }
-
                     var heading = line.match(/^(#{1,6})\s+(.+)$/);
                     if (heading) {
                         var level = heading[1].length;
@@ -323,45 +320,29 @@
                         i++;
                         continue;
                     }
-
                     if (/^\|/.test(line) && /^\|?\s*:?-{3,}/.test(nextLine)) {
                         var headers = splitTableRow(line);
                         i += 2;
                         var rows = [];
-                        while (i < lines.length && /^\|/.test(lines[i])) {
-                            rows.push(splitTableRow(lines[i]));
-                            i++;
-                        }
+                        while (i < lines.length && /^\|/.test(lines[i])) { rows.push(splitTableRow(lines[i])); i++; }
                         var table = '<div class="table-wrap"><table><thead><tr>' + headers.map(function (cell) { return '<th>' + inline(cell) + '</th>'; }).join('') + '</tr></thead><tbody>';
                         rows.forEach(function (row) {
-                            table += '<tr>' + headers.map(function (_, index) { return '<td>' + inline(row[index] || '') + '</td>'; }).join('') + '</tr>';
+                            table += '<tr>' + headers.map(function (_, cellIndex) { return '<td>' + inline(row[cellIndex] || '') + '</td>'; }).join('') + '</tr>';
                         });
                         html.push(table + '</tbody></table></div>');
                         continue;
                     }
-
                     if (/^-\s+/.test(line)) {
                         var items = [];
-                        while (i < lines.length && /^-\s+/.test(lines[i])) {
-                            items.push(lines[i].replace(/^-\s+/, ''));
-                            i++;
-                        }
+                        while (i < lines.length && /^-\s+/.test(lines[i])) { items.push(lines[i].replace(/^-\s+/, '')); i++; }
                         html.push('<ul>' + items.map(function (item) { return '<li>' + inline(item) + '</li>'; }).join('') + '</ul>');
                         continue;
                     }
-
                     var paragraph = [];
-                    while (i < lines.length && lines[i].trim() && !isBlockStart(lines[i], lines[i + 1] || '')) {
-                        paragraph.push(lines[i].trim());
-                        i++;
-                    }
-                    if (paragraph.length) {
-                        html.push('<p>' + inline(paragraph.join(' ')) + '</p>');
-                    } else {
-                        i++;
-                    }
+                    while (i < lines.length && lines[i].trim() && !isBlockStart(lines[i], lines[i + 1] || '')) { paragraph.push(lines[i].trim()); i++; }
+                    if (paragraph.length) html.push('<p>' + inline(paragraph.join(' ')) + '</p>');
+                    else i++;
                 }
-
                 return html.join('');
             }
 
@@ -369,15 +350,11 @@
                 var parts = window.__javaDiagramParts || [];
                 var image = contentNode.querySelector('.java-diagram img');
                 if (!image || parts.length !== 4) return;
-
                 var encodedImage = parts.join('');
                 if (encodedImage.length !== 9500) return;
-
                 var dataUrl = 'data:image/png;base64,' + encodedImage;
                 var verifier = new Image();
-                verifier.onload = function () {
-                    image.src = dataUrl;
-                };
+                verifier.onload = function () { image.src = dataUrl; };
                 verifier.src = dataUrl;
             }
 
@@ -385,8 +362,6 @@
                 var headings = Array.prototype.slice.call(contentNode.querySelectorAll('h1, h2, h3, h4, h5, h6'));
                 var rootList = document.createElement('ul');
                 var stack = [{ level: 0, list: rootList }];
-                var h2Index = 0;
-
                 rootList.className = 'toc-tree';
                 tocLinksNode.innerHTML = '';
 
@@ -395,38 +370,24 @@
                     var label = heading.textContent;
                     var id = 'section-' + (index + 1);
                     heading.id = id;
-
-                    if (level === 2) {
-                        h2Index++;
-                        heading.innerHTML = '<span class="section-index">' + String(h2Index).padStart(2, '0') + '</span>' + heading.innerHTML;
-                    }
-
-                    while (stack.length > 1 && level <= stack[stack.length - 1].level) {
-                        stack.pop();
-                    }
-
+                    while (stack.length > 1 && level <= stack[stack.length - 1].level) stack.pop();
                     var parent = stack[stack.length - 1];
                     var item = document.createElement('li');
                     item.className = 'toc-item toc-level-' + level;
-
                     var row = document.createElement('div');
                     row.className = 'toc-row';
-
                     var itemToggle = document.createElement('button');
                     itemToggle.type = 'button';
                     itemToggle.className = 'toc-item-toggle is-placeholder';
                     itemToggle.setAttribute('aria-hidden', 'true');
                     itemToggle.tabIndex = -1;
                     itemToggle.textContent = '⌄';
-
                     var link = document.createElement('a');
                     link.className = 'toc-link';
                     link.href = '#' + id;
                     link.textContent = label;
-
                     var children = document.createElement('ul');
                     children.className = 'toc-children';
-
                     row.appendChild(itemToggle);
                     row.appendChild(link);
                     item.appendChild(row);
@@ -438,7 +399,6 @@
                 Array.prototype.slice.call(rootList.querySelectorAll('.toc-item')).forEach(function (item) {
                     var children = item.lastElementChild;
                     var itemToggle = item.querySelector(':scope > .toc-row > .toc-item-toggle');
-
                     if (children && children.children.length > 0) {
                         itemToggle.classList.remove('is-placeholder');
                         itemToggle.removeAttribute('aria-hidden');
@@ -449,13 +409,14 @@
                             var collapsed = item.classList.toggle('is-collapsed');
                             itemToggle.setAttribute('aria-expanded', String(!collapsed));
                             itemToggle.setAttribute('aria-label', collapsed ? '展开子目录' : '收起子目录');
+                            updateBulkToggle();
                         });
                     } else if (children) {
                         children.remove();
                     }
                 });
-
                 tocLinksNode.appendChild(rootList);
+                updateBulkToggle();
             }
 
             fetch('./JAVA学习.md')
