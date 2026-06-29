@@ -40,7 +40,6 @@
 
 
 
-
 /*非常吃性能,低配手机会卡顿*/
 /*卡片模糊背景＋黑色透明卡片+白色svg**/
 html {
@@ -172,4 +171,14 @@ html {
 
 .switch:hover .switchLabel {
     display: block !important;
+}
+
+/* 主页第二句简介：替换为新引语，保留原有位置与字号。 */
+.welcome + .description + .description {
+    font-size: 0;
+}
+
+.welcome + .description + .description::after {
+    content: "Man proposes, God disposes";
+    font-size: 20px;
 }
