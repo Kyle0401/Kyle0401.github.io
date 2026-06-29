@@ -173,31 +173,16 @@ html {
     display: block !important;
 }
 
-/* 主页第一句简介：替换职业说明，保留图标、位置与字号。 */
-.welcome + .description {
-    font-size: 0;
-}
-
-.welcome + .description::after {
-    content: "👦 寄算机大摆子";
-    font-size: 20px;
-}
-
-/* 主页第二句简介：保留笔记图标，并完全替换旧内容。 */
+/* 主页简介：由脚本写入真实文本节点，支持局部高亮。 */
+.welcome + .description,
 .welcome + .description + .description {
-    font-size: 0;
-}
-
-.welcome + .description + .description > * {
-    display: none !important;
-}
-
-.welcome + .description + .description::before {
-    content: "📝 ";
     font-size: 20px;
 }
 
+.welcome + .description::before,
+.welcome + .description::after,
+.welcome + .description + .description::before,
 .welcome + .description + .description::after {
-    content: "Man proposes, God disposes";
-    font-size: 20px;
+    content: none !important;
+    display: none !important;
 }
