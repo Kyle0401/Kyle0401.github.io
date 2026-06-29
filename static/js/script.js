@@ -90,6 +90,18 @@ document.addEventListener('DOMContentLoaded', function () {
         favicon.type = 'image/svg+xml';
     }
 
+    var profileTagContainer = document.querySelector('.left-tag');
+    var profileTags = ['网瘾', '研0', '网页', 'linux', '跑者', '前端', '羽毛球', '小提琴'];
+    if (profileTagContainer) {
+        profileTagContainer.innerHTML = '';
+        profileTags.forEach(function (tagText) {
+            var tag = document.createElement('div');
+            tag.className = 'left-tag-item';
+            tag.textContent = tagText;
+            profileTagContainer.appendChild(tag);
+        });
+    }
+
     var mailButton = document.querySelector('.iconItem[aria-label="Mail"]');
     if (mailButton) {
         mailButton.setAttribute('role', 'button');
