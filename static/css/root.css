@@ -186,3 +186,13 @@ html {
     content: none !important;
     display: none !important;
 }
+
+/* 标签区域略微收紧：使 linux、跑者、嵌入式可同行显示。 */
+.left-tag {
+    padding: 10px !important;
+}
+
+.left-tag-item {
+    margin: 0 4px 4px 0 !important;
+    padding: 8px !important;
+}
