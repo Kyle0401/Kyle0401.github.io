@@ -179,13 +179,22 @@ html {
 }
 
 .welcome + .description::after {
-    content: "📝 寄算机大摆子";
+    content: "👦 寄算机大摆子";
     font-size: 20px;
 }
 
-/* 主页第二句简介：替换为新引语，保留原有位置与字号。 */
+/* 主页第二句简介：保留笔记图标，并完全替换旧内容。 */
 .welcome + .description + .description {
     font-size: 0;
+}
+
+.welcome + .description + .description > * {
+    display: none !important;
+}
+
+.welcome + .description + .description::before {
+    content: "📝 ";
+    font-size: 20px;
 }
 
 .welcome + .description + .description::after {
