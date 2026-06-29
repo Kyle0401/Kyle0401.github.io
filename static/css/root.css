@@ -173,6 +173,16 @@ html {
     display: block !important;
 }
 
+/* 主页第一句简介：替换职业说明，保留图标、位置与字号。 */
+.welcome + .description {
+    font-size: 0;
+}
+
+.welcome + .description::after {
+    content: "📝 寄算机大摆子";
+    font-size: 20px;
+}
+
 /* 主页第二句简介：替换为新引语，保留原有位置与字号。 */
 .welcome + .description + .description {
     font-size: 0;
