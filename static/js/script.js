@@ -11,15 +11,15 @@ document.addEventListener('contextmenu', function (event) {
     event.preventDefault();
 });
 
-function handlePress(event) {
+function handlePress() {
     this.classList.add('pressed');
 }
 
-function handleRelease(event) {
+function handleRelease() {
     this.classList.remove('pressed');
 }
 
-function handleCancel(event) {
+function handleCancel() {
     this.classList.remove('pressed');
 }
 
@@ -34,8 +34,7 @@ buttons.forEach(function (button) {
 });
 
 function toggleClass(selector, className) {
-    var elements = document.querySelectorAll(selector);
-    elements.forEach(function (element) {
+    document.querySelectorAll(selector).forEach(function (element) {
         element.classList.toggle(className);
     });
 }
@@ -50,13 +49,17 @@ function pop(imageURL) {
 }
 
 var tc = document.getElementsByClassName('tc');
-var tc_main = document.getElementsByClassName('tc-main');
-tc[0].addEventListener('click', function (event) {
-    pop();
-});
-tc_main[0].addEventListener('click', function (event) {
-    event.stopPropagation();
-});
+var tcMain = document.getElementsByClassName('tc-main');
+if (tc.length > 0) {
+    tc[0].addEventListener('click', function () {
+        pop();
+    });
+}
+if (tcMain.length > 0) {
+    tcMain[0].addEventListener('click', function (event) {
+        event.stopPropagation();
+    });
+}
 
 function setCookie(name, value, days) {
     var expires = '';
@@ -73,10 +76,10 @@ function getCookie(name) {
     var cookies = document.cookie.split(';');
     for (var i = 0; i < cookies.length; i++) {
         var cookie = cookies[i];
-        while (cookie.charAt(0) == ' ') {
+        while (cookie.charAt(0) === ' ') {
             cookie = cookie.substring(1, cookie.length);
         }
-        if (cookie.indexOf(nameEQ) == 0) {
+        if (cookie.indexOf(nameEQ) === 0) {
             return cookie.substring(nameEQ.length, cookie.length);
         }
     }
@@ -159,7 +162,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     var projectLists = document.querySelectorAll('.projectList');
-
     if (projectLists.length > 0) {
         var siteCards = projectLists[0].querySelectorAll('.projectItem');
 
@@ -207,6 +209,22 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    if (projectLists.length > 1) {
+        var projectCards = projectLists[1].querySelectorAll('.projectItem');
+
+        if (projectCards.length > 0) {
+            projectCards[0].querySelector('h1').textContent = '项目记录';
+            projectCards[0].querySelector('p').textContent = '项目的介绍与解读';
+            projectCards[0].querySelector('.projectItemRight img').alt = '项目记录图标';
+        }
+
+        if (projectCards.length > 1) {
+            projectCards[1].querySelector('h1').textContent = '代码仓库';
+            projectCards[1].querySelector('p').textContent = '存储项目代码';
+            projectCards[1].querySelector('.projectItemRight img').alt = '代码仓库图标';
+        }
+    }
+
     var html = document.querySelector('html');
     var themeState = getCookie('themeState') || 'Light';
     var tanChiShe = document.getElementById('tanChiShe');
@@ -228,25 +246,27 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function changeTheme(theme) {
-        tanChiShe.src = './static/svg/snake-' + theme + '.svg';
+        if (tanChiShe) {
+            tanChiShe.src = './static/svg/snake-' + theme + '.svg';
+        }
         html.dataset.theme = theme;
         setCookie('themeState', theme, 365);
         themeState = theme;
     }
 
-    var Checkbox = document.getElementById('myonoffswitch');
-    Checkbox.addEventListener('change', function () {
-        if (themeState == 'Dark') {
-            changeTheme('Light');
-        } else if (themeState == 'Light') {
-            changeTheme('Dark');
-        } else {
-            changeTheme('Dark');
-        }
-    });
+    var checkbox = document.getElementById('myonoffswitch');
+    if (checkbox) {
+        checkbox.addEventListener('change', function () {
+            if (themeState === 'Dark') {
+                changeTheme('Light');
+            } else {
+                changeTheme('Dark');
+            }
+        });
 
-    if (themeState == 'Dark') {
-        Checkbox.checked = false;
+        if (themeState === 'Dark') {
+            checkbox.checked = false;
+        }
     }
 
     changeTheme(themeState);
@@ -258,7 +278,7 @@ document.addEventListener('DOMContentLoaded', function () {
     fpsElement.style.left = '0';
     document.body.insertBefore(fpsElement, document.body.firstChild);
 
-    var showFPS = (function () {
+    (function showFPS() {
         var requestAnimationFrame = window.requestAnimationFrame ||
             window.webkitRequestAnimationFrame ||
             window.mozRequestAnimationFrame ||
@@ -268,26 +288,21 @@ document.addEventListener('DOMContentLoaded', function () {
                 window.setTimeout(callback, 1000 / 60);
             };
 
-        var fps = 0,
-            last = Date.now(),
-            offset, step, appendFps;
+        var fps = 0;
+        var last = Date.now();
 
-        step = function () {
-            offset = Date.now() - last;
+        function step() {
+            var offset = Date.now() - last;
             fps += 1;
 
             if (offset >= 1000) {
                 last += offset;
-                appendFps(fps);
+                fpsElement.textContent = 'FPS: ' + fps;
                 fps = 0;
             }
 
             requestAnimationFrame(step);
-        };
-
-        appendFps = function (fpsValue) {
-            fpsElement.textContent = 'FPS: ' + fpsValue;
-        };
+        }
 
         step();
     })();
@@ -296,6 +311,8 @@ document.addEventListener('DOMContentLoaded', function () {
 var pageLoading = document.querySelector('#zyyo-loading');
 window.addEventListener('load', function () {
     setTimeout(function () {
-        pageLoading.style.opacity = '0';
+        if (pageLoading) {
+            pageLoading.style.opacity = '0';
+        }
     }, 100);
 });
