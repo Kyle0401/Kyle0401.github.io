@@ -10,8 +10,9 @@
     <style>
         :root { --note-accent: #2496ed; --note-accent-deep: #0b67b2; --note-soft: #eaf6ff; }
         .note-brand-mark { background: linear-gradient(135deg, #2496ed, #0875c8); box-shadow: 0 8px 20px rgba(36,150,237,.25); }
-        .article h2 { scroll-margin-top: 100px; }
-        .article h3 { scroll-margin-top: 100px; }
+        .note-layout { transition: grid-template-columns .25s ease; }
+        .note-layout.toc-collapsed { grid-template-columns: 52px minmax(0, 820px); }
+        .article h2, .article h3, .article h4 { scroll-margin-top: 100px; }
         .article .command-title { display: inline-flex; align-items: center; margin: 32px 0 14px; padding: 7px 11px; color: #0b67b2; background: #eaf6ff; border-radius: 8px; font-family: "Cascadia Code", "JetBrains Mono", Consolas, monospace; font-size: 14px; font-weight: 800; }
         .article .command-title + p { margin-top: 0; }
         .article .callout code { white-space: normal; }
@@ -20,7 +21,22 @@
         .toc-list a { padding: 7px 8px; }
         .toc-list .toc-sub { margin: 3px 0 5px 10px; padding-left: 9px; border-left: 1px solid #dceaf6; }
         .toc-list .toc-sub a { font-size: 12px; }
-        @media (max-width: 1040px) { .toc { position: static; } }
+        .toc-row { display: flex; align-items: flex-start; min-width: 0; }
+        .toc-row > a { flex: 1 1 auto; min-width: 0; }
+        .toc-item-toggle { flex: 0 0 22px; width: 22px; height: 31px; margin: 0 1px 0 0; padding: 0; color: #6b7890; background: transparent; border: 0; cursor: pointer; font: inherit; font-size: 14px; line-height: 1; transition: color .2s ease, transform .2s ease; }
+        .toc-item-toggle:hover { color: var(--note-accent-deep); }
+        .toc-item.is-collapsed > .toc-sub { display: none; }
+        .toc-item.is-collapsed > .toc-row .toc-item-toggle { transform: rotate(-90deg); }
+        .toc-item-toggle:focus-visible { outline: 2px solid var(--note-accent); outline-offset: 2px; border-radius: 4px; }
+        @media (max-width: 1040px) {
+            .toc { position: static; }
+            .note-layout.toc-collapsed { grid-template-columns: minmax(0, 1fr); }
+            .note-layout.toc-collapsed .toc { width: 100%; }
+            .note-layout.toc-collapsed .toc-toggle { justify-content: flex-start; padding: 0 17px; }
+            .note-layout.toc-collapsed .toc-toggle-text,
+            .note-layout.toc-collapsed .toc-toggle-chevron { display: inline; }
+            .note-layout.toc-collapsed .toc-content { display: none; }
+        }
     </style>
 </head>
 <body>
@@ -32,8 +48,8 @@
         <a class="note-back" href="../">← 返回学习记录</a>
     </header>
 
-    <div class="note-layout">
-        <aside class="toc" aria-label="文章目录">
+    <div class="note-layout" id="note-layout">
+        <aside class="toc" id="toc" aria-label="文章目录">
             <button class="toc-toggle" id="toc-toggle" type="button" aria-expanded="true" aria-controls="toc-content" aria-label="收起文章目录">
                 <span class="toc-toggle-icon" aria-hidden="true">☰</span>
                 <span class="toc-toggle-text">目录</span>
@@ -45,9 +61,12 @@
                     <ul class="toc-list">
                         <li><a href="#overview">学习概览</a></li>
                         <li><a href="#cnb">一、腾讯云 CNB 环境</a></li>
-                        <li>
-                            <a href="#commands">二、Docker 相关命令</a>
-                            <ul class="toc-list toc-sub">
+                        <li class="toc-item">
+                            <div class="toc-row">
+                                <button class="toc-item-toggle" type="button" aria-expanded="true" aria-controls="toc-docker-commands" aria-label="收起 Docker 相关命令子目录">⌄</button>
+                                <a href="#commands">二、Docker 相关命令</a>
+                            </div>
+                            <ul class="toc-list toc-sub" id="toc-docker-commands">
                                 <li><a href="#version">查看版本</a></li>
                                 <li><a href="#pull">拉取镜像</a></li>
                                 <li><a href="#images">查看镜像</a></li>
@@ -166,12 +185,28 @@ apt install -y curl</code></pre>
 
     <script>
         (function () {
-            var toc = document.querySelector('.toc');
-            var button = document.getElementById('toc-toggle');
-            button.addEventListener('click', function () {
-                var collapsed = toc.classList.toggle('is-collapsed');
-                button.setAttribute('aria-expanded', String(!collapsed));
-                button.setAttribute('aria-label', collapsed ? '展开文章目录' : '收起文章目录');
+            var toc = document.getElementById('toc');
+            var layout = document.getElementById('note-layout');
+            var tocToggle = document.getElementById('toc-toggle');
+
+            function setTocCollapsed(collapsed) {
+                toc.classList.toggle('is-collapsed', collapsed);
+                layout.classList.toggle('toc-collapsed', collapsed);
+                tocToggle.setAttribute('aria-expanded', String(!collapsed));
+                tocToggle.setAttribute('aria-label', collapsed ? '展开文章目录' : '收起文章目录');
+            }
+
+            tocToggle.addEventListener('click', function () {
+                setTocCollapsed(!toc.classList.contains('is-collapsed'));
+            });
+
+            Array.prototype.forEach.call(document.querySelectorAll('.toc-item-toggle'), function (button) {
+                button.addEventListener('click', function () {
+                    var item = button.closest('.toc-item');
+                    var collapsed = item.classList.toggle('is-collapsed');
+                    button.setAttribute('aria-expanded', String(!collapsed));
+                    button.setAttribute('aria-label', collapsed ? '展开 Docker 相关命令子目录' : '收起 Docker 相关命令子目录');
+                });
             });
         })();
     </script>
