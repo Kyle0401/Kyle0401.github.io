@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Kyle 的 Docker 学习记录：CNB 环境、镜像、容器与端口映射基础">
+    <title>Docker学习 · 学习记录 · Kyle</title>
+    <link rel="icon" type="image/svg+xml" href="../../static/img/logo-jy.svg">
+    <link rel="stylesheet" href="../../static/css/java-note.css">
+    <style>
+        :root { --note-accent: #2496ed; --note-accent-deep: #0b67b2; --note-soft: #eaf6ff; }
+        .note-brand-mark { background: linear-gradient(135deg, #2496ed, #0875c8); box-shadow: 0 8px 20px rgba(36,150,237,.25); }
+        .article h2 { scroll-margin-top: 100px; }
+        .article h3 { scroll-margin-top: 100px; }
+        .article .command-title { display: inline-flex; align-items: center; margin: 32px 0 14px; padding: 7px 11px; color: #0b67b2; background: #eaf6ff; border-radius: 8px; font-family: "Cascadia Code", "JetBrains Mono", Consolas, monospace; font-size: 14px; font-weight: 800; }
+        .article .command-title + p { margin-top: 0; }
+        .article .callout code { white-space: normal; }
+        .toc-list { margin: 0; padding: 0; list-style: none; }
+        .toc-list li + li { margin-top: 3px; }
+        .toc-list a { padding: 7px 8px; }
+        .toc-list .toc-sub { margin: 3px 0 5px 10px; padding-left: 9px; border-left: 1px solid #dceaf6; }
+        .toc-list .toc-sub a { font-size: 12px; }
+        @media (max-width: 1040px) { .toc { position: static; } }
+    </style>
+</head>
+<body>
+    <header class="note-topbar">
+        <a class="note-brand" href="../../" aria-label="返回 Kyle 主页">
+            <span class="note-brand-mark">K</span>
+            <span>Kyle · Learning Records</span>
+        </a>
+        <a class="note-back" href="../">← 返回学习记录</a>
+    </header>
+
+    <div class="note-layout">
+        <aside class="toc" aria-label="文章目录">
+            <button class="toc-toggle" id="toc-toggle" type="button" aria-expanded="true" aria-controls="toc-content" aria-label="收起文章目录">
+                <span class="toc-toggle-icon" aria-hidden="true">☰</span>
+                <span class="toc-toggle-text">目录</span>
+                <span class="toc-toggle-chevron" aria-hidden="true">⌄</span>
+            </button>
+            <div class="toc-content" id="toc-content">
+                <p class="toc-title">On this page</p>
+                <nav id="toc-links" aria-label="文章目录链接">
+                    <ul class="toc-list">
+                        <li><a href="#overview">学习概览</a></li>
+                        <li><a href="#cnb">一、腾讯云 CNB 环境</a></li>
+                        <li>
+                            <a href="#commands">二、Docker 相关命令</a>
+                            <ul class="toc-list toc-sub">
+                                <li><a href="#version">查看版本</a></li>
+                                <li><a href="#pull">拉取镜像</a></li>
+                                <li><a href="#images">查看镜像</a></li>
+                                <li><a href="#run">运行镜像</a></li>
+                                <li><a href="#ps">查看容器</a></li>
+                                <li><a href="#interactive">交互式容器</a></li>
+                                <li><a href="#remove">删除容器与镜像</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#build">三、制作自己的 Docker 镜像</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </aside>
+
+        <main class="note-main">
+            <nav class="breadcrumb" aria-label="面包屑导航">
+                <a href="../../">主页</a><span>/</span>
+                <a href="../">学习记录</a><span>/</span>
+                <span>Docker学习</span>
+            </nav>
+
+            <article class="article">
+                <p class="article-kicker">Containerization · Learning Record</p>
+                <h1>Docker 学习记录</h1>
+                <div class="article-divider"></div>
+
+                <section id="overview">
+                    <p>本笔记记录 Docker 入门环境、常用镜像与容器命令，以及通过 Ubuntu 容器进行基础实践的过程。</p>
+                </section>
+
+                <section id="cnb">
+                    <h2><span class="section-index">01</span>腾讯云 CNB 环境</h2>
+                    <p>微信登录 → 创建组织 → 创建仓库 → 点击<strong>云原生开发</strong>一键初始化。</p>
+                </section>
+
+                <section id="commands">
+                    <h2><span class="section-index">02</span>Docker 相关命令</h2>
+
+                    <h3 id="version" class="command-title">docker --version</h3>
+                    <p>查看 Docker 版本。</p>
+
+                    <h3 id="pull" class="command-title">docker pull library/hello-world</h3>
+                    <p>拉取镜像。常见镜像引用格式为：</p>
+                    <pre><code>[registry-host[:port]/][namespace/]repository[:tag]</code></pre>
+                    <p>例如，<code>library/hello-world</code> 对应 Docker Hub 的官方镜像命名空间。<code>library</code> 是 Docker Hub 为 Docker Official Images 保留的特殊命名空间，<strong>不是普通用户组织</strong>。未显式指定时，Docker 通常会补全默认 registry、namespace 和 <code>latest</code> 标签。</p>
+
+                    <h3 id="images" class="command-title">docker images</h3>
+                    <p>查看本地已拉取的镜像。</p>
+
+                    <h3 id="run" class="command-title">docker run library/hello-world</h3>
+                    <p>基于镜像创建并运行容器。</p>
+
+                    <h3 id="ps" class="command-title">docker ps -a</h3>
+                    <p><code>docker ps</code> 默认仅显示正在运行的容器；加入 <code>-a</code> 后，同时显示已停止的容器。<code>ps</code> 沿用 Unix 命令名，通常解释为 <strong>process status</strong>（进程状态）。</p>
+
+                    <h3 id="interactive" class="command-title">docker run -it ubuntu bash</h3>
+                    <p>运行 Ubuntu 容器并进入 <code>bash</code>。</p>
+                    <ul>
+                        <li><code>-i</code>：<code>--interactive</code>，保持标准输入开启；</li>
+                        <li><code>-t</code>：<code>--tty</code>，为容器分配伪终端（pseudo-TTY）。</li>
+                    </ul>
+                    <div class="callout">
+                        <div><p><strong>为什么常把 <code>-i</code> 和 <code>-t</code> 放在一起？</strong><br>二者配合时，容器内的 <code>bash</code> 可以像本机终端一样交互，能够正确显示提示符和部分命令格式。</p></div>
+                    </div>
+                    <pre><code>docker run -it ubuntu bash</code></pre>
+                    <pre><code>➜  /workspace git:(main) docker run -it ubuntu bash
+Unable to find image 'ubuntu:latest' locally
+latest: Pulling from library/ubuntu
+...
+root@8aecb273d78d:/# ls
+bin  boot  dev  etc  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+root@8aecb273d78d:/# exit
+exit
+➜  /workspace git:(main)</code></pre>
+                    <p>退出 <code>bash</code> 后，容器的主进程结束，容器也会停止。</p>
+
+                    <h4>后台运行容器</h4>
+                    <pre><code>docker run -it -d ubuntu
+docker ps
+docker ps -a</code></pre>
+                    <p><code>-d</code> 即 <code>--detach</code>，表示让容器在后台运行。容器能否持续运行取决于其主进程（PID 1）是否仍在运行；实际服务通常应以前台方式启动 Web 服务、数据库或其他长期运行进程。</p>
+
+                    <h4>进入后台运行的容器</h4>
+                    <pre><code>docker exec -it &lt;container-id&gt; bash</code></pre>
+                    <p><code>exit</code> 只会退出本次通过 <code>exec</code> 启动的 <code>bash</code>，不会停止原容器的主进程。</p>
+
+                    <h4>停止容器</h4>
+                    <pre><code>docker stop &lt;container-id&gt;</code></pre>
+                    <p>停止后可通过 <code>docker ps -a</code> 查看容器状态。若容器在宽限期内未自行退出，Docker 会强制终止它，因此可能看到退出码 <code>137</code>。</p>
+
+                    <h3 id="remove" class="command-title">docker rm / docker rmi</h3>
+                    <p><code>docker rm &lt;container-id&gt; ...</code> 用于删除已停止的容器记录。运行中的容器需要先停止，或显式使用强制删除选项。</p>
+                    <p><code>docker rmi &lt;image-id&gt; ...</code> 用于删除本地镜像。若仍有容器依赖该镜像，需要先删除相关容器，或确认强制删除的影响。</p>
+                    <pre><code>docker rm &lt;container-id&gt;
+docker rmi &lt;image-id&gt;</code></pre>
+                </section>
+
+                <section id="build">
+                    <h2><span class="section-index">03</span>制作自己的 Docker 镜像：实践起点</h2>
+                    <pre><code>docker run -it -p 8000:8000 ubuntu bash</code></pre>
+                    <p><code>-p 8000:8000</code> 是端口发布（port publishing）：将宿主机的 <code>8000</code> 端口映射到容器的 <code>8000</code> 端口。只有容器内有程序监听对应端口，并且该程序监听在可访问地址上时，才能通过宿主机端口访问。</p>
+                    <p>进入容器后，可以先更新软件包索引并安装 <code>curl</code>：</p>
+                    <pre><code>apt update
+apt install -y curl</code></pre>
+                    <p><code>curl</code> 是命令行网络数据传输工具，可用于通过 URL 下载内容、发起 HTTP 请求、上传数据或测试网络接口。</p>
+                </section>
+
+                <footer class="article-footer">
+                    <span>学习记录 · Docker学习</span>
+                    <a href="../">返回学习记录目录 →</a>
+                </footer>
+            </article>
+        </main>
+    </div>
+
+    <script>
+        (function () {
+            var toc = document.querySelector('.toc');
+            var button = document.getElementById('toc-toggle');
+            button.addEventListener('click', function () {
+                var collapsed = toc.classList.toggle('is-collapsed');
+                button.setAttribute('aria-expanded', String(!collapsed));
+                button.setAttribute('aria-label', collapsed ? '展开文章目录' : '收起文章目录');
+            });
+        })();
+    </script>
+</body>
+</html>
