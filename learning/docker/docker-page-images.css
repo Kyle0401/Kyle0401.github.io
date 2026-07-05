@@ -1,0 +1,3 @@
+#article-content .figure-crop { position:relative; width:100%; aspect-ratio:160 / 102; overflow:hidden; background:#f7f9fc; border-radius:10px; }
+#article-content .figure-crop img { display:block; width:200%; max-width:none; height:auto; transform:translate(calc(var(--cell-x) * -50%), calc(var(--cell-y) * -25%)); transform-origin:top left; }
+#article-content .figure-crop + figcaption { padding-top:11px; }
