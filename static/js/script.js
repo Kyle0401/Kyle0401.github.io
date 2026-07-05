@@ -250,6 +250,19 @@ document.addEventListener('DOMContentLoaded', function () {
             tanChiShe.src = './static/svg/snake-' + theme + '.svg';
         }
         html.dataset.theme = theme;
+
+        if (themeSwitch) {
+            var switchLabel = themeSwitch.querySelector('.switchLabel');
+            var switchAction = theme === 'Dark' ? '开灯' : '关灯';
+
+            if (switchLabel) {
+                switchLabel.textContent = switchAction;
+            }
+
+            themeSwitch.setAttribute('aria-label', switchAction);
+            themeSwitch.setAttribute('title', switchAction);
+        }
+
         setCookie('themeState', theme, 365);
         themeState = theme;
     }
