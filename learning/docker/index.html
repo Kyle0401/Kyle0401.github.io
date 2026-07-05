@@ -34,7 +34,9 @@
         #article-content h2 { margin:54px 0 24px; }
         #article-content h3 { margin:34px 0 15px; }
         #article-content h4 { margin:28px 0 14px; }
-        .article pre.code-block::before { content:attr(data-language); }
+        .article pre.code-block { position:relative; padding:0; overflow:hidden; }
+        .article pre.code-block::before { content:attr(data-language); display:block; min-height:31px; box-sizing:border-box; padding:8px 18px; color:#7dd3fc; background:rgba(7,21,37,.44); border-bottom:1px solid rgba(125,211,252,.24); font:700 11px/15px "Cascadia Code", "JetBrains Mono", Consolas, monospace; letter-spacing:.06em; text-transform:lowercase; }
+        .article pre.code-block > code { display:block; padding:17px 20px 20px; }
         .article .figure-note { margin:14px 0 24px; padding:12px 14px; color:var(--note-muted); background:#f7f9fc; border:1px dashed var(--note-line); border-radius:10px; font-size:13px; }
         @media (max-width:1040px) {
             .toc { position:static; }
