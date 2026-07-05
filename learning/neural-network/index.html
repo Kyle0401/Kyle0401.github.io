@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Kyle 的神经网络学习记录：图像分类、反向传播、CNN、RNN 与 LSTM">
+    <title>神经网络学习 · 学习记录 · Kyle</title>
+    <link rel="icon" type="image/svg+xml" href="../../static/img/logo-jy.svg">
+    <link rel="stylesheet" href="../../static/css/java-note.css">
+    <style>
+        :root { --note-accent: #6d5dfc; --note-accent-deep: #4d3fd1; --note-soft: #f0efff; }
+        .note-brand-mark { background: linear-gradient(135deg, #6d5dfc, #a05ce5); box-shadow: 0 8px 20px rgba(109,93,252,.25); }
+        .toc-content { padding-top: 18px; }
+        .toc-section + .toc-section { margin-top: 8px; }
+        .toc-section > a { color: #34415b; font-weight: 800; }
+        .toc-sub { margin: 2px 0 6px 2px; padding-left: 8px; border-left: 1px solid #e2e7f2; }
+        .toc-sub a { padding: 5px 8px; font-size: 12.5px; }
+        .formula { margin: 18px 0 24px; padding: 16px 18px; overflow-x: auto; color: #e9e8ff; background: #29264d; border-radius: 14px; font: 600 14px/1.8 "Cascadia Code", "JetBrains Mono", Consolas, monospace; }
+        .key-point { color: var(--note-accent-deep); font-weight: 800; }
+    </style>
+</head>
+<body>
+    <header class="note-topbar">
+        <a class="note-brand" href="../../" aria-label="返回 Kyle 主页"><span class="note-brand-mark">K</span><span>Kyle · Learning Records</span></a>
+        <a class="note-back" href="../">← 返回学习记录</a>
+    </header>
+
+    <div class="note-layout">
+        <aside class="toc" aria-label="文章目录">
+            <div class="toc-content">
+                <p class="toc-title">On this page</p>
+                <nav>
+                    <div class="toc-section"><a href="#map">学习地图</a></div>
+                    <div class="toc-section"><a href="#classification">图像分类基础</a><div class="toc-sub"><a href="#knn">KNN 与交叉验证</a><a href="#linear">线性分类与 Softmax</a></div></div>
+                    <div class="toc-section"><a href="#training">训练神经网络</a><div class="toc-sub"><a href="#loss">损失函数与正则化</a><a href="#gradient">梯度下降与反向传播</a><a href="#mlp">全连接网络与 Dropout</a></div></div>
+                    <div class="toc-section"><a href="#cnn">卷积神经网络</a><div class="toc-sub"><a href="#conv">卷积、池化与参数共享</a><a href="#architecture">经典网络与感受野</a></div></div>
+                    <div class="toc-section"><a href="#sequence">序列模型：RNN 与 LSTM</a></div>
+                    <div class="toc-section"><a href="#checklist">复习检查清单</a></div>
+                </nav>
+            </div>
+        </aside>
+
+        <main class="note-main">
+            <nav class="breadcrumb" aria-label="面包屑导航"><a href="../../">主页</a><span>/</span><a href="../">学习记录</a><span>/</span><span>神经网络学习</span></nav>
+
+            <article class="article">
+                <p class="article-kicker">Neural Networks & Deep Learning</p>
+                <h1>神经网络学习记录</h1>
+                <div class="article-divider"></div>
+                <p>这份记录按“<strong>图像分类问题 → 目标函数 → 梯度优化 → 神经网络 → 卷积网络 → 序列模型</strong>”的路线整理。核心不是记住名词，而是把一次训练真正串起来：数据输入后如何前向计算，损失如何衡量误差，梯度如何反向传播，参数又如何被更新。</p>
+
+                <section id="map">
+                    <h2><span class="section-index">01</span>学习地图</h2>
+                    <ul>
+                        <li><strong>深度学习的角色：</strong>相较于手工设计特征，模型可以通过多层表示自动学习对任务有效的特征。</li>
+                        <li><strong>图像分类起点：</strong>图像在计算机中是数值张量，例如 RGB 图像可表示为 <code>H × W × 3</code>；分类器要从这些数值中预测类别。</li>
+                        <li><strong>训练闭环：</strong>前向传播得到类别得分，损失函数评价预测，反向传播计算参数梯度，优化器根据梯度更新参数。</li>
+                        <li><strong>模型演进：</strong>从 KNN、线性分类器到全连接网络，再到更适合图像结构的 CNN，以及处理序列信息的 RNN/LSTM。</li>
+                    </ul>
+                </section>
+
+                <section id="classification">
+                    <h2><span class="section-index">02</span>图像分类基础</h2>
+                    <p>图像分类面对的难点并不只是“像素数量多”。同一个对象会受光照、拍摄角度、姿态变化、部分遮挡和复杂背景影响；因此，直接比较原始像素通常不能稳定地反映语义相似性。</p>
+
+                    <h3 id="knn">KNN 与交叉验证</h3>
+                    <p>K 近邻（KNN）对待预测样本寻找训练集中距离最近的 <code>K</code> 个样本，并以多数投票决定类别。它几乎没有显式训练阶段，但预测时需要遍历训练集，因此训练样本多时推理代价高。</p>
+                    <div class="formula">d<sub>L1</sub>(I<sub>1</sub>, I<sub>2</sub>) = Σ<sub>p</sub> | I<sub>1</sub><sup>p</sup> − I<sub>2</sub><sup>p</sup> |</div>
+                    <p>上式是图像按像素计算 L1 距离的形式。它可以作为入门基线，但对“主体位置变了、背景变了”非常敏感。<span class="key-point">K、距离度量等超参数应使用验证集或交叉验证选择，不能用测试集反复调参。</span>测试集应保留到最后，用于一次相对客观的泛化评估。</p>
+
+                    <h3 id="linear">线性分类与 Softmax</h3>
+                    <p>线性分类器将展平后的输入向量映射为各类别的得分。虽然表达能力有限，但它建立了后续神经网络的基本计算单元。</p>
+                    <div class="formula">s = W x + b</div>
+                    <p>其中 <code>x</code> 是输入特征，<code>W</code> 是权重，<code>b</code> 是偏置，<code>s</code> 是类别得分。Softmax 将得分归一化为概率分布：</p>
+                    <div class="formula">P(y = k | x) = exp(s<sub>k</sub>) / Σ<sub>j</sub> exp(s<sub>j</sub>)</div>
+                    <p>概率最大的类别就是预测结果；训练时还需结合真实标签，计算交叉熵等损失来判断预测质量。</p>
+                </section>
+
+                <section id="training">
+                    <h2><span class="section-index">03</span>训练神经网络</h2>
+
+                    <h3 id="loss">损失函数与正则化</h3>
+                    <p>损失函数将“模型预测得好不好”转换成可优化的数值目标。仅让训练集损失很低并不够：过于复杂的模型可能记住训练样本，却无法泛化到新数据。因此常把数据损失和正则化惩罚结合起来。</p>
+                    <div class="formula">L = L<sub>data</sub> + λ · R(W)</div>
+                    <p><code>L_data</code> 衡量预测与标签的差异，<code>R(W)</code> 抑制过大的或过于复杂的参数，<code>λ</code> 控制惩罚强度。正则化不是越强越好；它需要和验证集表现一起判断。</p>
+
+                    <h3 id="gradient">梯度下降与反向传播</h3>
+                    <p>训练的目标是在参数空间中找到更小的损失。梯度给出当前位置损失增大最快的方向，因此沿负梯度方向更新参数：</p>
+                    <div class="formula">θ ← θ − η · ∇<sub>θ</sub>L</div>
+                    <p><code>η</code> 是学习率。学习率过大可能越过低点甚至发散，过小则收敛缓慢。常见梯度计算方式如下：</p>
+                    <div class="table-wrap"><table><thead><tr><th>方法</th><th>一次更新使用的数据</th><th>特点</th></tr></thead><tbody><tr><td>批量梯度下降</td><td>全部训练样本</td><td>梯度稳定，但每一步成本高。</td></tr><tr><td>随机梯度下降</td><td>单个样本</td><td>更新快、噪声大，方向波动明显。</td></tr><tr><td>小批量梯度下降</td><td>一个 mini-batch</td><td>在效率、显存和梯度稳定性之间折中，是实践中的常用选择。</td></tr></tbody></table></div>
+                    <p>反向传播并不是另一种优化算法，而是高效计算梯度的方法。它把网络看作计算图，先完成前向计算并缓存中间值，再用链式法则把损失对输出的梯度逐层传回参数。</p>
+
+                    <h3 id="mlp">全连接网络、激活函数与 Dropout</h3>
+                    <p>多层感知机（MLP）在每一层进行线性变换后加入非线性激活函数：</p>
+                    <div class="formula">a<sup>(l)</sup> = φ(W<sup>(l)</sup>a<sup>(l−1)</sup> + b<sup>(l)</sup>)</div>
+                    <p>没有激活函数时，多层线性变换仍可合并为一层线性变换，无法拟合复杂的非线性关系。常见激活函数包括 Sigmoid、Tanh 和 ReLU；现代网络中 ReLU 及其变体使用广泛，但也要关注“死亡 ReLU”等训练现象。</p>
+                    <ul>
+                        <li><strong>数据预处理：</strong>统一量纲、中心化或标准化，避免不同输入尺度让优化过程失衡。</li>
+                        <li><strong>参数初始化：</strong>不能所有权重都初始化为相同值，否则神经元会保持对称、学到同样的表示。</li>
+                        <li><strong>Dropout：</strong>训练时随机屏蔽部分神经元，降低神经元之间的共适应，从而缓解过拟合；推理时不再随机屏蔽。</li>
+                    </ul>
+                </section>
+
+                <section id="cnn">
+                    <h2><span class="section-index">04</span>卷积神经网络（CNN）</h2>
+                    <p>全连接层会忽略图像的空间结构，并带来大量参数。CNN 利用局部感受野和参数共享，让模型以更少参数提取边缘、纹理、局部形状，再逐层组合成更高层的语义特征。</p>
+
+                    <h3 id="conv">卷积、池化与参数共享</h3>
+                    <p>卷积层使用可学习的卷积核在输入上滑动，每个卷积核产生一张特征图。卷积输出尺寸的常用计算式为：</p>
+                    <div class="formula">W<sub>out</sub> = ⌊(W<sub>in</sub> − F + 2P) / S⌋ + 1</div>
+                    <p>其中 <code>F</code> 为卷积核尺寸，<code>S</code> 为步长，<code>P</code> 为零填充大小。以 <code>32 × 32 × 3</code> 的图像为例，使用 <code>10</code> 个 <code>5 × 5 × 3</code> 卷积核，步长为 <code>1</code>、填充为 <code>2</code>，输出尺寸为 <code>32 × 32 × 10</code>。对应参数量为 <code>10 × (5 × 5 × 3 + 1) = 760</code>，远少于同等规模的全连接连接数。</p>
+                    <p>池化层不学习卷积核参数，常见最大池化会保留局部窗口的最大响应，以降低特征图空间尺寸、增加一定的局部平移鲁棒性。需要区分：<strong>卷积层主要负责特征提取，池化层主要负责下采样</strong>。</p>
+
+                    <h3 id="architecture">感受野与经典网络</h3>
+                    <p>感受野是特征图上一个神经元所能看到的原始输入区域。堆叠多个小卷积核可以扩大感受野，同时减少参数量并引入更多非线性。例如，连续堆叠三个 <code>3 × 3</code> 卷积层，其感受野可覆盖 <code>7 × 7</code> 区域，这也是 VGG 倾向使用小卷积核的一个直观原因。</p>
+                    <ul>
+                        <li><strong>AlexNet：</strong>推动深度 CNN 在大规模图像分类中的成功应用。</li>
+                        <li><strong>VGG：</strong>通过连续堆叠小卷积核加深网络，强调结构规整。</li>
+                        <li><strong>ResNet：</strong>引入残差连接，让网络学习残差映射，缓解深层网络中的梯度传播困难和退化问题。</li>
+                    </ul>
+                </section>
+
+                <section id="sequence">
+                    <h2><span class="section-index">05</span>序列模型：RNN 与 LSTM</h2>
+                    <p>图像任务侧重空间结构，而文本、语音和时间序列还需要处理前后依赖。RNN 在每个时间步维护隐藏状态，使当前输出同时依赖当前输入和历史状态：</p>
+                    <div class="formula">h<sub>t</sub> = f(x<sub>t</sub>, h<sub>t−1</sub>)</div>
+                    <p>普通 RNN 在长序列上容易出现梯度消失或梯度爆炸。LSTM 通过细胞状态和门控机制选择性地保留、写入和输出信息：门的数值通常位于 <code>0</code> 到 <code>1</code> 之间，可理解为“让多少信息通过”。因此它更适合学习较长距离的依赖关系。</p>
+                </section>
+
+                <section id="checklist">
+                    <h2><span class="section-index">06</span>复习检查清单</h2>
+                    <ul>
+                        <li>能否解释一次完整训练中前向传播、损失计算、反向传播和参数更新的先后关系？</li>
+                        <li>能否区分训练集、验证集、测试集各自的职责，并说明为什么不能用测试集挑超参数？</li>
+                        <li>能否根据 <code>F</code>、<code>S</code>、<code>P</code> 计算卷积输出尺寸和参数量？</li>
+                        <li>能否说明 CNN 的参数共享、池化、感受野分别解决了什么问题？</li>
+                        <li>能否解释 LSTM 为什么比普通 RNN 更能保留长程信息？</li>
+                    </ul>
+                </section>
+
+                <footer class="article-footer"><span>学习记录 · 神经网络学习</span><a href="../">返回学习记录目录 →</a></footer>
+            </article>
+        </main>
+    </div>
+</body>
+</html>
