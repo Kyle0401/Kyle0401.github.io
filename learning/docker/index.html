@@ -7,46 +7,7 @@
     <title>Docker学习 · 学习记录 · Kyle</title>
     <link rel="icon" type="image/svg+xml" href="../../static/img/logo-jy.svg">
     <link rel="stylesheet" href="../../static/css/java-note.css">
-    <style>
-        :root { --note-accent: #2496ed; --note-accent-deep: #0b67b2; --note-soft: #eaf6ff; }
-        .note-brand-mark { background: linear-gradient(135deg, #2496ed, #0875c8); box-shadow: 0 8px 20px rgba(36,150,237,.25); }
-        .note-layout { transition: grid-template-columns .25s ease; }
-        .note-layout.toc-collapsed { grid-template-columns: 52px minmax(0, 820px); }
-        .toc-title-row { display:flex; align-items:center; justify-content:space-between; gap:8px; margin:0 0 9px; }
-        .toc-title-row .toc-title { margin:0; }
-        .toc-bulk-toggle { padding:4px 7px; color:#647085; background:#f1f4f9; border:1px solid #dce3ef; border-radius:6px; cursor:pointer; font:inherit; font-size:11px; font-weight:700; }
-        .toc-bulk-toggle:hover { color:var(--note-accent-deep); background:#e9f5fd; border-color:#bee1f8; }
-        #toc-links ul { margin:0; padding:0; list-style:none; }
-        .toc-children { margin:2px 0 6px 2px; padding-left:8px; border-left:1px solid #dceaf6; }
-        .toc-row { display:flex; align-items:flex-start; min-width:0; }
-        .toc-link { flex:1 1 auto; min-width:0; overflow-wrap:anywhere; }
-        .toc-item-toggle { flex:0 0 16px; width:16px; height:30px; margin:0 2px 0 0; padding:0; color:#6b7890; background:transparent; border:0; cursor:pointer; font-size:13px; line-height:1; transition:color .2s ease, transform .2s ease; }
-        .toc-item-toggle:hover { color:var(--note-accent-deep); }
-        .toc-item-toggle.is-placeholder { visibility:hidden; pointer-events:none; }
-        .toc-item.is-collapsed > .toc-children { display:none; }
-        .toc-item.is-collapsed > .toc-row .toc-item-toggle { transform:rotate(-90deg); }
-        .toc-level-1 > .toc-row .toc-link { color:#24344c; font-size:14px; font-weight:800; }
-        .toc-level-2 > .toc-row .toc-link { color:#344861; font-size:13px; font-weight:700; }
-        .toc-level-3 > .toc-row .toc-link, .toc-level-4 > .toc-row .toc-link { color:#657084; font-size:12.5px; }
-        #article-content > h1:first-child { margin:0; font-size:clamp(34px,5vw,52px); line-height:1.16; letter-spacing:-.03em; }
-        #article-content > h1:first-child + h2 { margin-top:46px; }
-        #article-content h1, #article-content h2, #article-content h3, #article-content h4 { scroll-margin-top:96px; }
-        #article-content h2 { margin:54px 0 24px; }
-        #article-content h3 { margin:34px 0 15px; }
-        #article-content h4 { margin:28px 0 14px; }
-        .article pre.code-block { position:relative; padding:0; overflow:hidden; }
-        .article pre.code-block::before { content:attr(data-language); display:block; min-height:31px; box-sizing:border-box; padding:8px 18px; color:#7dd3fc; background:rgba(7,21,37,.44); border-bottom:1px solid rgba(125,211,252,.24); font:700 11px/15px "Cascadia Code", "JetBrains Mono", Consolas, monospace; letter-spacing:.06em; text-transform:lowercase; }
-        .article pre.code-block > code { display:block; padding:17px 20px 20px; }
-        .article .figure-note { margin:14px 0 24px; padding:12px 14px; color:var(--note-muted); background:#f7f9fc; border:1px dashed var(--note-line); border-radius:10px; font-size:13px; }
-        @media (max-width:1040px) {
-            .toc { position:static; }
-            .note-layout.toc-collapsed { grid-template-columns:minmax(0,1fr); }
-            .note-layout.toc-collapsed .toc { width:100%; }
-            .note-layout.toc-collapsed .toc-toggle { justify-content:flex-start; padding:0 17px; }
-            .note-layout.toc-collapsed .toc-toggle-text, .note-layout.toc-collapsed .toc-toggle-chevron { display:inline; }
-            .note-layout.toc-collapsed .toc-content { display:none; }
-        }
-    </style>
+    <link rel="stylesheet" href="./docker-page.css?v=20260706e">
 </head>
 <body>
     <header class="note-topbar">
@@ -69,56 +30,6 @@
             </article>
         </main>
     </div>
-    <script>
-        (function () {
-            var contentNode = document.getElementById('article-content');
-            var tocNode = document.getElementById('toc');
-            var layoutNode = document.getElementById('note-layout');
-            var tocLinksNode = document.getElementById('toc-links');
-            var tocToggle = document.getElementById('toc-toggle');
-            var tocBulkToggle = document.getElementById('toc-bulk-toggle');
-
-            function escapeHtml(value) { return String(value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-            function inline(value) {
-                var parts = [];
-                var text = escapeHtml(value);
-                text = text.replace(/`([^`]+)`/g, function (_, code) { var key='@@C'+parts.length+'@@'; parts.push('<code>'+code+'</code>'); return key; });
-                text = text.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
-                text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*([^*]+)\*/g, '<em>$1</em>');
-                parts.forEach(function (part,index) { text=text.replace('@@C'+index+'@@',part); });
-                return text;
-            }
-            function tableCells(line) { return line.trim().replace(/^\||\|$/g,'').split('|').map(function (cell) { return cell.trim(); }); }
-            function blockStart(line,next) { return /^#{1,6}\s+/.test(line)||/^```/.test(line)||/^-{3,}\s*$/.test(line)||/^>\s*\[!NOTE\]/.test(line)||/^[-*]\s+/.test(line)||(/^\|/.test(line)&&/^\|?\s*:?-{3,}/.test(next||''))||/^!\[.*?\]\(.+?\)$/.test(line); }
-            function parse(lines) {
-                var html=[], i=0;
-                while(i<lines.length) {
-                    var line=lines[i], next=lines[i+1]||'';
-                    if(!line.trim()) { i++; continue; }
-                    if(/^```/.test(line)) { var language=line.slice(3).trim()||'text', code=[]; i++; while(i<lines.length&&!/^```/.test(lines[i])) { code.push(lines[i]); i++; } if(i<lines.length)i++; html.push('<pre class="code-block" data-language="'+escapeHtml(language)+'"><code>'+escapeHtml(code.join('\n'))+'</code></pre>'); continue; }
-                    if(/^>\s*\[!NOTE\]/.test(line)) { var note=[]; i++; while(i<lines.length&&(lines[i].startsWith('>')||!lines[i].trim())) { note.push(lines[i].startsWith('>')?lines[i].replace(/^>\s?/,''):''); i++; } html.push('<div class="callout"><div>'+parse(note)+'</div></div>'); continue; }
-                    if(/^-{3,}\s*$/.test(line)) { html.push('<hr>'); i++; continue; }
-                    var heading=line.match(/^(#{1,6})\s+(.+)$/); if(heading) { html.push('<h'+heading[1].length+'>'+inline(heading[2])+'</h'+heading[1].length+'>'); i++; continue; }
-                    if(/^\|/.test(line)&&/^\|?\s*:?-{3,}/.test(next)) { var headers=tableCells(line), rows=[]; i+=2; while(i<lines.length&&/^\|/.test(lines[i])) { rows.push(tableCells(lines[i])); i++; } var table='<div class="table-wrap"><table><thead><tr>'+headers.map(function(c){return '<th>'+inline(c)+'</th>';}).join('')+'</tr></thead><tbody>'; rows.forEach(function(row){table+='<tr>'+headers.map(function(_,k){return '<td>'+inline(row[k]||'')+'</td>';}).join('')+'</tr>';}); html.push(table+'</tbody></table></div>'); continue; }
-                    if(/^[-*]\s+/.test(line)) { var items=[]; while(i<lines.length&&/^[-*]\s+/.test(lines[i])) { items.push(lines[i].replace(/^[-*]\s+/,'')); i++; } html.push('<ul>'+items.map(function(item){return '<li>'+inline(item)+'</li>';}).join('')+'</ul>'); continue; }
-                    var image=line.match(/^!\[(.*?)\]\((.+?)\)$/); if(image) { html.push('<p class="figure-note">配图：'+inline(image[1])+'（图片资源待安全整理后补充）</p>'); i++; continue; }
-                    var paragraph=[]; while(i<lines.length&&lines[i].trim()&&!blockStart(lines[i],lines[i+1]||'')){paragraph.push(lines[i].trim());i++;} if(paragraph.length) html.push('<p>'+inline(paragraph.join('<br>'))+'</p>'); else i++;
-                }
-                return html.join('');
-            }
-            function setTocCollapsed(collapsed) { tocNode.classList.toggle('is-collapsed',collapsed); layoutNode.classList.toggle('toc-collapsed',collapsed); tocToggle.setAttribute('aria-expanded',String(!collapsed)); tocToggle.setAttribute('aria-label',collapsed?'展开文章目录':'收起文章目录'); }
-            function branchItems() { return Array.prototype.slice.call(tocLinksNode.querySelectorAll('.toc-item')).filter(function(item){var children=item.querySelector(':scope > .toc-children');return children&&children.children.length;}); }
-            function updateBulk() { var items=branchItems(), all=items.length&&items.every(function(item){return item.classList.contains('is-collapsed');}); tocBulkToggle.textContent=all?'全部展开':'全部折叠'; tocBulkToggle.disabled=!items.length; }
-            function buildToc() {
-                var headings=Array.prototype.slice.call(contentNode.querySelectorAll('h1,h2,h3,h4')), root=document.createElement('ul'), stack=[{level:0,list:root}]; tocLinksNode.innerHTML='';
-                headings.forEach(function(heading,index){var level=Number(heading.tagName.slice(1)), label=heading.textContent, id='section-'+(index+1); heading.id=id; while(stack.length>1&&level<=stack[stack.length-1].level)stack.pop(); var item=document.createElement('li'), row=document.createElement('div'), button=document.createElement('button'), link=document.createElement('a'), children=document.createElement('ul'); item.className='toc-item toc-level-'+level;row.className='toc-row';button.type='button';button.className='toc-item-toggle is-placeholder';button.textContent='⌄';button.tabIndex=-1;link.className='toc-link';link.href='#'+id;link.textContent=label;children.className='toc-children';row.appendChild(button);row.appendChild(link);item.appendChild(row);item.appendChild(children);stack[stack.length-1].list.appendChild(item);stack.push({level:level,list:children});});
-                Array.prototype.forEach.call(root.querySelectorAll('.toc-item'),function(item){var children=item.lastElementChild,button=item.querySelector(':scope > .toc-row > .toc-item-toggle');if(children&&children.children.length){button.classList.remove('is-placeholder');button.tabIndex=0;button.setAttribute('aria-expanded','true');button.addEventListener('click',function(){var collapsed=item.classList.toggle('is-collapsed');button.setAttribute('aria-expanded',String(!collapsed));updateBulk();});}else if(children)children.remove();});
-                tocLinksNode.appendChild(root);updateBulk();
-            }
-            tocToggle.addEventListener('click',function(){setTocCollapsed(!tocNode.classList.contains('is-collapsed'));});
-            tocBulkToggle.addEventListener('click',function(){var items=branchItems(), collapse=!items.every(function(item){return item.classList.contains('is-collapsed');});items.forEach(function(item){item.classList.toggle('is-collapsed',collapse);var button=item.querySelector(':scope > .toc-row > .toc-item-toggle');if(button)button.setAttribute('aria-expanded',String(!collapse));});updateBulk();});
-            fetch('./Docker学习.md').then(function(response){if(!response.ok)throw new Error();return response.text();}).then(function(markdown){contentNode.innerHTML=parse(markdown.replace(/\r\n/g,'\n').split('\n'));buildToc();}).catch(function(){contentNode.innerHTML='<h1>Docker学习</h1><p>笔记文件暂时无法读取。</p>';});
-        })();
-    </script>
+    <script src="./docker-page.js?v=20260706e"></script>
 </body>
 </html>
