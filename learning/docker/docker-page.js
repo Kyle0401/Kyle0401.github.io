@@ -51,7 +51,7 @@
         i++;
         while (i < lines.length && !/^```/.test(lines[i])) { code.push(lines[i]); i++; }
         if (i < lines.length) i++;
-        out.push('<div class="code-block"><div class="code-language">' + esc(lang) + '</div><pre><code>' + esc(code.join('\n')) + '</code></pre></div>');
+        out.push('<div class="code-block"><div class="code-language"><span class="code-language-text">' + esc(lang) + '</span></div><pre><code>' + esc(code.join('\n')) + '</code></pre></div>');
         continue;
       }
       if (/^>\s*\[!NOTE\]/.test(line)) {
@@ -110,8 +110,71 @@
     tocLinks.appendChild(root); refreshBulk();
   }
 
+  function fallbackCopy(text) {
+    return new Promise(function (resolve, reject) {
+      var textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.setAttribute('readonly', '');
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      textarea.style.pointerEvents = 'none';
+      document.body.appendChild(textarea);
+      textarea.select();
+      textarea.setSelectionRange(0, textarea.value.length);
+      var copied = false;
+      try { copied = document.execCommand('copy'); } catch (error) { copied = false; }
+      document.body.removeChild(textarea);
+      if (copied) resolve(); else reject(new Error('copy failed'));
+    });
+  }
+
+  function copyCode(text) {
+    if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text).catch(function () { return fallbackCopy(text); });
+    return fallbackCopy(text);
+  }
+
+  function addCopyButtons() {
+    Array.prototype.forEach.call(content.querySelectorAll('.code-block'), function (block) {
+      if (block.querySelector('.copy-code-button')) return;
+      var languageBar = block.querySelector('.code-language');
+      var code = block.querySelector('pre code');
+      if (!languageBar || !code) return;
+      var button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'copy-code-button';
+      button.setAttribute('aria-label', '复制代码');
+      button.title = '复制代码';
+      button.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="10" height="10" rx="2"></rect><path d="M15 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3"></path></svg>';
+      button.addEventListener('click', function () {
+        button.disabled = true;
+        copyCode(code.textContent).then(function () {
+          button.classList.add('is-copied');
+          button.setAttribute('aria-label', '代码已复制');
+          button.title = '已复制';
+          window.setTimeout(function () {
+            button.classList.remove('is-copied');
+            button.setAttribute('aria-label', '复制代码');
+            button.title = '复制代码';
+            button.disabled = false;
+          }, 1400);
+        }, function () {
+          button.classList.add('is-copy-failed');
+          button.setAttribute('aria-label', '复制失败');
+          button.title = '复制失败，请手动复制';
+          window.setTimeout(function () {
+            button.classList.remove('is-copy-failed');
+            button.setAttribute('aria-label', '复制代码');
+            button.title = '复制代码';
+            button.disabled = false;
+          }, 1800);
+        });
+      });
+      languageBar.appendChild(button);
+    });
+  }
+
   tocToggle.addEventListener('click', function () { setTocClosed(!toc.classList.contains('is-collapsed')); });
   bulkToggle.addEventListener('click', function () { var list = branches(), close = !list.every(function (x) { return x.classList.contains('is-collapsed'); }); list.forEach(function (item) { item.classList.toggle('is-collapsed', close); var btn = item.querySelector(':scope > .toc-row > .toc-item-toggle'); if (btn) btn.setAttribute('aria-expanded', String(!close)); }); refreshBulk(); });
 
-  fetch('./Docker学习.md?v=20260706h').then(function (response) { if (!response.ok) throw new Error(); return response.text(); }).then(function (md) { content.innerHTML = parse(md.replace(/\r\n/g, '\n').split('\n')); buildToc(); }).catch(function () { content.innerHTML = '<h1>Docker学习</h1><p>笔记文件暂时无法读取。</p>'; });
+  fetch('./Docker学习.md?v=20260706h').then(function (response) { if (!response.ok) throw new Error(); return response.text(); }).then(function (md) { content.innerHTML = parse(md.replace(/\r\n/g, '\n').split('\n')); addCopyButtons(); buildToc(); }).catch(function () { content.innerHTML = '<h1>Docker学习</h1><p>笔记文件暂时无法读取。</p>'; });
 })();
