@@ -1,6 +1,8 @@
 (function () {
   var screenshots = {
     '通过 CNB 端口访问 code-server 的浏览器界面': 'image-20260703022125604.png',
+    '在代码仓库中创建 Dockerfile': 'image-20260706234000076.png',
+    '在 VS Code 扩展详情中查看 Go 扩展 Identifier': 'image-20260707020711503.png',
     'CNB 制品页面中的 Docker 镜像制品': 'image-20260706031930791.png',
     'CNB Docker 制品的使用方式选择界面': 'image-20260706032005537.png',
     'CNB Docker 制品的本地命令行推送指引': 'image-20260706032048008.png',
@@ -26,7 +28,7 @@
       link.title = '在新窗口查看原图';
 
       var image = document.createElement('img');
-      image.src = './assets/' + filename + '?v=20260706h';
+      image.src = './assets/' + filename + '?v=20260707b';
       image.alt = caption.textContent.trim();
       image.loading = 'lazy';
       image.decoding = 'async';

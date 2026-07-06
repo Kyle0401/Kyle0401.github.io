@@ -8,6 +8,8 @@
 
   var safeFigures = {
     '通过 CNB 端口访问 code-server 的浏览器界面': ['code-server', '通过 PORTS 地址访问浏览器中的 code-server', ['工作区编辑器', '终端与文件树', '端口 8000 服务']],
+    '在代码仓库中创建 Dockerfile': ['dockerfile', '在工作区中创建镜像构建文件', ['Dockerfile 文件', '构建指令', '版本控制']],
+    '在 VS Code 扩展详情中查看 Go 扩展 Identifier': ['extension', '从扩展详情获取安装标识', ['Go 扩展', 'Identifier', 'golang.go']],
     'CNB 制品页面中的 Docker 镜像制品': ['registry', '在 CNB 制品页查看 Docker 镜像', ['Docker 镜像制品', '标签与版本', '使用 Docker 制品']],
     'CNB Docker 制品的使用方式选择界面': ['use', '选择 Docker 制品的使用方式', ['本地命令行推送', '流水线中使用', '拉取并运行']],
     'CNB Docker 制品的本地命令行推送指引': ['guide', '本地命令行推送使用指引', ['docker login', 'docker tag', 'docker push']],
@@ -176,5 +178,5 @@
   tocToggle.addEventListener('click', function () { setTocClosed(!toc.classList.contains('is-collapsed')); });
   bulkToggle.addEventListener('click', function () { var list = branches(), close = !list.every(function (x) { return x.classList.contains('is-collapsed'); }); list.forEach(function (item) { item.classList.toggle('is-collapsed', close); var btn = item.querySelector(':scope > .toc-row > .toc-item-toggle'); if (btn) btn.setAttribute('aria-expanded', String(!close)); }); refreshBulk(); });
 
-  fetch('./Docker学习.md?v=20260706h').then(function (response) { if (!response.ok) throw new Error(); return response.text(); }).then(function (md) { content.innerHTML = parse(md.replace(/\r\n/g, '\n').split('\n')); addCopyButtons(); buildToc(); }).catch(function () { content.innerHTML = '<h1>Docker学习</h1><p>笔记文件暂时无法读取。</p>'; });
+  fetch('./Docker学习.md?v=20260707b').then(function (response) { if (!response.ok) throw new Error(); return response.text(); }).then(function (md) { content.innerHTML = parse(md.replace(/\r\n/g, '\n').split('\n')); addCopyButtons(); buildToc(); }).catch(function () { content.innerHTML = '<h1>Docker学习</h1><p>笔记文件暂时无法读取。</p>'; });
 })();
