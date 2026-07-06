@@ -20,11 +20,19 @@
   };
 
   function esc(v) { return String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  function codeLanguage(v) {
+    var language = String(v || '').trim().toLowerCase();
+    var aliases = { sh: 'bash', shell: 'bash', console: 'bash', txt: 'plaintext', text: 'plaintext' };
+    if (!language) return 'plaintext';
+    language = aliases[language] || language;
+    return /^[a-z0-9_+-]+$/.test(language) ? language : 'plaintext';
+  }
   function inline(v) {
     var parts = [];
     var s = esc(v);
     s = s.replace(/`([^`]+)`/g, function (_, code) { var key = '@@C' + parts.length + '@@'; parts.push('<code>' + code + '</code>'); return key; });
     s = s.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+    s = s.replace(/\[([^\]]+)\]\((#[a-zA-Z0-9_-]+)\)/g, '<a href="$2">$1</a>');
     s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*([^*]+)\*/g, '<em>$1</em>');
     parts.forEach(function (part, i) { s = s.replace('@@C' + i + '@@', part); });
     return s;
@@ -53,7 +61,7 @@
         i++;
         while (i < lines.length && !/^```/.test(lines[i])) { code.push(lines[i]); i++; }
         if (i < lines.length) i++;
-        out.push('<div class="code-block"><div class="code-language"><span class="code-language-text">' + esc(lang) + '</span></div><pre><code>' + esc(code.join('\n')) + '</code></pre></div>');
+        out.push('<div class="code-block"><div class="code-language"><span class="code-language-text">' + esc(lang) + '</span></div><pre><code class="language-' + esc(codeLanguage(lang)) + '">' + esc(code.join('\n')) + '</code></pre></div>');
         continue;
       }
       if (/^>\s*\[!NOTE\]/.test(line)) {
@@ -135,6 +143,14 @@
     return fallbackCopy(text);
   }
 
+  function addSyntaxHighlighting() {
+    if (!window.hljs || typeof window.hljs.highlightElement !== 'function') return;
+    Array.prototype.forEach.call(content.querySelectorAll('.code-block pre code'), function (code) {
+      if (code.classList.contains('hljs')) return;
+      try { window.hljs.highlightElement(code); } catch (error) { code.classList.add('nohighlight'); }
+    });
+  }
+
   function addCopyButtons() {
     Array.prototype.forEach.call(content.querySelectorAll('.code-block'), function (block) {
       if (block.querySelector('.copy-code-button')) return;
@@ -178,5 +194,5 @@
   tocToggle.addEventListener('click', function () { setTocClosed(!toc.classList.contains('is-collapsed')); });
   bulkToggle.addEventListener('click', function () { var list = branches(), close = !list.every(function (x) { return x.classList.contains('is-collapsed'); }); list.forEach(function (item) { item.classList.toggle('is-collapsed', close); var btn = item.querySelector(':scope > .toc-row > .toc-item-toggle'); if (btn) btn.setAttribute('aria-expanded', String(!close)); }); refreshBulk(); });
 
-  fetch('./Docker学习.md?v=20260707c').then(function (response) { if (!response.ok) throw new Error(); return response.text(); }).then(function (md) { content.innerHTML = parse(md.replace(/\r\n/g, '\n').split('\n')); addCopyButtons(); buildToc(); }).catch(function () { content.innerHTML = '<h1>Docker学习</h1><p>笔记文件暂时无法读取。</p>'; });
+  fetch('./Docker学习.md?v=20260707e').then(function (response) { if (!response.ok) throw new Error(); return response.text(); }).then(function (md) { content.innerHTML = parse(md.replace(/\r\n/g, '\n').split('\n')); addSyntaxHighlighting(); addCopyButtons(); buildToc(); }).catch(function () { content.innerHTML = '<h1>Docker学习</h1><p>笔记文件暂时无法读取。</p>'; });
 })();

@@ -474,7 +474,7 @@ docker.cnb.cool/kyle-cnb/docker-learning   latest    97f491c9e63c   4 hours ago 
 ubuntu                                     latest    b7f48194d4d8   8 days ago    155MB
 ```
 
-`docker tag` 不会重命名或复制镜像，而是为同一个镜像 ID 新增一个指向目标仓库的引用。若在 `docker build` 时已经使用完整仓库名和版本标签（例如 `:v1.0.0`），则不需要再次执行 `docker tag`。
+`docker tag` 不会重命名或复制镜像，而是为同一个镜像 ID 新增一个指向目标仓库的引用。若在 [`docker build` 时](#section-20)已经使用完整仓库名和版本标签（例如 `:v1.0.0`），则不需要再次执行 `docker tag`。
 
 ### 第三步：上传镜像
 
