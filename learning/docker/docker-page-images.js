@@ -5,6 +5,7 @@
     'CNB Docker 制品的使用方式选择界面': 'image-20260706032005537.png',
     'CNB Docker 制品的本地命令行推送指引': 'image-20260706032048008.png',
     'CNB 个人设置中的访问令牌创建界面': 'image-20260706032302171.png',
+    'CNB 访问令牌创建成功页面': 'image-20260706032406427-redacted.png',
     'CNB 制品列表中的 docker-learning 镜像': 'image-20260706033226226.png',
     'CNB docker-learning 镜像详情页': 'image-20260706033939536.png'
   };
@@ -25,7 +26,7 @@
       link.title = '在新窗口查看原图';
 
       var image = document.createElement('img');
-      image.src = './assets/' + filename + '?v=20260706g';
+      image.src = './assets/' + filename + '?v=20260706h';
       image.alt = caption.textContent.trim();
       image.loading = 'lazy';
       image.decoding = 'async';
