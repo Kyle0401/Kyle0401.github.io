@@ -38,6 +38,10 @@
 .code-block pre code { display:block; padding:0; color:inherit; background:transparent; font-size:14px; line-height:1.75; }
 .code-block pre code.hljs { overflow:visible; background:transparent; }
 .code-block .hljs-comment,.code-block .hljs-quote { font-style:italic; }
+.article a[href^="#"] { color:#0875c8; text-decoration-line:underline; text-decoration-style:solid; text-decoration-thickness:1.5px; text-underline-offset:3px; }
+.article a[href^="#"] code { color:inherit; }
+.article a[href^="#"]:hover { color:#075f9f; text-decoration-thickness:2px; }
+.article a[href^="#"]:focus-visible { outline:2px solid rgba(8,117,200,.38); outline-offset:3px; border-radius:4px; }
 .figure-ui { overflow:hidden; background:#f8faff; border:1px solid var(--note-line); border-radius:12px; }
 .figure-ui-top { display:flex; align-items:center; justify-content:space-between; padding:11px 14px; color:#eff8ff; background:linear-gradient(110deg,#1b4f73,#187ab7); font-size:12px; font-weight:800; }
 .figure-ui-top span:last-child { padding:3px 7px; background:rgba(255,255,255,.16); border-radius:99px; font-size:10px; }
