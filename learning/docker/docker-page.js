@@ -12,6 +12,7 @@
     'CNB Docker 制品的使用方式选择界面': ['use', '选择 Docker 制品的使用方式', ['本地命令行推送', '流水线中使用', '拉取并运行']],
     'CNB Docker 制品的本地命令行推送指引': ['guide', '本地命令行推送使用指引', ['docker login', 'docker tag', 'docker push']],
     'CNB 个人设置中的访问令牌创建界面': ['credential', '个人设置中的访问令牌入口', ['访问令牌', '创建新令牌', '权限与有效期']],
+    'CNB 访问令牌创建成功页面': ['credential', '访问令牌创建成功页面', ['令牌名称', 'Git Username', 'Token']],
     'CNB 制品列表中的 docker-learning 镜像': ['list', '制品列表中的 docker-learning 镜像', ['docker-learning', 'latest', '镜像摘要与大小']],
     'CNB docker-learning 镜像详情页': ['detail', 'docker-learning 镜像详情', ['标签与摘要', '镜像层', '拉取使用指引']]
   };
@@ -112,5 +113,5 @@
   tocToggle.addEventListener('click', function () { setTocClosed(!toc.classList.contains('is-collapsed')); });
   bulkToggle.addEventListener('click', function () { var list = branches(), close = !list.every(function (x) { return x.classList.contains('is-collapsed'); }); list.forEach(function (item) { item.classList.toggle('is-collapsed', close); var btn = item.querySelector(':scope > .toc-row > .toc-item-toggle'); if (btn) btn.setAttribute('aria-expanded', String(!close)); }); refreshBulk(); });
 
-  fetch('./Docker学习.md?v=20260706e').then(function (response) { if (!response.ok) throw new Error(); return response.text(); }).then(function (md) { content.innerHTML = parse(md.replace(/\r\n/g, '\n').split('\n')); buildToc(); }).catch(function () { content.innerHTML = '<h1>Docker学习</h1><p>笔记文件暂时无法读取。</p>'; });
+  fetch('./Docker学习.md?v=20260706h').then(function (response) { if (!response.ok) throw new Error(); return response.text(); }).then(function (md) { content.innerHTML = parse(md.replace(/\r\n/g, '\n').split('\n')); buildToc(); }).catch(function () { content.innerHTML = '<h1>Docker学习</h1><p>笔记文件暂时无法读取。</p>'; });
 })();
