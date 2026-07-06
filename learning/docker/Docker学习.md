@@ -292,7 +292,7 @@ CNB 使用访问令牌进行鉴权。可在个人设置的“访问令牌”中�
 
 ![CNB 个人设置中的访问令牌创建界面](data:image/webp;base64,UklGRlAAAABXRUJQVlA4IEQAAADwAQCdASoIBwB+JaQAA3HhD3T1EAA2JaW76H/aX2hGU1jyQ5oYPNhF+WB7w/JX8evcpCfqPJr+u4AA/vN7yZEhW57Lf4ZqgsLLE1/9s7XjQjwxOCvW9akONLfMfWzG1gn0K/4xULn5CT7L0iU4iSEmP7kJwnXB+KZXj0/rnWlAvDo43dQAA==)
 
-创建令牌后，可用 Token 登录 CNB 镜像仓库。访问令牌不应提交到公开仓库、网页或日志中。
+创建令牌后，可用 Token 登录 CNB 镜像仓库。
 
 ![CNB 访问令牌创建成功页面](data:image/webp;base64,UklGRlAAAABXRUJQVlA4IEQAAADwAQCdASoIBwB+JaQAA3HhD3T1EAA2JaW76H/aX2hGU1jyQ5oYPNhF+WB7w/JX8evcpCfqPJr+u4AA/vN7yZEhW57Lf4ZqgsLLE1/9s7XjQjwxOCvW9akONLfMfWzG1gn0K/4xULn5CT7L0iU4iSEmP7kJwnXB+KZXj0/rnWlAvDo43dQAA==)
 
