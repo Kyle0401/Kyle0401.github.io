@@ -178,5 +178,5 @@
   tocToggle.addEventListener('click', function () { setTocClosed(!toc.classList.contains('is-collapsed')); });
   bulkToggle.addEventListener('click', function () { var list = branches(), close = !list.every(function (x) { return x.classList.contains('is-collapsed'); }); list.forEach(function (item) { item.classList.toggle('is-collapsed', close); var btn = item.querySelector(':scope > .toc-row > .toc-item-toggle'); if (btn) btn.setAttribute('aria-expanded', String(!close)); }); refreshBulk(); });
 
-  fetch('./Docker学习.md?v=20260707b').then(function (response) { if (!response.ok) throw new Error(); return response.text(); }).then(function (md) { content.innerHTML = parse(md.replace(/\r\n/g, '\n').split('\n')); addCopyButtons(); buildToc(); }).catch(function () { content.innerHTML = '<h1>Docker学习</h1><p>笔记文件暂时无法读取。</p>'; });
+  fetch('./Docker学习.md?v=20260707c').then(function (response) { if (!response.ok) throw new Error(); return response.text(); }).then(function (md) { content.innerHTML = parse(md.replace(/\r\n/g, '\n').split('\n')); addCopyButtons(); buildToc(); }).catch(function () { content.innerHTML = '<h1>Docker学习</h1><p>笔记文件暂时无法读取。</p>'; });
 })();
