@@ -20,11 +20,11 @@
 [registry-host[:port]/][namespace/]repository[:tag]
 ```
 
-`library/hello-world` 对应 Docker Hub 的官方镜像命名空间。`library` 是 Docker Hub 为官方镜像保留的特殊命名空间，并不是普通用户组织。未显式指定 registry、namespace 或 tag 时，Docker 会按默认规则补全；默认 tag 为 `latest`。
+`library/hello-world` 对应 Docker Hub 的官方镜像命名空间。`library` 是 Docker Hub 为官方镜像保留的特殊命名空间，并不是普通用户组织。未指定 registry 时默认使用 Docker Hub（`docker.io`），未指定 namespace 时默认使用 `library`，未指定 tag 时默认使用 `latest`。`latest` 只是默认标签，并不保证它一定是时间上最新的版本。
 
 ### 3. `docker images`
 
-查看本地已拉取的镜像。
+查看本地镜像。
 
 ### 4. `docker run library/hello-world`
 
@@ -39,13 +39,33 @@
 运行 Ubuntu 容器并进入 `bash`。
 
 > [!NOTE]
-> `-i` 即 `--interactive`，保持标准输入开启；`-t` 即 `--tty`，为容器分配伪终端（pseudo-TTY）。二者常配合使用，使容器内的 `bash` 能够像本机终端一样交互并正确显示提示符。
+>
+> Docker 里 `-t` 的长选项是：
+>
+> ```bash
+> --tty
+> ```
+>
+> 其中 **TTY** 原本指 *Teletypewriter*，在现代 Unix/Linux 语境中通常泛指**终端设备**。
+>
+> 在 Docker 中，`-t` 的作用是：
+>
+> > 为容器分配一个**伪终端（pseudo-TTY）**。
+>
+> 例如：
+>
+> ```bash
+> docker run -it ubuntu bash
+> ```
+>
+> 这里：
+>
+> - `-i`：`--interactive`，保持标准输入开启；
+> - `-t`：`--tty`，分配伪终端。
+>
+> 二者常配合使用，才能让容器中的 `bash` 像本机终端一样可交互使用、正确显示提示符和部分命令的格式。Docker 官方对 `-t, --tty` 的定义就是“Allocate a pseudo-TTY”。
 
-```bash
-docker run -it ubuntu bash
 ```
-
-```text
 ➜  /workspace git:(main) docker run -it ubuntu bash
 Unable to find image 'ubuntu:latest' locally
 latest: Pulling from library/ubuntu
@@ -64,75 +84,101 @@ exit
 
 #### 后台运行容器
 
-```bash
-docker run -it -d ubuntu
-docker ps
-docker ps -a
 ```
-
-```text
-➜  /workspace git:(main) docker run -it -d ubuntu
+➜  /workspace git:(main) docker run -dit ubuntu bash
 7f2ce79b0dc9bf7f5eb703ff2d919db2d435e9808db524cb360aa870b797e3ad
 ➜  /workspace git:(main) docker ps
 CONTAINER ID   IMAGE     COMMAND       CREATED         STATUS         PORTS     NAMES
 7f2ce79b0dc9   ubuntu    "/bin/bash"   5 seconds ago   Up 5 seconds             adoring_payne
+➜  /workspace git:(main) docker ps -a
+CONTAINER ID   IMAGE         COMMAND       CREATED          STATUS                      PORTS     NAMES
+7f2ce79b0dc9   ubuntu        "/bin/bash"   13 seconds ago   Up 12 seconds                         adoring_payne
+8aecb273d78d   ubuntu        "bash"        7 minutes ago    Exited (0) 4 minutes ago              laughing_cohen
+7a04315e84e5   hello-world   "/hello"      26 minutes ago   Exited (0) 26 minutes ago             tender_hodgkin
+➜  /workspace git:(main)
 ```
 
 `-d` 即 `--detach`，表示让容器在后台运行。容器是否持续运行取决于其主进程（PID 1）是否仍在运行；实际服务通常应以前台方式启动 Web 服务、数据库或其他长期运行进程。
 
 #### 进入后台运行的容器
 
-```bash
-docker exec -it <container-id> bash
+可以通过 `docker exec -it 7f2ce79b0dc9 bash` 进入容器；`7f2ce79b0dc9` 是刚才后台运行的 Ubuntu 容器 ID。
+
 ```
-
-例如：
-
-```bash
-docker exec -it 7f2ce79b0dc9 bash
+➜  /workspace git:(main) docker exec -it 7f2ce79b0dc9 bash
+root@7f2ce79b0dc9:/# exit
+exit
+➜  /workspace git:(main) docker ps
+CONTAINER ID   IMAGE     COMMAND       CREATED         STATUS         PORTS     NAMES
+7f2ce79b0dc9   ubuntu    "/bin/bash"   4 minutes ago   Up 4 minutes             adoring_payne
 ```
 
 `exit` 只会退出本次通过 `exec` 启动的 `bash`，不会停止原容器的主进程。
 
 #### 停止容器
 
-```bash
-docker stop <container-id>
-```
+使用 `docker stop 7f2ce79b0dc9`，即 `docker stop` 加容器 ID。
 
-停止后可通过 `docker ps -a` 查看容器状态。若容器在宽限期内未自行退出，Docker 会强制终止它，因此可能看到退出码 `137`。
+```
+➜  /workspace git:(main) docker stop 7f2ce79b0dc9
+
+7f2ce79b0dc9
+➜  /workspace git:(main)
+➜  /workspace git:(main) docker ps
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+➜  /workspace git:(main) docker ps -a
+CONTAINER ID   IMAGE         COMMAND       CREATED          STATUS                        PORTS     NAMES
+7f2ce79b0dc9   ubuntu        "/bin/bash"   7 minutes ago    Exited (137) 16 seconds ago             adoring_payne
+8aecb273d78d   ubuntu        "bash"        14 minutes ago   Exited (0) 11 minutes ago               laughing_cohen
+7a04315e84e5   hello-world   "/hello"      34 minutes ago   Exited (0) 34 minutes ago               tender_hodgkin
+```
 
 ### 7. `docker rm <container-id> ...`
 
-删除 `docker ps -a` 中的已停止容器记录。
+删除已停止的容器，而不只是隐藏 `docker ps -a` 中的记录。运行中的容器需要先停止，或在明确了解影响后使用 `docker rm -f`。
 
-```bash
-docker rm 7f2ce79b0dc9
-docker rm 8aecb273d78d 7a04315e84e5
 ```
-
-运行中的容器需要先停止，或显式使用强制删除选项。
+➜  /workspace git:(main) docker rm 7f2ce79b0dc9
+7f2ce79b0dc9
+➜  /workspace git:(main) docker ps -a
+CONTAINER ID   IMAGE         COMMAND    CREATED          STATUS                      PORTS     NAMES
+8aecb273d78d   ubuntu        "bash"     15 minutes ago   Exited (0) 12 minutes ago             laughing_cohen
+7a04315e84e5   hello-world   "/hello"   34 minutes ago   Exited (0) 34 minutes ago             tender_hodgkin
+➜  /workspace git:(main) docker rm 8aecb273d78d 7a04315e84e5
+8aecb273d78d
+7a04315e84e5
+➜  /workspace git:(main) docker ps -a
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+```
 
 ### 8. `docker rmi <image-id> <image-name> ...`
 
-删除已拉取的本地镜像。
+删除本地镜像。若仍有容器依赖该镜像，需要先删除相关容器，或确认强制删除的影响。
 
-```bash
-docker rmi 53958ec7b67c
-docker rmi 96498ffd522e
 ```
-
-若仍有容器依赖该镜像，需要先删除相关容器，或确认强制删除的影响。
+➜  /workspace git:(main) docker images
+REPOSITORY    TAG       IMAGE ID       CREATED        SIZE
+ubuntu        latest    53958ec7b67c   3 weeks ago    155MB
+hello-world   latest    96498ffd522e   3 months ago   16.3kB
+➜  /workspace git:(main) docker rmi 53958ec7b67c
+Untagged: ubuntu:latest
+Deleted: sha256:53958ec7b67c2c9355df922dd08dbf0360611f8c3cdb656875e81873db9ffdba
+➜  /workspace git:(main) docker images
+REPOSITORY    TAG       IMAGE ID       CREATED        SIZE
+hello-world   latest    96498ffd522e   3 months ago   16.3kB
+➜  /workspace git:(main) docker rmi 96498ffd522e
+Untagged: hello-world:latest
+Deleted: sha256:96498ffd522e70807ab6384a5c0485a79b9c7c08ca79ba08623edcad1054e62d
+➜  /workspace git:(main) docker images
+REPOSITORY   TAG       IMAGE ID   CREATED   SIZE
+```
 
 ### 9. `docker logs <container-id>`
 
-查看指定容器的标准输出和标准错误日志。
+查看指定容器写入标准输出（stdout）和标准错误（stderr）的日志。例如：
 
-```bash
-docker logs 00a913763c7e
 ```
-
-```text
+➜  /workspace git:(main) docker logs 00a913763c7e
 [2026-07-05T19:05:08.527Z] info  code-server 4.127.0 1e6ed874e3138141a5636f6e0dbe8570aa6cd001
 [2026-07-05T19:05:08.528Z] info  Using user-data-dir /root/.local/share/code-server
 [2026-07-05T19:05:08.535Z] info  Using config file /root/.config/code-server/config.yaml
@@ -148,89 +194,139 @@ docker logs 00a913763c7e
 
 ### 1. 创建带端口映射的 Ubuntu 容器
 
-```bash
-docker run -it -p 8000:8000 ubuntu bash
+```
+➜  /workspace git:(main) docker run -it -p 8000:8000 ubuntu bash
+Unable to find image 'ubuntu:latest' locally
+latest: Pulling from library/ubuntu
+2c1ce1d0a589: Download complete
+a9be9fd915e9: Download complete
+Digest: sha256:b7f48194d4d8b763a478a621cdc81c27be222ba2206ca3ca6bc42b49685f3d9e
+Status: Downloaded newer image for ubuntu:latest
 ```
 
-`-p 8000:8000` 是端口发布（port publishing），格式为：
+`-p` 用于发布容器端口，使宿主机能够访问容器内的网络服务。
 
-```text
--p 宿主机端口:容器端口
-```
-
-它将宿主机的 `8000` 端口映射到容器内部的 `8000` 端口。假设容器内启动了监听 `8000` 端口的 Web 服务，例如：
-
-```bash
-python3 -m http.server 8000
-```
-
-那么可从宿主机浏览器访问：
-
-```text
-http://localhost:8000
-```
-
-Docker 会将该请求转发到容器中的 `8000` 端口。
+> [!NOTE]
+>
+> `-p 8000:8000` 是 **端口映射（port publishing）**，格式为：
+>
+> ```
+> -p 宿主机端口:容器端口
+> ```
+>
+> 因此：
+>
+> ```
+> -p 8000:8000
+> ```
+>
+> 表示把：
+>
+> - 你电脑上的 `8000` 端口
+> - 映射到 Docker 容器内部的 `8000` 端口
+>
+> 假设容器里启动了一个监听 `8000` 端口的 Web 服务，例如：
+>
+> ```
+> python3 -m http.server 8000
+> ```
+>
+> 那么你可以在宿主机浏览器访问：
+>
+> ```
+> http://localhost:8000
+> ```
+>
+> 请求会被 Docker 转发到容器里的 `8000` 端口。
+>
+> 如果没有写宿主机 IP，`-p 8000:8000` 默认绑定宿主机的所有网络接口，外部网络可能也能访问该端口。仅需本机访问时可写成 `-p 127.0.0.1:8000:8000`；在 CNB 这类受控云开发环境中，则根据平台的端口访问控制决定绑定方式。
 
 ### 2. 安装 `curl` 与 code-server
 
-进入容器后先更新软件包索引并安装 `curl`：
+接下来执行两个命令：
 
 ```bash
-apt update
-apt install -y curl
+apt-get update
+apt-get install -y curl ca-certificates
 ```
 
-`curl` 是命令行网络数据传输工具，可通过 URL 下载内容、发起 HTTP 请求、上传数据或测试网络接口。
+使用 `curl` 进行后续 code-server 安装。`curl` 是一个**命令行网络数据传输工具**，通常用于通过 URL 下载内容、上传数据或测试网络请求。
 
-code-server 的安装命令可从 [coder/code-server: VS Code in the browser](https://github.com/coder/code-server) 获取：
+接下来安装 code-server，对应命令可从官方文档或 GitHub 仓库获取：
+
+[coder/code-server: VS Code in the browser](https://github.com/coder/code-server)
+
+可先用 `--dry-run` 查看安装脚本将执行的操作，再正式安装：
 
 ```bash
+curl -fsSL https://code-server.dev/install.sh | sh -s -- --dry-run
 curl -fsSL https://code-server.dev/install.sh | sh
 ```
 
-首次执行 `code-server` 时，会生成默认配置文件；默认服务监听在 `127.0.0.1:8080`，并启用密码认证：
+然后再做以下操作：
 
-```text
+```bash
 root@ee5dbce07d54:/# code-server
 [2026-07-02T17:20:39.840Z] info  Wrote default config file to /root/.config/code-server/config.yaml
 [2026-07-02T17:20:39.947Z] info  code-server 4.127.0 1e6ed874e3138141a5636f6e0dbe8570aa6cd001
+[2026-07-02T17:20:39.948Z] info  Using user-data-dir /root/.local/share/code-server
+[2026-07-02T17:20:39.955Z] info  Using config file /root/.config/code-server/config.yaml
 [2026-07-02T17:20:39.955Z] info  HTTP server listening on http://127.0.0.1:8080/
 [2026-07-02T17:20:39.955Z] info    - Authentication is enabled
 [2026-07-02T17:20:39.955Z] info      - Using password from /root/.config/code-server/config.yaml
+[2026-07-02T17:20:39.955Z] info    - Not serving HTTPS
+[2026-07-02T17:20:39.955Z] info  Session server listening on /root/.local/share/code-server/code-server-ipc.sock
+
+^Croot@ee5dbce07d54:/#
+root@ee5dbce07d54:/# code-server --bind-addr=0.0.0.0:8000 --auth=none
+[2026-07-02T17:23:00.066Z] info  code-server 4.127.0 1e6ed874e3138141a5636f6e0dbe8570aa6cd001
+[2026-07-02T17:23:00.067Z] info  Using user-data-dir /root/.local/share/code-server
+[2026-07-02T17:23:00.075Z] info  Using config file /root/.config/code-server/config.yaml
+[2026-07-02T17:23:00.075Z] info  HTTP server listening on http://0.0.0.0:8000/
+[2026-07-02T17:23:00.075Z] info    - Authentication is disabled
+[2026-07-02T17:23:00.075Z] info    - Not serving HTTPS
+[2026-07-02T17:23:00.075Z] info  Session server listening on /root/.local/share/code-server/code-server-ipc.sock
+[17:41:50]
 ```
 
-使用下面的启动方式，使 code-server 监听所有 IPv4 接口的 `8000` 端口，并关闭临时访问密码：
+`--bind-addr` 用于指定监听地址与端口，以便从容器外部访问。
 
-```bash
-code-server --bind-addr=0.0.0.0:8000 --auth=none
+其中：
+
+```
+--bind-addr=0.0.0.0:8000
 ```
 
-`--bind-addr=0.0.0.0:8000` 的含义如下：
+是让 `code-server` **监听网络地址 `0.0.0.0` 的 8000 端口**。
 
-| 部分 | 含义 |
-| --- | --- |
-| `0.0.0.0` | 监听当前机器的所有 IPv4 网络接口 |
-| `8000` | code-server 对外提供 Web 服务的端口 |
+| 部分      | 含义                                 |
+| --------- | ------------------------------------ |
+| `0.0.0.0` | 监听当前机器的**所有 IPv4 网络接口** |
+| `8000`    | code-server 对外提供 Web 服务的端口  |
 
-`--auth=none` 表示禁用认证。它只适用于受控的开发环境；在可被公网访问的场景中，不应直接关闭认证，应配合访问控制、反向代理或安全网络使用。
+也就是说，code-server 不仅能通过本机访问，还会接收来自网卡、局域网或 Docker 网络的请求。
 
-通过 CNB 的 **PORTS** 面板提供的访问地址，可以进入浏览器中的 code-server：
+`--auth=none` 表示禁用认证。
 
-![通过 CNB 端口访问 code-server 的浏览器界面](data:image/webp;base64,UklGRkYAAABXRUJQVlA4IDoAAADwAQCdASoIBwB+JaQAA3HhD3T1EAA2JaW76H/aX2hGU1jyQ5oYPNhF+WB7w/JX8evcpCfqPJr+u4AA/vN7yZEhW57Lf4ZqgsLLE1/9s7XjQjwxOCvW9akONLfMfWzG1gn0K/4xULn5CT7L0iU4iSEmP7kJwnXB+KZXj0/rnWlAvDo43dQAA==)
+> [!NOTE]
+> **安全提示：**不应把关闭认证的 code-server 直接暴露到公网，否则他人可能通过内置终端控制运行环境。这里只适用于 CNB 已提供访问控制的临时开发环境；其他场景应保留认证，并配合 HTTPS、反向代理或受限网络。
+
+之后可通过 CNB 的 **PORTS** 面板提供的地址访问浏览器中的 code-server。该地址可能随工作区变化，因此不在笔记中保存临时 URL。
+
+![通过 CNB 端口访问 code-server 的浏览器界面](assets/image-20260703022125604.png)
+
+以上步骤仍然接近“打开一台虚拟机后手动安装软件”，不利于重复执行和版本管理。下面将环境固化为镜像。
+
+一共有两种方法：
 
 ### 3. 通过交互式容器打包镜像：`docker commit`
 
-前面的步骤依旧接近“打开一台虚拟机后手动安装软件”。为了将当前容器中的环境固化下来，可以使用：
-
-```text
 docker commit <container-id> [image-name[:tag]]
-docker run <image>  →  container
+docker run <image> → container
+
+`docker commit` 会把容器当前的文件系统状态创建为新镜像；它适合学习和临时快照，但难以复现、审查与自动化。正式项目应优先使用 Dockerfile。
+
 ```
-
-`docker commit` 会把指定容器当前的文件系统状态创建为新镜像。未指定镜像名称和标签时，结果会以 `<none>:<none>` 的形式出现，但仍可通过镜像 ID 使用。
-
-```text
 ➜  /workspace git:(main) docker ps
 CONTAINER ID   IMAGE     COMMAND   CREATED          STATUS          PORTS                                         NAMES
 7bd8b92526c3   ubuntu    "bash"    36 minutes ago   Up 36 minutes   0.0.0.0:8000->8000/tcp, [::]:8000->8000/tcp   focused_brahmagupta
@@ -240,27 +336,125 @@ sha256:97f491c9e63c5f73fd3913372e404ccd7f7481003edd9297d7a628e49737f136
 REPOSITORY   TAG       IMAGE ID       CREATED          SIZE
 <none>       <none>    97f491c9e63c   17 minutes ago   1.48GB
 ubuntu       latest    b7f48194d4d8   8 days ago       155MB
+➜  /workspace git:(main) docker run -it -p 8000:8000 97f491c9e63c code-server --bind-addr=0.0.0.0:8000 --auth=none
+[2026-07-05T16:31:13.386Z] info  code-server 4.127.0 1e6ed874e3138141a5636f6e0dbe8570aa6cd001
+[2026-07-05T16:31:13.386Z] info  Using user-data-dir /root/.local/share/code-server
+[2026-07-05T16:31:13.394Z] info  Using config file /root/.config/code-server/config.yaml
+[2026-07-05T16:31:13.394Z] info  HTTP server listening on http://0.0.0.0:8000/
+[2026-07-05T16:31:13.394Z] info    - Authentication is disabled
+[2026-07-05T16:31:13.394Z] info    - Not serving HTTPS
+[2026-07-05T16:31:13.394Z] info  Session server listening on /root/.local/share/code-server/code-server-ipc.sock
+[16:31:18]
 ```
 
-使用该镜像启动 code-server：
+前台运行时，退出终端会结束 code-server。若要让它作为容器主进程在后台运行，可以执行：
 
-```bash
-docker run -it -p 8000:8000 97f491c9e63c \
-  code-server --bind-addr=0.0.0.0:8000 --auth=none
+```
+➜  /workspace git:(main) docker run -d -p 8000:8000 --entrypoint code-server 97f491c9e63c --bind-addr=0.0.0.0:8000 --auth=none
+00a913763c7e5f5d80297bc6949d5d3d0840c57abb3575d3ff34e6838d13e029
+➜  /workspace git:(main) docker ps
+CONTAINER ID   IMAGE          COMMAND                   CREATED          STATUS          PORTS                                         NAMES
+00a913763c7e   97f491c9e63c   "code-server --bind-…"   27 seconds ago   Up 26 seconds   0.0.0.0:8000->8000/tcp, [::]:8000->8000/tcp   vigilant_cannon
+➜  /workspace git:(main) docker logs 00a913763c7e
+[2026-07-05T19:05:08.527Z] info  code-server 4.127.0 1e6ed874e3138141a5636f6e0dbe8570aa6cd001
+[2026-07-05T19:05:08.528Z] info  Using user-data-dir /root/.local/share/code-server
+[2026-07-05T19:05:08.535Z] info  Using config file /root/.config/code-server/config.yaml
+[2026-07-05T19:05:08.535Z] info  HTTP server listening on http://0.0.0.0:8000/
+[2026-07-05T19:05:08.535Z] info    - Authentication is disabled
+[2026-07-05T19:05:08.535Z] info    - Not serving HTTPS
+[2026-07-05T19:05:08.535Z] info  Session server listening on /root/.local/share/code-server/code-server-ipc.sock
 ```
 
-若要让 code-server 作为容器主进程在后台运行，可覆盖镜像默认 entrypoint：
-
-```bash
-docker run -it -p 8000:8000 --entrypoint "code-server" -d 97f491c9e63c \
-  --bind-addr=0.0.0.0:8000 --auth=none
-```
-
-`--entrypoint "code-server"` 用于覆盖镜像默认入口程序，使容器直接以 `code-server` 启动；`-d` 用于后台运行。随后可以用 `docker logs <container-id>` 查看服务日志。
+`--entrypoint code-server` 用于覆盖镜像默认入口程序，使容器直接以 code-server 启动；`-d` 用于后台运行。这里无需 `-it`，因为服务不需要交互式终端。
 
 ### 4. 通过 Dockerfile 构建镜像
 
-Dockerfile 方式可将环境构建步骤写成可复现的文本配置，便于版本管理和自动化构建。此处暂未记录具体 Dockerfile 内容，后续补充。
+首先在代码仓库中创建 `Dockerfile`：
+
+![在代码仓库中创建 Dockerfile](assets/image-20260706234000076.png)
+
+把前面的手动操作转换成可复现的 Dockerfile 指令：
+
+```dockerfile
+# syntax=docker/dockerfile:1
+FROM ubuntu:24.04
+
+ARG CODE_SERVER_VERSION=4.127.0
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates curl \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN curl -fsSL https://code-server.dev/install.sh -o /tmp/install-code-server.sh \
+    && sh /tmp/install-code-server.sh --version "${CODE_SERVER_VERSION}" \
+    && rm /tmp/install-code-server.sh
+
+RUN code-server --install-extension golang.go
+
+EXPOSE 8000
+
+ENTRYPOINT ["code-server"]
+CMD ["--bind-addr=0.0.0.0:8000", "--auth=none"]
+```
+
+这里做了几项改进：
+
+- 使用 `ubuntu:24.04`，避免 `latest` 随时间变化而让基础系统版本不明确；
+- 在同一个 `RUN` 中完成 `apt-get update`、安装与索引清理，减少缓存问题和镜像体积；
+- 固定 code-server 版本，使构建结果更容易复现；
+- 用 `ENTRYPOINT` 和 `CMD` 设置默认启动方式，运行镜像时不再需要手动覆盖入口程序；
+- `EXPOSE 8000` 只用于说明容器内服务端口，真正发布到宿主机仍需使用 `-p`。
+
+> [!NOTE]
+> 该示例保留 `--auth=none` 是为了配合已有访问控制的 CNB 临时开发环境。若镜像会直接暴露到公网，应删除这个参数并配置认证与 HTTPS。
+
+构建镜像：
+
+```bash
+docker build --pull \
+  -t docker.cnb.cool/kyle-cnb/docker-learning:v1.0.0 .
+```
+
+其中 `-t` 用于设置镜像名称和版本标签，末尾的 `.` 表示使用当前目录作为构建上下文。`--pull` 会检查基础镜像是否有更新。
+
+构建完成后可直接运行：
+
+```bash
+docker run -d --name code-server -p 8000:8000 \
+  docker.cnb.cool/kyle-cnb/docker-learning:v1.0.0
+```
+
+后续若要预装 code-server 扩展，只需继续迭代 Dockerfile 并更新镜像版本。例如：
+
+```dockerfile
+RUN code-server --install-extension golang.go
+```
+
+![在 VS Code 扩展详情中查看 Go 扩展 Identifier](assets/image-20260707020711503.png)
+
+扩展命令使用详情页 **Identifier** 字段中的唯一标识，这里是 `golang.go`。
+
+**将 Dockerfile 保存到 CNB 代码仓库**
+
+```bash
+git add Dockerfile
+git commit -m "feat: add Dockerfile"
+git push --set-upstream origin main
+```
+
+`git push --set-upstream origin main` 会把本地 `main` 推送到名为 `origin` 的远程仓库，并建立本地 `main` 与 `origin/main` 的跟踪关系。`origin` 只是 Git 常用的默认远程名称，实际可以指向 CNB、GitHub、GitLab 或其他 Git 服务，并不特指 GitHub。
+
+建立跟踪关系后，后续通常只需执行 `git push`。如果 Git 已配置：
+
+```bash
+git config --global push.autoSetupRemote true
+```
+
+那么首次执行普通 `git push` 时，也可能自动建立上游分支。可用下面的命令检查该配置：
+
+```bash
+git config --get push.autoSetupRemote
+```
 
 ---
 
@@ -278,23 +472,28 @@ docker login
 
 登录私有仓库时，以 CNB 的镜像仓库为例，可以在制品页面找到 Docker 镜像制品：
 
-![CNB 制品页面中的 Docker 镜像制品](data:image/webp;base64,UklGRlAAAABXRUJQVlA4IEQAAADwAQCdASoIBwB+JaQAA3HhD3T1EAA2JaW76H/aX2hGU1jyQ5oYPNhF+WB7w/JX8evcpCfqPJr+u4AA/vN7yZEhW57Lf4ZqgsLLE1/9s7XjQjwxOCvW9akONLfMfWzG1gn0K/4xULn5CT7L0iU4iSEmP7kJwnXB+KZXj0/rnWlAvDo43dQAA==)
-
-点击“使用 Docker 制品”后，可以查看不同使用方式：
-
-![CNB Docker 制品的使用方式选择界面](data:image/webp;base64,UklGRlAAAABXRUJQVlA4IEQAAADwAQCdASoIBwB+JaQAA3HhD3T1EAA2JaW76H/aX2hGU1jyQ5oYPNhF+WB7w/JX8evcpCfqPJr+u4AA/vN7yZEhW57Lf4ZqgsLLE1/9s7XjQjwxOCvW9akONLfMfWzG1gn0K/4xULn5CT7L0iU4iSEmP7kJwnXB+KZXj0/rnWlAvDo43dQAA==)
+![CNB 制品页面中的 Docker 镜像制品](assets/image-20260706031930791.png)
 
 在制品 tag 的“使用指引”中，选择“本地命令行推送”可获得登录、构建、推送和拉取命令：
 
-![CNB Docker 制品的本地命令行推送指引](data:image/webp;base64,UklGRlAAAABXRUJQVlA4IEQAAADwAQCdASoIBwB+JaQAA3HhD3T1EAA2JaW76H/aX2hGU1jyQ5oYPNhF+WB7w/JX8evcpCfqPJr+u4AA/vN7yZEhW57Lf4ZqgsLLE1/9s7XjQjwxOCvW9akONLfMfWzG1gn0K/4xULn5CT7L0iU4iSEmP7kJwnXB+KZXj0/rnWlAvDo43dQAA==)
+![CNB Docker 制品的本地命令行推送指引](assets/image-20260706032048008.png)
 
 CNB 使用访问令牌进行鉴权。可在个人设置的“访问令牌”中创建令牌：
 
-![CNB 个人设置中的访问令牌创建界面](data:image/webp;base64,UklGRlAAAABXRUJQVlA4IEQAAADwAQCdASoIBwB+JaQAA3HhD3T1EAA2JaW76H/aX2hGU1jyQ5oYPNhF+WB7w/JX8evcpCfqPJr+u4AA/vN7yZEhW57Lf4ZqgsLLE1/9s7XjQjwxOCvW9akONLfMfWzG1gn0K/4xULn5CT7L0iU4iSEmP7kJwnXB+KZXj0/rnWlAvDo43dQAA==)
+![CNB 个人设置中的访问令牌创建界面](assets/image-20260706032302171.png)
 
-创建令牌后，可用 Token 登录 CNB 镜像仓库。
+创建令牌后，可将 Token 通过标准输入传给 Docker，避免它出现在命令历史中：
 
-![CNB 访问令牌创建成功页面](data:image/webp;base64,UklGRlAAAABXRUJQVlA4IEQAAADwAQCdASoIBwB+JaQAA3HhD3T1EAA2JaW76H/aX2hGU1jyQ5oYPNhF+WB7w/JX8evcpCfqPJr+u4AA/vN7yZEhW57Lf4ZqgsLLE1/9s7XjQjwxOCvW9akONLfMfWzG1gn0K/4xULn5CT7L0iU4iSEmP7kJwnXB+KZXj0/rnWlAvDo43dQAA==)
+```bash
+read -rsp "CNB Token: " CNB_TOKEN; echo
+printf '%s' "$CNB_TOKEN" | docker login docker.cnb.cool \
+  --username <cnb-username> --password-stdin
+unset CNB_TOKEN
+```
+
+![CNB 访问令牌创建成功页面](assets/image-20260706032406427-redacted.png)
+
+公开笔记和截图中不要保留真实 Token。Docker 可能把登录凭据写入用户目录下的配置文件；在非 Docker Desktop 环境中应配置 credential helper，使用完也可执行 `docker logout docker.cnb.cool`。
 
 ### 第二步：为镜像添加仓库标签
 
@@ -306,13 +505,12 @@ docker.cnb.cool/kyle-cnb/docker-learning   latest    97f491c9e63c   4 hours ago 
 ubuntu                                     latest    b7f48194d4d8   8 days ago    155MB
 ```
 
-`docker tag` 会为已有镜像添加新的仓库名称与标签，镜像 ID 不会改变。此标签决定后续 `docker push` 要推送到的目标仓库。
+`docker tag` 不会重命名或复制镜像，而是为同一个镜像 ID 新增一个指向目标仓库的引用。若在 `docker build` 时已经使用完整仓库名和版本标签（例如 `:v1.0.0`），则不需要再次执行 `docker tag`。
 
 ### 第三步：上传镜像
 
 ```text
-➜  /workspace git:(main) docker push docker.cnb.cool/kyle-cnb/docker-learning
-Using default tag: latest
+➜  /workspace git:(main) docker push docker.cnb.cool/kyle-cnb/docker-learning:latest
 The push refers to repository [docker.cnb.cool/kyle-cnb/docker-learning]
 18582ffa9453: Pushed
 a9be9fd915e9: Pushed
@@ -320,26 +518,34 @@ a9be9fd915e9: Pushed
 latest: digest: sha256:97f491c9e63c5f73fd3913372e404ccd7f7481003edd9297d7a628e49737f136 size: 1172
 ```
 
+建议显式写出标签，避免误以为 `latest` 自动代表最新版本。Dockerfile 构建出的版本也可以单独推送：
+
+```bash
+docker push docker.cnb.cool/kyle-cnb/docker-learning:v1.0.0
+```
+
 上传完成后，可以在 CNB 的“制品”标签中看到镜像：
 
-![CNB 制品列表中的 docker-learning 镜像](data:image/webp;base64,UklGRlAAAABXRUJQVlA4IEQAAADwAQCdASoIBwB+JaQAA3HhD3T1EAA2JaW76H/aX2hGU1jyQ5oYPNhF+WB7w/JX8evcpCfqPJr+u4AA/vN7yZEhW57Lf4ZqgsLLE1/9s7XjQjwxOCvW9akONLfMfWzG1gn0K/4xULn5CT7L0iU4iSEmP7kJwnXB+KZXj0/rnWlAvDo43dQAA==)
+![CNB 制品列表中的 docker-learning 镜像](assets/image-20260706033226226.png)
 
 镜像详情页会展示标签、摘要、大小与镜像层信息：
 
-![CNB docker-learning 镜像详情页](data:image/webp;base64,UklGRlAAAABXRUJQVlA4IEQAAADwAQCdASoIBwB+JaQAA3HhD3T1EAA2JaW76H/aX2hGU1jyQ5oYPNhF+WB7w/JX8evcpCfqPJr+u4AA/vN7yZEhW57Lf4ZqgsLLE1/9s7XjQjwxOCvW9akONLfMfWzG1gn0K/4xULn5CT7L0iU4iSEmP7kJwnXB+KZXj0/rnWlAvDo43dQAA==)
+![CNB docker-learning 镜像详情页](assets/image-20260706033939536.png)
 
-### 第四步：使用已推送的镜像
+### 第四步：使用镜像
 
-```text
-➜  /workspace git:(main) docker run -it -p 8000:8000 --entrypoint "code-server" -d docker.cnb.cool/kyle-cnb/docker-learning --bind-addr=0.0.0.0:8000 --auth=none
-Unable to find image 'docker.cnb.cool/kyle-cnb/docker-learning:latest' locally
-latest: Pulling from kyle-cnb/docker-learning
-18582ffa9453: Pull complete
-a9be9fd915e9: Pull complete
-2c1ce1d0a589: Pull complete
-Digest: sha256:97f491c9e63c5f73fd3913372e404ccd7f7481003edd9297d7a628e49737f136
-Status: Downloaded newer image for docker.cnb.cool/kyle-cnb/docker-learning:latest
-bfba1585fecce5177a660fd9086402301f1a6ea48855a0ef69980d4a82c69d57
+```bash
+docker run -d --name code-server -p 8000:8000 \
+  docker.cnb.cool/kyle-cnb/docker-learning:v1.0.0
 ```
 
-当本地没有该镜像时，`docker run` 会先从指定仓库拉取镜像，再创建并启动容器。
+如果本地没有该镜像，`docker run` 会先从指定仓库拉取镜像，再创建并启动容器。由于 Dockerfile 已定义 `ENTRYPOINT` 和 `CMD`，这里无需再次传入 code-server 的启动参数。
+
+若使用前面通过 `docker commit` 生成、没有默认入口配置的 `latest` 镜像，则仍需显式覆盖入口：
+
+```bash
+docker run -d --name code-server -p 8000:8000 \
+  --entrypoint code-server \
+  docker.cnb.cool/kyle-cnb/docker-learning:latest \
+  --bind-addr=0.0.0.0:8000 --auth=none
+```
