@@ -321,8 +321,10 @@ root@ee5dbce07d54:/# code-server --bind-addr=0.0.0.0:8000 --auth=none
 
 ### 3. 通过交互式容器打包镜像：`docker commit`
 
+```text
 docker commit <container-id> [image-name[:tag]]
 docker run <image> → container
+```
 
 `docker commit` 会把容器当前的文件系统状态创建为新镜像；它适合学习和临时快照，但难以复现、审查与自动化。正式项目应优先使用 Dockerfile。
 
@@ -373,56 +375,23 @@ CONTAINER ID   IMAGE          COMMAND                   CREATED          STATUS 
 
 ![在代码仓库中创建 Dockerfile](assets/image-20260706234000076.png)
 
-把前面的手动操作转换成可复现的 Dockerfile 指令：
+把前面的手动操作转换成 Dockerfile 指令：
 
 ```dockerfile
-# syntax=docker/dockerfile:1
-FROM ubuntu:24.04
+FROM ubuntu:latest # 使用 ubuntu:latest 镜像作为基础镜像
 
-ARG CODE_SERVER_VERSION=4.127.0
+RUN apt update && apt install -y curl
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends ca-certificates curl \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN curl -fsSL https://code-server.dev/install.sh -o /tmp/install-code-server.sh \
-    && sh /tmp/install-code-server.sh --version "${CODE_SERVER_VERSION}" \
-    && rm /tmp/install-code-server.sh
-
-RUN code-server --install-extension golang.go
-
-EXPOSE 8000
-
-ENTRYPOINT ["code-server"]
-CMD ["--bind-addr=0.0.0.0:8000", "--auth=none"]
+RUN curl -fsSL https://code-server.dev/install.sh | sh
 ```
 
-这里做了几项改进：
-
-- 使用 `ubuntu:24.04`，避免 `latest` 随时间变化而让基础系统版本不明确；
-- 在同一个 `RUN` 中完成 `apt-get update`、安装与索引清理，减少缓存问题和镜像体积；
-- 固定 code-server 版本，使构建结果更容易复现；
-- 用 `ENTRYPOINT` 和 `CMD` 设置默认启动方式，运行镜像时不再需要手动覆盖入口程序；
-- `EXPOSE 8000` 只用于说明容器内服务端口，真正发布到宿主机仍需使用 `-p`。
-
-> [!NOTE]
-> 该示例保留 `--auth=none` 是为了配合已有访问控制的 CNB 临时开发环境。若镜像会直接暴露到公网，应删除这个参数并配置认证与 HTTPS。
-
-构建镜像：
+这样就能得到一个最简单的 Dockerfile。然后执行 `docker build`：
 
 ```bash
-docker build --pull \
-  -t docker.cnb.cool/kyle-cnb/docker-learning:v1.0.0 .
+docker build -t docker.cnb.cool/kyle-cnb/docker-learning:v1.0.0 .
 ```
 
-其中 `-t` 用于设置镜像名称和版本标签，末尾的 `.` 表示使用当前目录作为构建上下文。`--pull` 会检查基础镜像是否有更新。
-
-构建完成后可直接运行：
-
-```bash
-docker run -d --name code-server -p 8000:8000 \
-  docker.cnb.cool/kyle-cnb/docker-learning:v1.0.0
-```
+其中 `-t` 用于设置镜像名称和版本标签，末尾的 `.` 表示使用当前目录作为构建上下文。
 
 后续若要预装 code-server 扩展，只需继续迭代 Dockerfile 并更新镜像版本。例如：
 
@@ -536,16 +505,9 @@ docker push docker.cnb.cool/kyle-cnb/docker-learning:v1.0.0
 
 ```bash
 docker run -d --name code-server -p 8000:8000 \
-  docker.cnb.cool/kyle-cnb/docker-learning:v1.0.0
-```
-
-如果本地没有该镜像，`docker run` 会先从指定仓库拉取镜像，再创建并启动容器。由于 Dockerfile 已定义 `ENTRYPOINT` 和 `CMD`，这里无需再次传入 code-server 的启动参数。
-
-若使用前面通过 `docker commit` 生成、没有默认入口配置的 `latest` 镜像，则仍需显式覆盖入口：
-
-```bash
-docker run -d --name code-server -p 8000:8000 \
   --entrypoint code-server \
-  docker.cnb.cool/kyle-cnb/docker-learning:latest \
+  docker.cnb.cool/kyle-cnb/docker-learning:v1.0.0 \
   --bind-addr=0.0.0.0:8000 --auth=none
 ```
+
+如果本地没有该镜像，`docker run` 会先从指定仓库拉取镜像，再创建并启动容器。这个简单 Dockerfile 没有定义默认启动命令，因此仍需通过 `--entrypoint code-server` 显式指定入口。若要使用前面通过 `docker commit` 生成的镜像，可把标签改为 `latest`。
