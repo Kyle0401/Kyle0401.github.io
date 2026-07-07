@@ -170,6 +170,21 @@ document.addEventListener('DOMContentLoaded', function () {
             blogCard.querySelector('h1').textContent = '博客收藏';
             blogCard.querySelector('p').textContent = '收藏的优质技术博客';
             blogCard.querySelector('.projectItemRight img').alt = '博客收藏图标';
+            blogCard.setAttribute('role', 'link');
+            blogCard.setAttribute('tabindex', '0');
+            blogCard.style.cursor = 'pointer';
+
+            function openBlogDirectory() {
+                window.location.href = './blog/';
+            }
+
+            blogCard.addEventListener('click', openBlogDirectory);
+            blogCard.addEventListener('keydown', function (event) {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    openBlogDirectory();
+                }
+            });
         }
 
         if (siteCards.length > 2) {
