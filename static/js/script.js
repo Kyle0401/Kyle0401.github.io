@@ -165,6 +165,13 @@ document.addEventListener('DOMContentLoaded', function () {
     if (projectLists.length > 0) {
         var siteCards = projectLists[0].querySelectorAll('.projectItem');
 
+        if (siteCards.length > 0) {
+            var blogCard = siteCards[0];
+            blogCard.querySelector('h1').textContent = '博客收藏';
+            blogCard.querySelector('p').textContent = '收藏的优质技术博客';
+            blogCard.querySelector('.projectItemRight img').alt = '博客收藏图标';
+        }
+
         if (siteCards.length > 2) {
             var travelCard = siteCards[2];
             travelCard.querySelector('h1').textContent = '旅行';
@@ -188,6 +195,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (siteCards.length > 3) {
             var learningCard = siteCards[3];
+            projectLists[0].insertBefore(learningCard, projectLists[0].firstElementChild);
             learningCard.querySelector('h1').textContent = '学习记录';
             learningCard.querySelector('p').textContent = '记录计算机知识的学习';
             learningCard.querySelector('.projectItemRight img').alt = '学习记录图标';
