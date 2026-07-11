@@ -7,34 +7,57 @@
     <title>Docker学习 · 学习记录 · Kyle</title>
     <link rel="icon" type="image/svg+xml" href="../../static/img/logo-jy.svg">
     <link rel="stylesheet" href="../../static/css/java-note.css">
-    <link rel="stylesheet" href="./docker-page.css?v=20260707f">
+    <link rel="stylesheet" href="./docker-page.css?v=20260711a">
     <link rel="stylesheet" href="./docker-page-images.css?v=20260706g">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css" integrity="sha512-rO+olRTkcf304DQBxSWxln8JXCzTHlKnIdnMUwYvQa9/Jd4cQaNkItIUj6Z4nvW1dqK0SKXLbn9h4KwZTNtAyw==" crossorigin="anonymous" referrerpolicy="no-referrer">
 </head>
 <body>
     <header class="note-topbar">
         <a class="note-brand" href="../../" aria-label="返回 Kyle 主页"><span class="note-brand-mark">K</span><span>Kyle · Learning Records</span></a>
-        <a class="note-back" href="../">← 返回学习记录</a>
+        <div class="topbar-actions">
+            <button class="mobile-nav-toggle" id="mobile-nav-toggle" type="button" aria-expanded="false" aria-controls="docs-sidebar"><span aria-hidden="true">☰</span><span>目录</span></button>
+            <a class="note-back" href="../">← 返回学习记录</a>
+        </div>
     </header>
-    <div class="note-layout" id="note-layout">
-        <aside class="toc" id="toc" aria-label="文章目录">
-            <button class="toc-toggle" id="toc-toggle" type="button" aria-expanded="true" aria-controls="toc-content" aria-label="收起文章目录"><span class="toc-toggle-icon" aria-hidden="true">☰</span><span class="toc-toggle-text">目录</span><span class="toc-toggle-chevron" aria-hidden="true">⌄</span></button>
-            <div class="toc-content" id="toc-content">
-                <div class="toc-title-row"><p class="toc-title">On this page</p><button class="toc-bulk-toggle" id="toc-bulk-toggle" type="button">全部折叠</button></div>
-                <nav id="toc-links" aria-label="文章目录链接"></nav>
+
+    <div class="docs-layout" id="docs-layout">
+        <aside class="docs-sidebar" id="docs-sidebar" aria-label="Docker 学习目录">
+            <div class="docs-sidebar-heading">
+                <span class="docs-sidebar-kicker">LEARNING DOCS</span>
+                <strong id="docs-title">Docker 学习记录</strong>
             </div>
+            <nav class="page-nav" id="page-nav" aria-label="章节导航"><p class="nav-loading">正在加载目录…</p></nav>
         </aside>
+
         <main class="note-main">
             <nav class="breadcrumb" aria-label="面包屑导航"><a href="../../">主页</a><span>/</span><a href="../">学习记录</a><span>/</span><span>Docker学习</span></nav>
             <article class="article">
                 <div id="article-content"><p>正在加载笔记…</p></div>
+                <nav class="page-pagination" id="page-pagination" aria-label="上一篇和下一篇"></nav>
                 <footer class="article-footer"><span>学习记录 · Docker学习</span><a href="../">返回学习记录目录 →</a></footer>
             </article>
         </main>
+
+        <aside class="page-outline" id="page-outline" aria-label="当前页内容目录">
+            <p class="page-outline-title">此页内容</p>
+            <nav id="outline-links"></nav>
+        </aside>
     </div>
+
+    <button class="docs-overlay" id="docs-overlay" type="button" aria-label="关闭目录"></button>
+
+    <button class="reading-progress" id="reading-progress" type="button" aria-label="返回页面顶部" title="返回顶部">
+        <svg viewBox="0 0 52 52" aria-hidden="true">
+            <circle class="reading-progress-track" cx="26" cy="26" r="21"></circle>
+            <circle class="reading-progress-value" id="reading-progress-value" cx="26" cy="26" r="21"></circle>
+        </svg>
+        <span class="reading-progress-label" id="reading-progress-label">0%</span>
+        <span class="reading-progress-arrow" aria-hidden="true">↑</span>
+    </button>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js" integrity="sha512-EBLzUL8XLl+va/zAsmXwS7Z2B1F9HUHkZwyS/VKwh3S7T/U0nF4BaU29EP/ZSf6zgiIxYAnKLu6bJ8dqpmX5uw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/dockerfile.min.js" integrity="sha512-I2W0xPYARYkIy70gPRp7+04UsyKccIdvUSR7WI+7L8n9h7hVT/cg4+3QDBoiQZKMQVdefkdh+J5VieA48ziT4A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="./docker-page.js?v=20260707e"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/dockerfile.min.js" integrity="sha512-I2X0xPYARYkIy70gPRp7+04UsyKccIdvUSR7WI+7L8n9h7hVT/cg4+3QDBoiQZKMQVdefkdh+J5VieA48ziT4A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="./docker-page.js?v=20260711a"></script>
     <script src="./docker-page-images.js?v=20260707b"></script>
 </body>
 </html>
