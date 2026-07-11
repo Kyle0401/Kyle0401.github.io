@@ -14,6 +14,9 @@
         .doc-page-summary { display: none; }
         .article .page-pagination a[href^="#"],
         .article .page-pagination a[href^="#"]:hover { text-decoration: none; }
+        .camp-source-link { margin: -16px 0 30px; color: #667085; font-size: 14px; line-height: 1.8; }
+        .camp-source-link a { color: var(--docker-deep); font-weight: 700; text-decoration: none; }
+        .camp-source-link a:hover { text-decoration: underline; text-underline-offset: 3px; }
     </style>
 </head>
 <body>
@@ -64,5 +67,27 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/dockerfile.min.js" integrity="sha512-I2X0xPYARYkIy70gPRp7+04UsyKccIdvUSR7WI+7L8n9h7hVT/cg4+3QDBoiQZKMQVdefkdh+J5VieA48ziT4A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="./docker-page.js?v=20260711a"></script>
     <script src="./docker-page-images.js?v=20260707b"></script>
+    <script>
+        (function () {
+            var root = document.getElementById('article-content');
+            if (!root) return;
+
+            function syncCampLink() {
+                var kicker = root.querySelector('.doc-page-kicker');
+                if (!kicker || kicker.textContent.indexOf('第 1 /') === -1 || root.querySelector('.camp-source-link')) return;
+
+                var header = root.querySelector('.doc-page-header');
+                if (!header) return;
+
+                var paragraph = document.createElement('p');
+                paragraph.className = 'camp-source-link';
+                paragraph.innerHTML = '训练营地址：<a href="https://opencamp.cn/Docker/camp/202502" target="_blank" rel="noopener noreferrer">2025 第二期 Docker 训练营</a>';
+                header.insertAdjacentElement('afterend', paragraph);
+            }
+
+            new MutationObserver(syncCampLink).observe(root, { childList: true, subtree: true });
+            syncCampLink();
+        })();
+    </script>
 </body>
 </html>
