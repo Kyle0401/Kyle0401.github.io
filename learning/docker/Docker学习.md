@@ -462,7 +462,7 @@ unset CNB_TOKEN
 
 ![CNB 访问令牌创建成功页面](assets/image-20260706032406427-redacted.png)
 
-公开笔记和截图中不要保留真实 Token。Docker 可能把登录凭据写入用户目录下的配置文件；在非 Docker Desktop 环境中应配置 credential helper，使用完也可执行 `docker logout docker.cnb.cool`。
+Docker 可能把登录凭据写入用户目录下的配置文件；在非 Docker Desktop 环境中应配置 credential helper，使用完也可执行 `docker logout docker.cnb.cool`。
 
 ### 第二步：为镜像添加仓库标签
 
