@@ -102,6 +102,8 @@ foreach ($page in $manifest.pages) {
 if ($RequireFormal) {
     Assert-Check (-not [bool]$manifest.fixture) '要求正式验证，但内容清单仍标记为 fixture。'
     Assert-Check (-not [string]::IsNullOrWhiteSpace($CanonicalMarkdown)) '正式验证必须通过 -CanonicalMarkdown 提供根目录深入理解CUDA.md。'
+    $noJekyllPath = [System.IO.Path]::GetFullPath((Join-Path $Root '..\..\..\.nojekyll'))
+    Assert-Check (Test-Path -LiteralPath $noJekyllPath -PathType Leaf) '正式发布必须在仓库根目录提供 .nojekyll，以原样发布前端读取的 Markdown 并避免 Liquid 解析 CUDA 代码。'
 }
 
 $completenessText = ''
