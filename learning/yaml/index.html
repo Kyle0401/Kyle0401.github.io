@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Kyle 的 YAML 学习笔记：基础语法、数据类型、多行字符串、常见错误与 .cnb.yml 实践">
+    <title>YAML学习 · 学习记录 · Kyle</title>
+    <link rel="icon" type="image/svg+xml" href="../../static/img/logo-jy.svg">
+    <link rel="stylesheet" href="../../static/css/java-note.css">
+    <link rel="stylesheet" href="../docker/docker-page.css?v=20260711a">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css" integrity="sha512-rO+olRTkcf304DQBxSWxln8JXCzTHlKnIdnMUwYvQa9/Jd4cQaNkItIUj6Z4nvW1dqK0SKXLbn9h4KwZTNtAyw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <style>
+        .doc-page-summary { display: none; }
+        .article .page-pagination a[href^="#"],
+        .article .page-pagination a[href^="#"]:hover { text-decoration: none; }
+        .comments-section { margin-top: 56px; padding-top: 34px; border-top: 1px solid var(--docker-line); }
+        .comments-heading { margin-bottom: 20px; }
+        .comments-heading h2 { margin: 0 0 8px; color: var(--docker-ink); font-size: 24px; line-height: 1.4; }
+        .comments-heading p { margin: 0; color: #7a8495; font-size: 13px; line-height: 1.7; }
+        .comments-thread { min-height: 160px; }
+        .comments-thread .utterances { max-width: 100%; margin: 0; }
+        .doc-page-body blockquote.callout { margin: 22px 0; }
+        @media (max-width: 600px) {
+            .comments-section { margin-top: 44px; padding-top: 28px; }
+            .comments-heading h2 { font-size: 21px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="note-topbar">
+        <a class="note-brand" href="../../" aria-label="返回 Kyle 主页"><span class="note-brand-mark">K</span><span>Kyle · Learning Records</span></a>
+        <div class="topbar-actions">
+            <button class="mobile-nav-toggle" id="mobile-nav-toggle" type="button" aria-expanded="false" aria-controls="docs-sidebar"><span aria-hidden="true">☰</span><span>目录</span></button>
+            <a class="note-back" href="../">← 返回学习记录</a>
+        </div>
+    </header>
+
+    <div class="docs-layout" id="docs-layout">
+        <aside class="docs-sidebar" id="docs-sidebar" aria-label="YAML 学习目录">
+            <div class="docs-sidebar-heading">
+                <span class="docs-sidebar-kicker">LEARNING DOCS</span>
+                <strong id="docs-title">YAML 学习笔记</strong>
+            </div>
+            <nav class="page-nav" id="page-nav" aria-label="章节导航"><p class="nav-loading">正在加载目录…</p></nav>
+        </aside>
+
+        <main class="note-main">
+            <nav class="breadcrumb" aria-label="面包屑导航"><a href="../../">主页</a><span>/</span><a href="../">学习记录</a><span>/</span><span>YAML学习</span></nav>
+            <article class="article">
+                <div id="article-content"><p>正在加载笔记…</p></div>
+                <section class="comments-section" id="comments-section" aria-labelledby="comments-title">
+                    <div class="comments-heading">
+                        <h2 id="comments-title">评论区</h2>
+                        <p>使用 GitHub 账号登录后即可参与当前章节的讨论。</p>
+                    </div>
+                    <div class="comments-thread" id="comments-thread"><p class="nav-loading">正在加载评论区…</p></div>
+                </section>
+                <nav class="page-pagination" id="page-pagination" aria-label="上一篇和下一篇"></nav>
+                <footer class="article-footer"><span>学习记录 · YAML学习</span><a href="../">返回学习记录目录 →</a></footer>
+            </article>
+        </main>
+
+        <aside class="page-outline" id="page-outline" aria-label="当前页内容目录">
+            <p class="page-outline-title">此页内容</p>
+            <nav id="outline-links"></nav>
+        </aside>
+    </div>
+
+    <button class="docs-overlay" id="docs-overlay" type="button" aria-label="关闭目录"></button>
+
+    <button class="reading-progress" id="reading-progress" type="button" aria-label="返回页面顶部" title="返回顶部">
+        <svg viewBox="0 0 52 52" aria-hidden="true">
+            <circle class="reading-progress-track" cx="26" cy="26" r="21"></circle>
+            <circle class="reading-progress-value" id="reading-progress-value" cx="26" cy="26" r="21"></circle>
+        </svg>
+        <span class="reading-progress-label" id="reading-progress-label">0%</span>
+        <span class="reading-progress-arrow" aria-hidden="true">↑</span>
+    </button>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js" integrity="sha512-EBLzUL8XLl+va/zAsmXwS7Z2B1F9HUHkZwyS/VKwh3S7T/U0nF4BaU29EP/ZSf6zgiIxYAnKLu6bJ8dqpmX5uw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="./yaml-page.js?v=20260715a"></script>
+</body>
+</html>
