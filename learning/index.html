@@ -7,6 +7,7 @@
     <title>学习记录 · Kyle</title>
     <link rel="icon" type="image/svg+xml" href="../static/img/logo-jy.svg">
     <link rel="stylesheet" href="../static/css/learning.css">
+    <script src="../static/js/learning.js" defer></script>
 </head>
 <body>
     <div class="learning-shell">
@@ -32,51 +33,149 @@
             <div class="section-heading">
                 <div>
                     <h2>学习目录</h2>
-                    <p>点击已创建的学习卡片，进入对应的知识分类。</p>
+                    <p>输入关键词或选择分类，快速定位对应的学习记录。</p>
                 </div>
             </div>
 
-            <div class="record-grid">
-                <a class="record-card" href="./java/">
-                    <span class="status">已建立·持续完善</span>
+            <div class="directory-tools" aria-label="学习目录检索与筛选">
+                <div class="search-field">
+                    <span class="search-icon" aria-hidden="true">⌕</span>
+                    <input
+                        id="learning-search"
+                        class="search-input"
+                        type="search"
+                        inputmode="search"
+                        autocomplete="off"
+                        placeholder="搜索标题、内容或关键词，例如：CUDA、Java、配置文件"
+                        aria-label="搜索学习记录"
+                    >
+                    <button id="clear-search" class="search-clear" type="button" aria-label="清空搜索" hidden>×</button>
+                </div>
+
+                <div class="filter-stack">
+                    <div class="filter-row" data-filter-group="category">
+                        <span class="filter-label">技术方向</span>
+                        <div class="filter-options" role="group" aria-label="按技术方向筛选">
+                            <button class="filter-chip active" type="button" data-filter-value="all" aria-pressed="true">全部</button>
+                            <button class="filter-chip" type="button" data-filter-value="language" aria-pressed="false">编程语言</button>
+                            <button class="filter-chip" type="button" data-filter-value="engineering" aria-pressed="false">工程工具</button>
+                            <button class="filter-chip" type="button" data-filter-value="ai" aria-pressed="false">人工智能</button>
+                            <button class="filter-chip" type="button" data-filter-value="ai-system" aria-pressed="false">AI 系统</button>
+                        </div>
+                    </div>
+
+                    <div class="filter-row" data-filter-group="status">
+                        <span class="filter-label">学习状态</span>
+                        <div class="filter-options" role="group" aria-label="按学习状态筛选">
+                            <button class="filter-chip active" type="button" data-filter-value="all" aria-pressed="true">全部状态</button>
+                            <button class="filter-chip" type="button" data-filter-value="ongoing" aria-pressed="false">持续完善</button>
+                            <button class="filter-chip" type="button" data-filter-value="completed" aria-pressed="false">基本完结</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="filter-summary" aria-live="polite">
+                    <span id="result-count" class="result-count">共 5 项学习记录</span>
+                    <button id="reset-filters" class="reset-filters" type="button" hidden>清除全部筛选</button>
+                </div>
+            </div>
+
+            <div class="record-grid" id="learning-grid">
+                <a
+                    class="record-card"
+                    href="./java/"
+                    data-entry="learning"
+                    data-category="language"
+                    data-status="ongoing"
+                    data-search="java java学习 编程语言 jvm 面向对象 基础概念 语法 编程知识"
+                >
+                    <div class="card-meta">
+                        <span class="status">已建立·持续完善</span>
+                        <span class="category-label">编程语言</span>
+                    </div>
                     <h2>JAVA学习</h2>
                     <p>Java 基础概念、语法与编程知识的整理记录。</p>
                     <span class="card-arrow">→</span>
                 </a>
 
-                <a class="record-card" href="./docker/">
-                    <span class="status">已建立·持续完善</span>
+                <a
+                    class="record-card"
+                    href="./docker/"
+                    data-entry="learning"
+                    data-category="engineering"
+                    data-status="ongoing"
+                    data-search="docker 容器 镜像 常用命令 端口映射 工程工具 devops cnb 训练营"
+                >
+                    <div class="card-meta">
+                        <span class="status">已建立·持续完善</span>
+                        <span class="category-label">工程工具</span>
+                    </div>
                     <h2>2025 第二期 Docker 训练营学习</h2>
                     <p>容器、镜像、常用命令与端口映射实践的学习记录。</p>
                     <span class="card-arrow">→</span>
                 </a>
 
-                <a class="record-card" href="./neural-network/">
-                    <span class="status">已建立·持续完善</span>
+                <a
+                    class="record-card"
+                    href="./neural-network/"
+                    data-entry="learning"
+                    data-category="ai"
+                    data-status="ongoing"
+                    data-search="神经网络 人工智能 深度学习 图像分类 反向传播 cnn rnn lstm"
+                >
+                    <div class="card-meta">
+                        <span class="status">已建立·持续完善</span>
+                        <span class="category-label">人工智能</span>
+                    </div>
                     <h2>神经网络学习</h2>
                     <p>从图像分类、反向传播到 CNN、RNN 与 LSTM 的深度学习学习记录。</p>
                     <span class="card-arrow">→</span>
                 </a>
 
-                <a class="record-card" href="./ai-infra/">
-                    <span class="status">已建立·持续完善</span>
+                <a
+                    class="record-card"
+                    href="./ai-infra/"
+                    data-entry="learning"
+                    data-category="ai-system"
+                    data-status="ongoing"
+                    data-search="ai infra ai系统 人工智能基础设施 cuda gpu triton flashattention 推理引擎 moe 分布式推理"
+                >
+                    <div class="card-meta">
+                        <span class="status">已建立·持续完善</span>
+                        <span class="category-label">AI 系统</span>
+                    </div>
                     <h2>AI Infra 学习</h2>
                     <p>围绕 CUDA、Triton、FlashAttention、推理引擎与 MoE 的八阶段学习记录。</p>
                     <span class="card-arrow">→</span>
                 </a>
 
-                <a class="record-card" href="./yaml/">
-                    <span class="status">已建立·基本完结</span>
+                <a
+                    class="record-card"
+                    href="./yaml/"
+                    data-entry="learning"
+                    data-category="engineering"
+                    data-status="completed"
+                    data-search="yaml yml 配置文件 数据序列化 cnb .cnb.yml 工程工具 语法 数据类型"
+                >
+                    <div class="card-meta">
+                        <span class="status">已建立·基本完结</span>
+                        <span class="category-label">工程工具</span>
+                    </div>
                     <h2>YAML 学习笔记</h2>
                     <p>系统整理 YAML 语法、数据类型、常见错误及 .cnb.yml 等工程实践。</p>
                     <span class="card-arrow">→</span>
                 </a>
 
-                <div class="record-card empty">
+                <div class="record-card empty" id="future-entry">
                     <span class="status">持续补充</span>
                     <h2>下一门知识</h2>
                     <p>新的学习方向、课程笔记和实践总结，会在这里继续展开。</p>
                 </div>
+            </div>
+
+            <div id="no-results" class="no-results" role="status" hidden>
+                <strong>没有找到匹配的学习记录</strong>
+                <span>可以尝试缩短关键词，或清除分类筛选后重新检索。</span>
             </div>
         </section>
 
