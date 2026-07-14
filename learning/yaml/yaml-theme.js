@@ -4,6 +4,7 @@
   var root = document.documentElement;
   var toggle = document.getElementById('theme-toggle');
   var commentsThread = document.getElementById('comments-thread');
+  var articleContent = document.getElementById('article-content');
   var storageKey = 'yaml-theme';
   var mediaQuery = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
 
@@ -54,6 +55,30 @@
     if (persist) writeStoredTheme(normalized);
   }
 
+  function addPronunciationNote() {
+    if (!articleContent || articleContent.querySelector('.yaml-pronunciation-note')) return;
+
+    var headings = articleContent.querySelectorAll('.doc-page-body h3');
+    var targetHeading = null;
+    Array.prototype.some.call(headings, function (heading) {
+      if (heading.textContent.trim() === 'YAML 是什么') {
+        targetHeading = heading;
+        return true;
+      }
+      return false;
+    });
+
+    if (!targetHeading) return;
+
+    var firstParagraph = targetHeading.nextElementSibling;
+    if (!firstParagraph || firstParagraph.tagName.toLowerCase() !== 'p') return;
+
+    var note = document.createElement('blockquote');
+    note.className = 'callout yaml-pronunciation-note';
+    note.innerHTML = '<p><strong>YAML 通常读作：</strong><code>/ˈjæməl/</code>，接近英文单词 <em>camel</em> 去掉开头的 <code>c</code>。中文可近似读成“亚么尔”或“雅莫尔”。</p>';
+    firstParagraph.insertAdjacentElement('afterend', note);
+  }
+
   if (toggle) {
     toggle.addEventListener('click', function () {
       applyTheme(currentTheme() === 'dark' ? 'light' : 'dark', true);
@@ -79,5 +104,10 @@
     }).observe(commentsThread, { childList: true, subtree: true });
   }
 
+  if (articleContent && 'MutationObserver' in window) {
+    new MutationObserver(addPronunciationNote).observe(articleContent, { childList: true, subtree: true });
+  }
+
   applyTheme(currentTheme(), false);
+  addPronunciationNote();
 })();
