@@ -20,6 +20,41 @@
         .comments-thread { min-height: 160px; }
         .comments-thread .utterances { max-width: 100%; margin: 0; }
         .doc-page-body blockquote.callout { margin: 22px 0; }
+
+        /* 使用 GitHub Dark / Primer 的标准暗色层级，确保 YAML 与 JSON 高亮配色完整呈现。 */
+        .code-block {
+            color: #c9d1d9;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(1, 4, 9, .12);
+        }
+        .code-language {
+            color: #8b949e;
+            background: #161b22;
+            border-bottom-color: #30363d;
+            letter-spacing: .06em;
+        }
+        .code-block pre,
+        .code-block pre code,
+        .code-block pre code.hljs {
+            color: #c9d1d9;
+            background: #0d1117;
+        }
+        .copy-code-button {
+            color: #8b949e;
+            background: transparent;
+            border-color: #30363d;
+        }
+        .copy-code-button:hover {
+            color: #f0f6fc;
+            background: #21262d;
+            border-color: #8b949e;
+        }
+        .copy-code-button:focus-visible {
+            outline-color: #58a6ff;
+        }
+
         @media (max-width: 600px) {
             .comments-section { margin-top: 44px; padding-top: 28px; }
             .comments-heading h2 { font-size: 21px; }
