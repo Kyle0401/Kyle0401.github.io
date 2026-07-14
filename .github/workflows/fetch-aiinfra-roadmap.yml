@@ -1,0 +1,55 @@
+name: Temporary AI Infra Roadmap Fetch
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fetch-aiinfra-roadmap.yml'
+  workflow_dispatch:
+
+jobs:
+  fetch-roadmap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Install Playwright
+        run: |
+          npm init -y
+          npm install playwright@1.53.2
+          npx playwright install --with-deps chromium
+
+      - name: Render and extract roadmap
+        run: |
+          cat > fetch-roadmap.js <<'JS'
+          const { chromium } = require('playwright');
+          const fs = require('fs');
+
+          (async () => {
+            const browser = await chromium.launch({ headless: true });
+            const page = await browser.newPage({ viewport: { width: 1440, height: 1200 } });
+            await page.goto('https://aiinfra.pub/roadmap', {
+              waitUntil: 'networkidle',
+              timeout: 120000
+            });
+            await page.waitForTimeout(3000);
+            const text = await page.locator('body').innerText();
+            fs.writeFileSync('roadmap-text.txt', text, 'utf8');
+            fs.writeFileSync('roadmap.html', await page.content(), 'utf8');
+            await page.screenshot({ path: 'roadmap.png', fullPage: true });
+            console.log(text);
+            await browser.close();
+          })().catch((error) => {
+            console.error(error);
+            process.exit(1);
+          });
+          JS
+          node fetch-roadmap.js
+
+      - name: Upload rendered roadmap
+        uses: actions/upload-artifact@v4
+        with:
+          name: aiinfra-roadmap-render
+          path: |
+            roadmap-text.txt
+            roadmap.html
+            roadmap.png
+          retention-days: 1
