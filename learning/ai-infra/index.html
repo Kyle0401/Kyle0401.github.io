@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Kyle 的 AI Infra 八阶段学习记录">
+    <title>AI Infra 学习 · 学习记录 · Kyle</title>
+    <link rel="icon" type="image/svg+xml" href="../../static/img/logo-jy.svg">
+    <link rel="stylesheet" href="../../static/css/learning.css">
+</head>
+<body>
+    <div class="learning-shell">
+        <header class="topbar">
+            <a class="brand" href="../../" aria-label="返回 Kyle 主页">
+                <span class="brand-mark">K</span>
+                <span>Kyle · Learning Records</span>
+            </a>
+            <a class="back-link" href="../">← 返回学习记录</a>
+        </header>
+
+        <section class="hero">
+            <p class="eyebrow">AI Infra archive</p>
+            <h1>AI Infra 学习，<br>从基础走向高性能推理。</h1>
+            <p>参考 AI Infra Academy 学习路线，分八个阶段整理 GPU、CUDA、Triton、FlashAttention、推理引擎与 MoE 等知识。</p>
+            <div class="hero-meta">
+                <span class="pill">AI Infra</span>
+                <span class="pill">八阶段路线</span>
+                <span class="pill">系统与性能优化</span>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-heading">
+                <div>
+                    <h2>学习阶段</h2>
+                    <p>点击阶段卡片进入对应目录，后续可继续补充笔记、代码和实践记录。</p>
+                </div>
+            </div>
+
+            <div class="record-grid">
+                <a class="record-card" href="./01-ai-infra-foundations/">
+                    <span class="status">阶段 1</span>
+                    <h2>AI Infra 基础</h2>
+                    <p>理解 AI Infra 的技术版图、软硬件栈与大模型训练和推理的基本流程。</p>
+                    <span class="card-arrow">→</span>
+                </a>
+                <a class="record-card" href="./02-cuda-programming/">
+                    <span class="status">阶段 2</span>
+                    <h2>CUDA 编程</h2>
+                    <p>学习 GPU 执行模型、线程层次、存储层次及基础 CUDA Kernel 开发。</p>
+                    <span class="card-arrow">→</span>
+                </a>
+                <a class="record-card" href="./03-cuda-optimization/">
+                    <span class="status">阶段 3</span>
+                    <h2>CUDA 性能优化</h2>
+                    <p>围绕访存、并行度、算子融合与性能分析逐步优化 CUDA 程序。</p>
+                    <span class="card-arrow">→</span>
+                </a>
+                <a class="record-card" href="./04-triton/">
+                    <span class="status">阶段 4</span>
+                    <h2>Triton 算子开发</h2>
+                    <p>使用 Triton 编写高性能 GPU 算子，并理解其编译和调优方法。</p>
+                    <span class="card-arrow">→</span>
+                </a>
+                <a class="record-card" href="./05-flash-attention/">
+                    <span class="status">阶段 5</span>
+                    <h2>FlashAttention</h2>
+                    <p>理解注意力计算瓶颈、IO-Aware 思想及 FlashAttention 的核心实现。</p>
+                    <span class="card-arrow">→</span>
+                </a>
+                <a class="record-card" href="./06-llm-inference/">
+                    <span class="status">阶段 6</span>
+                    <h2>大模型推理基础</h2>
+                    <p>学习 Prefill、Decode、KV Cache、批处理、量化与推理性能指标。</p>
+                    <span class="card-arrow">→</span>
+                </a>
+                <a class="record-card" href="./07-inference-engines/">
+                    <span class="status">阶段 7</span>
+                    <h2>vLLM 与 SGLang</h2>
+                    <p>理解主流推理引擎的调度、显存管理、服务化与吞吐优化机制。</p>
+                    <span class="card-arrow">→</span>
+                </a>
+                <a class="record-card" href="./08-moe-distributed-inference/">
+                    <span class="status">阶段 8</span>
+                    <h2>MoE 与分布式推理</h2>
+                    <p>学习专家并行、通信优化、多卡部署及更大规模的推理系统设计。</p>
+                    <span class="card-arrow">→</span>
+                </a>
+            </div>
+        </section>
+
+        <footer class="page-footer">Kyle Learning Records · AI Infra 学习</footer>
+    </div>
+</body>
+</html>
