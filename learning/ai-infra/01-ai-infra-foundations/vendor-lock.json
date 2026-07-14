@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "dependencies": {
+    "markdown-it": "14.1.0",
+    "markdown-it-footnote": "4.0.0",
+    "katex": "0.16.22",
+    "highlight.js": "11.11.1"
+  },
+  "katexFontFileCount": 60,
+  "files": [
+    {
+      "path": "vendor/markdown-it/markdown-it.min.js",
+      "sha256": "38c70a1e7ca91ab40e2d9e6e60129851a717ed1c7d4acbbdd41bf9503791cf68"
+    },
+    {
+      "path": "vendor/markdown-it/LICENSE",
+      "sha256": "792c48c5a849a15fdf9e37e8bcf9e6d1dd13b32b46c642a748a0a46a9919d473"
+    },
+    {
+      "path": "vendor/markdown-it-footnote/markdown-it-footnote.min.js",
+      "sha256": "d6fee58a3b56c5742fa18f3e01f1d317cc99975683ebd39c9195cb2aff0c2e42"
+    },
+    {
+      "path": "vendor/markdown-it-footnote/LICENSE",
+      "sha256": "81d61236a5f25294b2dad0c866d4ad6a40b865148b28df9a71f49ba771a6c54b"
+    },
+    {
+      "path": "vendor/katex/katex.min.js",
+      "sha256": "e8d885505949f3a5f4abdd5dd0d53696bd1371ad26ffbf4f310dcd77c8cdae89"
+    },
+    {
+      "path": "vendor/katex/katex.min.css",
+      "sha256": "19095127357ed6d29fe0a63a6b000c913a89f7f1963b765dd3715e97c9852e75"
+    },
+    {
+      "path": "vendor/katex/LICENSE",
+      "sha256": "766ccc1f306c885aa45542a9846bbd0a505b27a0374f146778171c2254ce18e3"
+    },
+    {
+      "path": "vendor/highlight.js/highlight.min.js",
+      "sha256": "c4a399dd6f488bc97a3546e3476747b3e714c99c57b9473154c6fb8d259b9381"
+    },
+    {
+      "path": "vendor/highlight.js/github-dark.min.css",
+      "sha256": "9f208d022102b1d0c7aebfecd8e42ca7997d5de636649d2b31ea63093d809019"
+    },
+    {
+      "path": "vendor/highlight.js/LICENSE",
+      "sha256": "6c081431591d9df696c82dc598fe1423765b8a299b200ed00b281afd0f64c490"
+    }
+  ]
+}

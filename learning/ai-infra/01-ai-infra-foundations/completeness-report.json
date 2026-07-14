@@ -1,0 +1,187 @@
+{
+  "schemaVersion": 1,
+  "release": "13.3",
+  "generator": "work/translation/build_release.py",
+  "deterministic": true,
+  "allPass": true,
+  "source": {
+    "officialUrl": "https://docs.nvidia.com/cuda/cuda-programming-guide/index.html",
+    "pdfSha256": "1A0659B7324D10F1C0A57FC0C82AA83EE1ABA437FA85DABC90EE8F736E439BEA",
+    "sourceInventorySha256": "e8112f197b92549092ab4f4bfff0ad08c8d321de0578bbe43071ddf3dc210a03",
+    "figureManifestSha256": "10463904b8eeb835db774eee620e92ee46c599af5b6742d3f138c4f8f68e555b",
+    "tableInventorySha256": "f40426bed0d69b19b98597c752b3f451f99bee817c282f349799382f2f36685d",
+    "sourceAuditReportSha256": "c078658b21bfd4f8c9ef7f7c0966b7170871406481d643f820977f8d96360009",
+    "translationRunSha256": "f154b4313df4faa2a445ab8dd0a69fb9b75e24a3f2a1a0d8ba5a201702c8d3e2",
+    "qualityGlossarySha256": "73be38387c302068425b619dbbd97bc2901c31ca9eec7e72349e3a8294ef2753",
+    "lintReportSha256": "d0631742bdace0dc5f6edfa78e5670e501a956129c5577d879542418ccabae27",
+    "reviewReportSha256": {
+      "chapters-1-3": "74050a33e013f32c9a90fe28e556152ae9793154ffae6d719fb60808e2d58fd7",
+      "chapter-4": "b210ebfb4b012faeeb6162ad03d2b714b1eb04a07693493dea24d2e647e60139",
+      "chapters-5-6": "ca3ed847b7fde0acd422fdf6bb790b657d294a4fa8fa6208e892bcd4ca7e007e"
+    },
+    "crossAuditReportSha256": {
+      "chapters-1-3": "4ceae09b29ed455e44557689523248f330885c04475811ae612e5d84a2ea7097",
+      "chapter-4": "75a7e7cd06032bb039fc896c441ad69e4ceaa02ca2c54ab7ff1ce0cdf21177be",
+      "chapters-5-6": "a75f8a5196abe3f5124043b9e413720fa7f389b58dda0abe2c914fb54e8e5454"
+    }
+  },
+  "artifacts": {
+    "cuda-programming-guide-zh.md": {
+      "sha256": "250c69d662751180c4b72d5478237f3e99737e2d13b9ffb817b938ef20a9bfbd",
+      "bytes": 1456297
+    },
+    "content-manifest.json": {
+      "sha256": "dc36349257d31c22c28b35a3dd9cec68c9769145b8943250e0a13069e67853d0",
+      "bytes": 146765
+    },
+    "glossary.md": {
+      "sha256": "95a4969dc863e1f6a29c3f5835e4e2f7fb027cce232061f09b48657527765179",
+      "bytes": 9271
+    }
+  },
+  "pageSha256": {
+    "1.1": "87374ac739c8bd7b7b1fc697d6301a86747f97e32c8670843e46d464b9429c48",
+    "1.2": "04fb908a8877f429d31f85ef64c0820ceb0f63307edd27a41613955ede222c9f",
+    "1.3": "5a4958ebb3bde06e513e2fd478fa1bcfede684f0b7b996c5c989a17000b6effd",
+    "2.1": "945342b023245dfc66ef1e0cadd2431b3353eabbe3af390e4237e492e4e669a1",
+    "2.2": "ac6952bc60a455cd03194bbd0e74ad3c46b2ce375421c0f82764bf39a399ca94",
+    "2.3": "686c3d69bff668c541edfbe4316612c0edb9f48120c9b3f8a86ed0ef6910d032",
+    "2.4": "9a7cd164bf8f8e1342548d22e5d9dda5c7180795dfe70fa569dbdc73a1b3df24",
+    "2.5": "e90b41e40e83acb564e5a03a8f04a21de341ebfe8b8044da598b24288e578e3f",
+    "2.6": "c2d3cacfe30344b40fe75427e2393b81c224d77e7359803e09beb2a21778537e",
+    "2.7": "5f10c2509c5792af6ef81c828c62b0d38c58ffca13dced39ad77db3f5a4cd942",
+    "3.1": "7091a0f7b5262c64d612d37ab7e31e3e54e073602035498f0c0e82d77a657f42",
+    "3.2": "76b3a3a26d87621236294f50e82ccadd7376b7e49ec5b7f7f00dab1c4f875051",
+    "3.3": "072283de8ea86234862b23c0cbdf97dd498b826039d451bbca26ab1fc70f36b1",
+    "3.4": "7eb9c2480a17ec3b1c12f5a7702ed169cf2ea0deda3e5560b4a48c298048599b",
+    "3.5": "a26781a436c953779ebf4821fa68e96adfa17cda4bda509b309fe890a515759d",
+    "4.1": "636b68d14d2976d6f8c18f1bfc6939aa6474bc0fe4eae874ebf816bb5dff06f5",
+    "4.2": "4a7c506496595b0c84f789f3784934e19514b01e9ddd85eef0b77ad4ebefcb75",
+    "4.3": "da0661e4a5e92bc93c2c67aa170312ea0b30587dea8a698bd909055edbc0e234",
+    "4.4": "6e631291593fd20c4bb08ef4a23129d5ff89ba09570da264713caefbd487b384",
+    "4.5": "2f8a8a92fb0088800a16633d53adf9eb43187b4833f4d1cf9139939e2d45f009",
+    "4.6": "1e37a245380ea44a1573da3cfa8eaed1a212b0a19058dc0648583b30ba259158",
+    "4.7": "689656e31249bac58c26e0877a222a2f6bde99d115007b887294bcf5b44a2a7b",
+    "4.8": "33fa431854acad1a8deba2ae2a94d8e48d59201b0bbdfeaa82ed4669edd7ebf8",
+    "4.9": "3612a36c0776280c946c2fb75e1bb49d0ccee5d5cff31e23b455d1077e00ab45",
+    "4.10": "c882d36bc0394258b77d574f9fba5bf5427eaf5b9b205827178d222923f3c904",
+    "4.11": "d170397988ee5aaecf8e13dfa57f0a34daaf14dbc98b819944907ffc2732acef",
+    "4.12": "69cbdad5cc1988767cf7a6e32b191ea53ac641c9bafd49b30a3e09d9a237da11",
+    "4.13": "16be900fe85fdaf50c5cfe699f72359a915239cbd143108e14e7322d94ae1602",
+    "4.14": "af023978d5d9f5fb12bbe53e91cec61fc38cd851465c465a238f63ee6e7e6a4e",
+    "4.15": "53a00ab37a3bf62cf1478a98744984a736f61f20d98cc87f7ab0631cd1fbcab6",
+    "4.16": "6d7dcfd1b9737d4aa9ab15302785d1fe073881ebd867c12f8cfa83028ae35aea",
+    "4.17": "dcdd73bd3629d4b7c87ac90aec4cac236bb50dae0321b1783f90afc23bad3b64",
+    "4.18": "3218101fe1c96149fb65885c0d1b952692078cf1f8bf485185acd91c286e2655",
+    "4.19": "eebc21ada76e61b37d618e635388b0d8f4ae7f669665e5224916a8aee364da61",
+    "4.20": "a3a52efe1d16a77954eea23ac339dedb1b73076c969fe87103aee898343d3c0a",
+    "5.1": "ff1194ad068f092c3aa375a7f04e18fc94204ddbe360457ba627c9fd8bf2a626",
+    "5.2": "8b3dd0e78c53392475e8b85ed5de7bb5414c98a0920aa7f503e3660dc1a8fee4",
+    "5.3": "969d70d025a7e9580b135e7ec837bd7f9e3e9c348735f73b3ac44400f4daea69",
+    "5.4": "de1dffa35187d04c8575053ceaca15dc028e4aecffdbfbb6a201e2e195d3210c",
+    "5.5": "2df3d401cb398b684f928d37bcef2fa47611e5c069b7dc53b40dc7d30ba5dbc2",
+    "5.6": "3a2c5f90a5beb54145624b8ff42907d90f535a063544decac0bd6c1a071fe2dc",
+    "5.7": "4dd32bf8c72b7cdd257ee2437c1ce53b52c65d68754771bd0acc7e0d4760e087",
+    "5.8": "643e815196d01d8ef8331b54c8134bc77c29e80bc09d40376325057a56d30c78",
+    "6.1": "0a4931f36d84730ca5c102bac49659aa9148a2f8549fcde696a276808187d9b5",
+    "6.2": "160a72baed5521041203eecf4e90c4e03b35679a0d0381ce2be14200342c1a73",
+    "6.3": "ecc5ee4c755f2844a1a6bba1e66c651f4a1d658354e0f9c6fefcf23df55fda0a"
+  },
+  "checks": [
+    {
+      "name": "translationRunComplete",
+      "passed": true,
+      "actual": 11231
+    },
+    {
+      "name": "translationLint",
+      "passed": true,
+      "actual": 0,
+      "expected": 0
+    },
+    {
+      "name": "technicalReviewReports",
+      "passed": true,
+      "actual": 3,
+      "expected": 3
+    },
+    {
+      "name": "independentCrossAuditReports",
+      "passed": true,
+      "actual": 3,
+      "expected": 3
+    },
+    {
+      "name": "labelledSourceErrata",
+      "passed": true,
+      "actual": 11,
+      "expected": 11
+    },
+    {
+      "name": "chapters",
+      "passed": true,
+      "actual": 6,
+      "expected": 6
+    },
+    {
+      "name": "pages",
+      "passed": true,
+      "actual": 46,
+      "expected": 46
+    },
+    {
+      "name": "figureReferences",
+      "passed": true,
+      "actual": 67,
+      "expected": 67
+    },
+    {
+      "name": "uniqueFigureAssets",
+      "passed": true,
+      "actual": 66,
+      "expected": 66
+    },
+    {
+      "name": "numberedFigures",
+      "passed": true,
+      "actual": 57,
+      "expected": 57
+    },
+    {
+      "name": "unnumberedFigures",
+      "passed": true,
+      "actual": 10,
+      "expected": 10
+    },
+    {
+      "name": "tables",
+      "passed": true,
+      "actual": 115,
+      "expected": 115
+    },
+    {
+      "name": "numberedTables",
+      "passed": true,
+      "actual": 62,
+      "expected": 62
+    },
+    {
+      "name": "markdownTables",
+      "passed": true,
+      "actual": 115,
+      "expected": 115
+    },
+    {
+      "name": "figureHashes",
+      "passed": true,
+      "actual": 66,
+      "expected": 66
+    },
+    {
+      "name": "localFigurePaths",
+      "passed": true,
+      "actual": 67,
+      "expected": 67
+    }
+  ]
+}

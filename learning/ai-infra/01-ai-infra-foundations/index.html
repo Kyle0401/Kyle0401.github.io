@@ -1,1 +1,106 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><meta name="description" content="CUDA 基础学习记录"><title>阶段 1 · CUDA 基础 · Kyle</title><link rel="icon" type="image/svg+xml" href="../../../static/img/logo-jy.svg"><link rel="stylesheet" href="../../../static/css/learning.css"></head><body><div class="learning-shell"><header class="topbar"><a class="brand" href="../../../"><span class="brand-mark">K</span><span>Kyle · Learning Records</span></a><a class="back-link" href="../">← 返回 AI Infra 路线</a></header><section class="hero"><p class="eyebrow">AI Infra · Stage 01</p><h1>CUDA 基础</h1><p>理解 GPU 架构、线程/Block/Grid、内存模型，写第一个 kernel。</p><div class="hero-meta"><span class="pill">阶段 1</span><span class="pill">入门</span><span class="pill">CUDA</span></div></section><section class="section"><div class="section-heading"><div><h2>学习笔记</h2><p>本阶段的知识梳理、资料链接与实践记录将在这里持续补充。</p></div></div><div class="record-grid"><div class="record-card empty"><span class="status">待补充</span><h2>第一篇笔记</h2><p>从 GPU 架构、线程组织和内存模型开始。</p></div></div></section><footer class="page-footer">Kyle Learning Records · CUDA 基础</footer></div></body></html>
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="CUDA Programming Guide Release 13.3 非官方中文翻译">
+  <meta name="theme-color" content="#76b900">
+  <title>CUDA Programming Guide v13.3 中文译本 · Kyle</title>
+  <link rel="icon" type="image/svg+xml" href="../../../static/img/logo-jy.svg">
+  <link rel="stylesheet" href="../../../static/css/java-note.css">
+  <link rel="stylesheet" href="./vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="./vendor/highlight.js/github-dark.min.css">
+  <link rel="stylesheet" href="./cuda-docs.css">
+</head>
+<body>
+  <a class="skip-link" href="#article-content">跳到正文</a>
+
+  <header class="note-topbar">
+    <a class="note-brand" href="../../../" aria-label="返回 Kyle 主页">
+      <span class="note-brand-mark">K</span>
+      <span>Kyle · Learning Records</span>
+    </a>
+    <div class="topbar-actions">
+      <button class="mobile-nav-toggle" id="mobile-nav-toggle" type="button" aria-expanded="false" aria-controls="docs-sidebar">
+        <span class="menu-icon" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span>目录</span>
+      </button>
+      <a class="note-back" href="../">← 返回 AI Infra 路线</a>
+    </div>
+  </header>
+
+  <div class="docs-layout" id="docs-app" aria-busy="true">
+    <aside class="docs-sidebar" id="docs-sidebar" aria-label="CUDA Programming Guide 中文译本目录">
+      <div class="docs-sidebar-heading">
+        <span class="docs-sidebar-kicker">CUDA DOCUMENTATION</span>
+        <strong id="docs-title">CUDA Programming Guide</strong>
+        <span class="docs-sidebar-release" id="docs-release">Release 13.3</span>
+      </div>
+      <nav class="page-nav" id="page-nav" aria-label="章节导航">
+        <p class="nav-loading">正在加载目录…</p>
+      </nav>
+    </aside>
+
+    <main class="note-main" id="main-content">
+      <nav class="breadcrumb" aria-label="面包屑导航">
+        <a href="../../../">主页</a><span>/</span><a href="../">AI Infra</a><span>/</span><span>CUDA 基础</span>
+      </nav>
+
+      <section class="release-banner" aria-label="译本信息">
+        <div class="release-banner-copy">
+          <div class="release-badges">
+            <span class="release-badge is-unofficial">非官方中文翻译</span>
+            <span class="release-badge" id="release-badge">Release 13.3</span>
+          </div>
+          <p>本译文及原图的公开使用已获 NVIDIA 书面授权；技术解释仍以官方英文原文为准。</p>
+        </div>
+        <a class="official-link" id="official-link" href="https://docs.nvidia.com/cuda/cuda-programming-guide/index.html" target="_blank" rel="noopener noreferrer">阅读官方原文 ↗</a>
+      </section>
+
+      <article class="article">
+        <div class="load-status" id="load-status" role="status" aria-live="polite">正在加载译本…</div>
+        <div id="article-content" tabindex="-1"></div>
+
+        <section class="comments-section" id="comments-section" aria-labelledby="comments-title" hidden>
+          <div class="comments-heading">
+            <h2 id="comments-title">本页讨论</h2>
+            <p>使用 GitHub 账号参与当前章节的讨论；评论主题会随分页切换。</p>
+          </div>
+          <div class="comments-thread" id="comments-thread"></div>
+        </section>
+
+        <nav class="page-pagination" id="page-pagination" aria-label="上一页和下一页"></nav>
+
+        <footer class="article-footer">
+          <span>CUDA Programming Guide · Release 13.3</span>
+          <a id="notices-link" href="https://docs.nvidia.com/cuda/cuda-programming-guide/notices.html" target="_blank" rel="noopener noreferrer">NVIDIA Notices ↗</a>
+        </footer>
+      </article>
+    </main>
+
+    <aside class="page-outline" id="page-outline" aria-label="当前页内容目录">
+      <p class="page-outline-title">此页内容</p>
+      <nav id="outline-links"><p class="outline-empty">正在加载…</p></nav>
+    </aside>
+  </div>
+
+  <button class="docs-overlay" id="docs-overlay" type="button" aria-label="关闭目录"></button>
+
+  <button class="reading-progress" id="reading-progress" type="button" aria-label="返回页面顶部" title="返回页面顶部">
+    <svg viewBox="0 0 52 52" aria-hidden="true">
+      <circle class="reading-progress-track" cx="26" cy="26" r="21"></circle>
+      <circle class="reading-progress-value" id="reading-progress-value" cx="26" cy="26" r="21"></circle>
+    </svg>
+    <span class="reading-progress-label" id="reading-progress-label">0%</span>
+    <span class="reading-progress-arrow" aria-hidden="true">↑</span>
+  </button>
+
+  <noscript><p class="noscript-message">此文档阅读器需要 JavaScript 才能按章节加载 Markdown 内容。</p></noscript>
+
+  <script src="./vendor/markdown-it/markdown-it.min.js"></script>
+  <script src="./vendor/markdown-it-footnote/markdown-it-footnote.min.js"></script>
+  <script src="./vendor/katex/katex.min.js"></script>
+  <script src="./vendor/highlight.js/highlight.min.js"></script>
+  <script src="./cuda-docs.js"></script>
+</body>
+</html>
