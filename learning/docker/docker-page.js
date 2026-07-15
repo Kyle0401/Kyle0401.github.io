@@ -113,7 +113,15 @@
       }
 
       if (/^```/.test(line)) {
-        var language = line.slice(3).trim() || 'text';
+        var fenceInfo = line.slice(3).trim();
+        var language = fenceInfo.split(/\s+/)[0] || 'text';
+        var titleMatch = fenceInfo.match(/(?:^|\s)title=(?:"([^"]*)"|'([^']*)'|([^\s]+))/);
+        var languageLabel = language;
+        if (titleMatch) {
+          languageLabel = titleMatch[1] !== undefined ? titleMatch[1]
+            : titleMatch[2] !== undefined ? titleMatch[2]
+              : titleMatch[3];
+        }
         var code = [];
         index++;
         while (index < lines.length && !/^```/.test(lines[index])) {
@@ -121,7 +129,7 @@
           index++;
         }
         if (index < lines.length) index++;
-        output.push('<div class="code-block"><div class="code-language"><span class="code-language-text">' + esc(language) + '</span></div><pre><code class="language-' + esc(codeLanguage(language)) + '">' + esc(code.join('\n')) + '</code></pre></div>');
+        output.push('<div class="code-block"><div class="code-language"><span class="code-language-text">' + esc(languageLabel) + '</span></div><pre><code class="language-' + esc(codeLanguage(language)) + '">' + esc(code.join('\n')) + '</code></pre></div>');
         continue;
       }
 
@@ -203,8 +211,14 @@
     var titleLine = -1;
     var intro = [];
     var current = null;
+    var insideFence = false;
 
     lines.forEach(function (line, lineIndex) {
+      if (/^```/.test(line)) {
+        insideFence = !insideFence;
+        return;
+      }
+      if (insideFence) return;
       var heading = line.match(/^(#{1,4})\s+(.+)$/);
       if (heading) {
         headingNumber++;
@@ -218,7 +232,7 @@
 
     pages = [];
     lines.forEach(function (line, lineIndex) {
-      var pageHeading = line.match(/^##\s+(.+)$/);
+      var pageHeading = headingIdByLine[lineIndex] ? line.match(/^##\s+(.+)$/) : null;
       if (pageHeading) {
         if (current) pages.push(current);
         current = {
@@ -363,7 +377,9 @@
       outlineObserver = null;
     }
 
-    var headings = Array.prototype.slice.call(content.querySelectorAll('.doc-page-body h2, .doc-page-body h3, .doc-page-body h4'));
+    var headings = Array.prototype.slice.call(content.querySelectorAll('.doc-page-body h2, .doc-page-body h3, .doc-page-body h4')).filter(function (heading) {
+      return Boolean(heading.id);
+    });
     if (!headings.length) {
       outlineLinks.innerHTML = '<p class="outline-empty">本页暂无子标题</p>';
       return;
@@ -487,7 +503,7 @@
   window.addEventListener('resize', updateReadingProgress);
   window.addEventListener('hashchange', routeFromHash);
 
-  fetch('./Docker学习.md?v=20260711a')
+  fetch('./Docker学习.md?v=20260716a')
     .then(function (response) {
       if (!response.ok) throw new Error('Markdown request failed');
       return response.text();
