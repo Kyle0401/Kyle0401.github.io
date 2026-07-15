@@ -4,13 +4,25 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="CUDA Programming Guide Release 13.3 非官方中文翻译">
-  <meta name="theme-color" content="#76b900">
+  <meta name="theme-color" id="theme-color" content="#76b900">
+  <script>
+    (function () {
+      'use strict';
+      var theme = 'light';
+      try {
+        if (localStorage.getItem('cuda-docs-theme') === 'dark') theme = 'dark';
+      } catch (error) {}
+      document.documentElement.setAttribute('data-theme', theme);
+      document.getElementById('theme-color').setAttribute('content', theme === 'dark' ? '#10140e' : '#76b900');
+    })();
+  </script>
   <title>CUDA Programming Guide v13.3 中文译本 · Kyle</title>
   <link rel="icon" type="image/svg+xml" href="../../../static/img/logo-jy.svg">
   <link rel="stylesheet" href="../../../static/css/java-note.css">
   <link rel="stylesheet" href="./vendor/katex/katex.min.css">
   <link rel="stylesheet" href="./vendor/highlight.js/github-dark.min.css">
   <link rel="stylesheet" href="./cuda-docs.css">
+  <link rel="stylesheet" href="./dark-mode.css">
 </head>
 <body>
   <a class="skip-link" href="#article-content">跳到正文</a>
@@ -24,6 +36,10 @@
       <button class="mobile-nav-toggle" id="mobile-nav-toggle" type="button" aria-expanded="false" aria-controls="docs-sidebar">
         <span class="menu-icon" aria-hidden="true"><i></i><i></i><i></i></span>
         <span>目录</span>
+      </button>
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-pressed="false" aria-label="切换到夜览模式" title="切换到夜览模式">
+        <span class="theme-toggle-icon" id="theme-toggle-icon" aria-hidden="true">☾</span>
+        <span class="theme-toggle-label" id="theme-toggle-label">夜览</span>
       </button>
       <a class="note-back" href="../">← 返回 AI Infra 路线</a>
     </div>
@@ -105,7 +121,63 @@
   <script>
     (function () {
       'use strict';
+      var rootElement = document.documentElement;
+      var themeToggle = document.getElementById('theme-toggle');
+      var themeToggleIcon = document.getElementById('theme-toggle-icon');
+      var themeToggleLabel = document.getElementById('theme-toggle-label');
+      var themeColor = document.getElementById('theme-color');
       var content = document.getElementById('article-content');
+
+      function currentTheme() {
+        return rootElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+      }
+
+      function syncThemeControls(theme) {
+        var isDark = theme === 'dark';
+        if (themeToggle) {
+          themeToggle.setAttribute('aria-pressed', String(isDark));
+          themeToggle.setAttribute('aria-label', isDark ? '切换到日间模式' : '切换到夜览模式');
+          themeToggle.setAttribute('title', isDark ? '切换到日间模式' : '切换到夜览模式');
+        }
+        if (themeToggleIcon) themeToggleIcon.textContent = isDark ? '☀' : '☾';
+        if (themeToggleLabel) themeToggleLabel.textContent = isDark ? '日览' : '夜览';
+        if (themeColor) themeColor.setAttribute('content', isDark ? '#10140e' : '#76b900');
+      }
+
+      function syncUtterancesTheme() {
+        var frame = document.querySelector('iframe.utterances-frame');
+        if (!frame || !frame.contentWindow) return;
+        if (!frame.hasAttribute('data-theme-sync-bound')) {
+          frame.setAttribute('data-theme-sync-bound', '');
+          frame.addEventListener('load', syncUtterancesTheme);
+        }
+        frame.contentWindow.postMessage({
+          type: 'set-theme',
+          theme: currentTheme() === 'dark' ? 'github-dark' : 'github-light'
+        }, 'https://utteranc.es');
+      }
+
+      function applyTheme(theme, persist) {
+        var normalized = theme === 'dark' ? 'dark' : 'light';
+        rootElement.setAttribute('data-theme', normalized);
+        syncThemeControls(normalized);
+        if (persist) {
+          try {
+            localStorage.setItem('cuda-docs-theme', normalized);
+          } catch (error) {}
+        }
+        syncUtterancesTheme();
+      }
+
+      if (themeToggle) {
+        themeToggle.addEventListener('click', function () {
+          applyTheme(currentTheme() === 'dark' ? 'light' : 'dark', true);
+        });
+      }
+      applyTheme(currentTheme(), false);
+
+      new MutationObserver(syncUtterancesTheme).observe(document.body, { childList: true, subtree: true });
+
       if (!content) return;
 
       function removeLegalNoticeItems() {
