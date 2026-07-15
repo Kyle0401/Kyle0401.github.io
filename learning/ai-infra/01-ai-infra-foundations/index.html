@@ -102,5 +102,24 @@
   <script src="./vendor/katex/katex.min.js"></script>
   <script src="./vendor/highlight.js/highlight.min.js"></script>
   <script src="./cuda-docs.js"></script>
+  <script>
+    (function () {
+      'use strict';
+      var content = document.getElementById('article-content');
+      if (!content) return;
+
+      function removeLegalNoticeItems() {
+        Array.prototype.forEach.call(content.querySelectorAll('li > strong:first-child'), function (label) {
+          var text = label.textContent.replace(/\s+/g, '');
+          if (text !== '法律声明：' && text !== '授权说明：') return;
+          var item = label.closest('li');
+          if (item) item.remove();
+        });
+      }
+
+      new MutationObserver(removeLegalNoticeItems).observe(content, { childList: true, subtree: true });
+      removeLegalNoticeItems();
+    })();
+  </script>
 </body>
 </html>
