@@ -131,9 +131,33 @@
         });
       }
 
+      function addCudaExplanationNote() {
+        Array.prototype.forEach.call(content.querySelectorAll('.doc-page-body > p'), function (paragraph) {
+          if (paragraph.textContent.indexOf('使各种计算工作负载都能脱离图形 API，利用 GPU 的高吞吐能力') === -1) return;
+          var next = paragraph.nextElementSibling;
+          if (next && next.hasAttribute('data-cuda-explanation-note')) return;
+
+          var note = document.createElement('div');
+          note.className = 'markdown-alert markdown-alert-note';
+          note.setAttribute('data-cuda-explanation-note', '');
+
+          var title = document.createElement('p');
+          title.className = 'markdown-alert-title';
+          title.textContent = '笔记';
+
+          var text = document.createElement('p');
+          text.textContent = 'CUDA 之前，通用计算通常要借助 OpenGL、Direct3D 等图形 API，把数据处理包装成渲染任务。CUDA 允许程序员直接编写 GPU 核函数、管理显存并启动计算，使 GPU 从图形处理器扩展为通用并行计算设备。这里的“高吞吐”强调单位时间内并行处理大量相似任务，而不是单个线程一定比 CPU 更快。';
+
+          note.appendChild(title);
+          note.appendChild(text);
+          paragraph.insertAdjacentElement('afterend', note);
+        });
+      }
+
       function syncArticleAdjustments() {
         removeLegalNoticeItems();
         addCudaFullName();
+        addCudaExplanationNote();
       }
 
       new MutationObserver(syncArticleAdjustments).observe(content, { childList: true, subtree: true });
