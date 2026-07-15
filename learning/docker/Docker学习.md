@@ -462,7 +462,7 @@ unset CNB_TOKEN
 
 ![CNB 访问令牌创建成功页面](assets/image-20260706032406427-redacted.png)
 
-Docker 可能把登录凭据写入用户目录下的配置文件；在非 Docker Desktop 环境中应配置 credential helper，使用完也可执行 `docker logout docker.cnb.cool`。
+公开笔记和截图中不要保留真实 Token。Docker 可能把登录凭据写入用户目录下的配置文件；在非 Docker Desktop 环境中应配置 credential helper，使用完也可执行 `docker logout docker.cnb.cool`。
 
 ### 第二步：为镜像添加仓库标签
 
@@ -511,3 +511,185 @@ docker run -d --name code-server -p 8000:8000 \
 ```
 
 如果本地没有该镜像，`docker run` 会先从指定仓库拉取镜像，再创建并启动容器。这个简单 Dockerfile 没有定义默认启动命令，因此仍需通过 `--entrypoint code-server` 显式指定入口。若要使用前面通过 `docker commit` 生成的镜像，可把标签改为 `latest`。
+
+------
+
+## 五、使用自定义镜像作为云原生开发环境
+
+CNB 云原生开发文档：[云原生开发介绍](https://docs.cnb.cool/zh/workspaces/intro.html)、[自定义开发环境](https://docs.cnb.cool/zh/workspaces/custom-dev-env.html)、[单/双容器模式](https://docs.cnb.cool/zh/workspaces/double-container.html)。
+
+云原生开发的主要特点之一是**声明式**：基于 Docker 生态，可以直接使用已有镜像，也可以通过 Dockerfile 声明并构建开发环境，并与代码同源管理。
+
+云原生开发的默认环境镜像为 [cnbcool/default-dev-env](https://cnb.cool/cnb/cool/default-dev-env)。
+
+### 1. 通过 Docker 镜像指定开发环境
+
+在 `.cnb.yml` 中编写云原生开发事件流水线，通过 `pipeline.docker.image` 指定开发环境镜像。
+
+如果指定镜像中已安装 `code-server`，将使用**单容器模式**启动；未安装则使用**双容器模式**。
+
+> [!NOTE]
+>
+> 这里的“单容器”和“双容器”，指的是 **CNB 云原生开发工作区中，开发环境与 WebIDE（`code-server`）如何部署**，不是指你的项目最终要部署几个容器。
+>
+> ## 先理解两个角色
+>
+> - **开发环境**：由自定义镜像、`.ide/Dockerfile` 或 CNB 默认镜像创建的容器，里面可能有 Node.js、Java、Python、GCC、Git 等工具。
+> - **`code-server`**：运行在服务器上的 VS Code，负责提供浏览器中的 WebIDE 界面。
+>
+> ------
+>
+> ## 单容器模式
+>
+> 开发工具和 `code-server` 全部运行在**同一个容器**中：
+>
+> ```text
+> 浏览器
+>    │
+>    ▼
+> ┌──────────────────────────────┐
+> │       开发环境容器            │
+> │                              │
+> │  code-server（WebIDE）        │
+> │  Git / GCC / Node / Python   │
+> │  项目代码 /workspace          │
+> └──────────────────────────────┘
+> ```
+>
+> 只有当你指定的镜像中**已经安装了 `code-server`** 时，CNB 才能直接这样启动。官方也推荐优先使用单容器模式。
+>
+> 例如：
+>
+> ```yaml
+> $:
+>   vscode:
+>     - docker:
+>         image: cnbcool/default-dev-env:latest
+>       services:
+>         - vscode
+>       stages:
+>         - name: check
+>           script: code-server --version
+> ```
+>
+> 这个镜像已经包含 `code-server`，所以：
+>
+> - WebIDE 在该容器中运行；
+> - 终端命令也在该容器中执行；
+> - VS Code 插件、调试器、编译器、运行时都处于同一个环境；
+> - 文件系统、进程和网络环境比较统一。
+>
+> 因此，单容器模式通常兼容性更好，特别是使用 Debug、语言服务器和开发类 VS Code 插件时。
+>
+> ------
+>
+> ## 双容器模式
+>
+> 你指定的镜像里没有 `code-server`，CNB 就会**额外启动一个 `code-server` 容器**：
+>
+> ```text
+> 浏览器
+>    │
+>    ▼
+> ┌──────────────────────┐
+> │ code-server 容器      │
+> │                      │
+> │ WebIDE                │
+> │ VS Code 插件          │
+> │ /workspace ───────────┼────┐
+> └──────────────────────┘    │
+>                             │ 共享工作区
+> ┌──────────────────────┐    │
+> │ 开发环境容器          │    │
+> │                      │    │
+> │ Node / Java / GCC    │    │
+> │ Git / Python         │    │
+> │ /workspace ◄─────────┼────┘
+> └──────────────────────┘
+> ```
+>
+> 两个容器通过共享的 `/workspace` 目录访问同一份代码。浏览器实际上连接的是 `code-server` 容器，而 CNB 默认提供名为 `CNB` 的跨容器终端，用它进入开发环境容器执行命令。
+>
+> 例如：
+>
+> ```yaml
+> $:
+>   vscode:
+>     - docker:
+>         image: node:22
+>       services:
+>         - vscode
+>       stages:
+>         - name: check-node
+>           script: node --version
+> ```
+>
+> 官方 `node:22` 镜像通常只包含 Node.js 开发环境，并没有安装 `code-server`，因此 CNB 会补充一个 `code-server` 容器，形成双容器模式。官方文档也直接用 `node:22` 作为双容器模式的示例。
+
+```yaml title=".cnb.yml"
+$:
+  vscode:  # 定义一个名为 vscode 的云原生开发事件
+    - docker:
+        # 指定开发环境使用的 Docker 镜像
+        image: cnbcool/default-dev-env:latest
+
+        # 也可以改为通过 Dockerfile 构建自定义开发镜像
+        # build: .ide/Dockerfile
+
+      services:
+        # 启动 WebIDE，即浏览器中的 VS Code
+        - vscode
+
+        # 启动 Docker 服务，使开发环境中可以执行 docker 命令
+        - docker
+
+      stages:
+        # 定义一个名为 ls 的流水线阶段
+        - name: ls
+
+          # 列出当前工作目录中的所有文件，包括隐藏文件及详细信息
+          script: ls -al
+```
+
+支持两种方式指定开发环境镜像：
+
+* `image`：直接使用**已有镜像**（适用于预置镜像场景）
+* `build`：通过 **Dockerfile** 自定义构建；若与 `image` 同时指定，`build` 优先，`image` 作为构建失败时的回退镜像
+
+### 2. 通过 Dockerfile 自定义开发环境
+
+如果指定镜像无法满足需求，可在仓库根目录创建 `.ide/Dockerfile` 来自定义开发环境。
+
+**未自定义启动流水线时**，系统会优先使用 `.ide/Dockerfile` 构建镜像作为基础镜像。
+如果 `.ide/Dockerfile` 不存在或构建失败，会回退使用默认镜像。
+
+```dockerfile
+# .ide/Dockerfile
+
+# 可将 node 替换为需要的基础镜像
+FROM node:20
+
+# 安装 code-server 和常用 vscode 插件
+RUN curl -fsSL https://code-server.dev/install.sh | sh \
+  && code-server --install-extension cnbcool.cnb-welcome \
+  && code-server --install-extension redhat.vscode-yaml \
+  && code-server --install-extension dbaeumer.vscode-eslint \
+  && code-server --install-extension mhutchie.git-graph \
+  && echo done
+
+# 安装 ssh 服务，用于支持 VSCode 等客户端通过 Remote-SSH 访问开发环境（也可按需安装其他软件）
+RUN apt-get update && apt-get install -y git wget unzip openssh-server
+
+# 指定字符集支持命令行输入中文（根据需要选择字符集）
+ENV LANG C.UTF-8
+ENV LANGUAGE C.UTF-8
+```
+
+### 3. 同时自定义开发环境和启动流程
+
+如果需要同时自定义开发环境和启动流程，可编写 `.ide/Dockerfile` 和 `.cnb.yml`。
+`Dockerfile` 内容与上文相同，不再重复。
+
+在 `.cnb.yml` 中使用 `build: .ide/Dockerfile` 指定构建文件，并可同时指定 `image` 作为回退镜像。
+
+将 `.cnb.yml` 提交到代码仓库后，下次启动云原生开发环境时，CNB 会按照该流水线配置创建并初始化工作区。
