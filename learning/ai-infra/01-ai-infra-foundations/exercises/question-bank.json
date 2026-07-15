@@ -1,0 +1,931 @@
+{
+  "schemaVersion": 1,
+  "release": "13.3",
+  "disclaimerZh": "公开面经来自候选人自述，不代表企业官方题库，也不保证再次出现。",
+  "sets": [
+    {
+      "id": "quiz-1-1",
+      "chapter": "1.1",
+      "route": "#quiz-1-1",
+      "titleZh": "1.1 简介 · 课后练习",
+      "titleEn": "Introduction · Exercises",
+      "sourcePageRoute": "../#page-1-1",
+      "questions": [
+        {
+          "id": "q-1-1-01",
+          "type": "single",
+          "difficulty": "easy",
+          "topic": "CPU 与 GPU 的设计取舍",
+          "stemMd": "某候选人在 NVIDIA 编译器实习面试中被要求比较 CPU 与 GPU 架构。下列哪项最准确地概括了 CUDA 编程指南中的核心取舍？",
+          "options": [
+            {
+              "id": "A",
+              "textMd": "GPU 主要通过更复杂的分支预测和更大的缓存来追求最高单线程性能"
+            },
+            {
+              "id": "B",
+              "textMd": "GPU 以较低的单线程性能为代价，将更多资源用于数据处理，以大量并行线程获得高总体吞吐量"
+            },
+            {
+              "id": "C",
+              "textMd": "CPU 与 GPU 的设计目标完全相同，差别只在时钟频率"
+            },
+            {
+              "id": "D",
+              "textMd": "GPU 只适合图形渲染，不能执行通用计算"
+            }
+          ],
+          "correctOptionIds": [
+            "B"
+          ],
+          "explanationMd": "CPU 优先降低少量线程的执行延迟，将较多晶体管用于缓存和流控制；GPU 则将更多资源用于数据处理单元，借助数千个并行线程提高总体指令吞吐量和内存带宽。",
+          "articleRoute": "../#section-1-1-2",
+          "officialAnswerUrl": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/introduction.html",
+          "provenance": {
+            "type": "reported-interview-adapted",
+            "company": "NVIDIA",
+            "role": "Compiler Intern（候选人自述）",
+            "sourceTitle": "NVIDIA Interview Experience for Compiler Intern (6 Months)",
+            "sourceUrl": "https://www.geeksforgeeks.org/interview-experiences/nvidia-interview-experience-for-compiler-intern-6-months/",
+            "adapted": true,
+            "accessedAt": "2026-07-16"
+          }
+        },
+        {
+          "id": "q-1-1-02",
+          "type": "single",
+          "difficulty": "medium",
+          "topic": "适合 GPU 的工作负载",
+          "stemMd": "某字节跳动系统工程候选人被问到“为什么使用 GPU”。在其他条件相近时，下列哪类任务最能直接发挥 GPU 的设计优势？",
+          "options": [
+            {
+              "id": "A",
+              "textMd": "只有一个操作且每一步都依赖前一步结果的短串行任务"
+            },
+            {
+              "id": "B",
+              "textMd": "高度依赖复杂分支预测、几乎没有数据并行性的控制任务"
+            },
+            {
+              "id": "C",
+              "textMd": "可拆成大量相互独立或弱依赖、执行相似数值运算的数据并行任务"
+            },
+            {
+              "id": "D",
+              "textMd": "必须由单个线程以最低延迟完成的操作系统中断处理"
+            }
+          ],
+          "correctOptionIds": [
+            "C"
+          ],
+          "explanationMd": "GPU 的优势来自高指令吞吐量和高内存带宽，需要足够多的并行工作来利用大量执行资源。强串行依赖或以单线程延迟为核心的任务通常更符合 CPU 的设计目标。",
+          "articleRoute": "../#section-1-1-2",
+          "officialAnswerUrl": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/introduction.html",
+          "provenance": {
+            "type": "reported-interview-adapted",
+            "company": "字节跳动",
+            "role": "系统工程实习生（候选人自述）",
+            "sourceTitle": "字节跳动系统工程面经",
+            "sourceUrl": "https://www.nowcoder.com/discuss/729821154558353408?sourceSSR=post",
+            "adapted": true,
+            "accessedAt": "2026-07-16"
+          }
+        },
+        {
+          "id": "q-1-1-03",
+          "type": "single",
+          "difficulty": "easy",
+          "topic": "CUDA 的作用",
+          "stemMd": "NVIDIA 在 2006 年推出 CUDA 后，开发者获得的关键能力是什么？",
+          "options": [
+            {
+              "id": "A",
+              "textMd": "只能通过图形 API 编写固定功能的 3D 渲染流水线"
+            },
+            {
+              "id": "B",
+              "textMd": "无需经过图形 API，即可把 GPU 的高吞吐能力用于多种通用计算负载"
+            },
+            {
+              "id": "C",
+              "textMd": "让所有 CPU 指令无需修改即可在任意 GPU 上以相同语义执行"
+            },
+            {
+              "id": "D",
+              "textMd": "取消主机代码，使 CUDA 应用程序只能从 GPU 启动"
+            }
+          ],
+          "correctOptionIds": [
+            "B"
+          ],
+          "explanationMd": "CUDA 将 GPU 从必须依赖图形 API 的使用方式中解放出来，使科学计算、数据分析和人工智能等通用计算负载能够直接利用 GPU。CUDA 应用程序仍从 CPU 上的主机代码开始执行。",
+          "articleRoute": "../#section-1-1-1",
+          "officialAnswerUrl": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/introduction.html",
+          "provenance": {
+            "type": "official-derived",
+            "company": "NVIDIA",
+            "role": "官方技术资料",
+            "sourceTitle": "CUDA Programming Guide 13.3 — Introduction",
+            "sourceUrl": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/introduction.html",
+            "adapted": true,
+            "accessedAt": "2026-07-16"
+          }
+        },
+        {
+          "id": "q-1-1-04",
+          "type": "single",
+          "difficulty": "easy",
+          "topic": "加速库的选择",
+          "stemMd": "项目需要执行标准稠密线性代数运算，且成熟的 NVIDIA GPU 加速库已经提供相应实现。通常最合理的第一步是什么？",
+          "options": [
+            {
+              "id": "A",
+              "textMd": "先从零编写自定义内核，因为库不可能针对不同 GPU 架构优化"
+            },
+            {
+              "id": "B",
+              "textMd": "优先评估并使用相应的成熟加速库，例如 cuBLAS"
+            },
+            {
+              "id": "C",
+              "textMd": "把所有计算改写为 CPU 单线程代码"
+            },
+            {
+              "id": "D",
+              "textMd": "只有先学习 PTX 汇编才能调用 GPU"
+            }
+          ],
+          "correctOptionIds": [
+            "B"
+          ],
+          "explanationMd": "当成熟库已提供所需算法时，直接使用通常能减少重复实现，并获得由库维护者针对多代 GPU 架构持续优化的性能与可移植性。只有在库不能满足需求时，才需要进一步考虑自定义实现。",
+          "articleRoute": "../#section-1-1-3",
+          "officialAnswerUrl": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/introduction.html",
+          "provenance": {
+            "type": "official-derived",
+            "company": "NVIDIA",
+            "role": "官方技术资料",
+            "sourceTitle": "CUDA Programming Guide 13.3 — Quick Start",
+            "sourceUrl": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/introduction.html",
+            "adapted": true,
+            "accessedAt": "2026-07-16"
+          }
+        },
+        {
+          "id": "q-1-1-05",
+          "type": "multiple",
+          "difficulty": "medium",
+          "topic": "GPU 加速的抽象层次",
+          "stemMd": "不直接编写底层 GPU 内核时，开发者仍可通过哪些方式使用 CUDA GPU 的计算能力？（多选）",
+          "options": [
+            {
+              "id": "A",
+              "textMd": "调用 cuBLAS、cuFFT 或 cuDNN 等 GPU 加速库"
+            },
+            {
+              "id": "B",
+              "textMd": "使用内部调用 GPU 加速库的人工智能框架"
+            },
+            {
+              "id": "C",
+              "textMd": "使用 NVIDIA Warp、OpenAI Triton 等可面向 CUDA 平台编译的领域特定语言"
+            },
+            {
+              "id": "D",
+              "textMd": "仅更换文件扩展名，完全不引入任何支持 GPU 的库、框架、编译器或代码路径"
+            }
+          ],
+          "correctOptionIds": [
+            "A",
+            "B",
+            "C"
+          ],
+          "explanationMd": "CUDA 生态提供多个抽象层次：优化库封装成熟算法；框架组合 GPU 加速构建块；DSL 提供比 CUDA C++ 更高层的编程接口。仅更名文件不会产生 GPU 执行路径。",
+          "articleRoute": "../#section-1-1-3",
+          "officialAnswerUrl": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/introduction.html",
+          "provenance": {
+            "type": "official-derived",
+            "company": "NVIDIA",
+            "role": "官方课程与技术资料",
+            "sourceTitle": "Fundamentals of Accelerated Computing with CUDA C/C++ — Learning Objectives",
+            "sourceUrl": "https://www.nvidia.com/content/dam/en-zz/Solutions/deep-learning/deep-learning-education/Fundamentals_of_Accelerated_Computing_with_CUDA_C_C%2B%2B.pdf",
+            "adapted": true,
+            "accessedAt": "2026-07-16"
+          }
+        },
+        {
+          "id": "q-1-1-06",
+          "type": "fill",
+          "difficulty": "easy",
+          "topic": "CUDA 全称",
+          "stemMd": "填空：CUDA 的英文全称是 ____。（也可填写中文全称）",
+          "acceptedAnswers": [
+            "Compute Unified Device Architecture",
+            "统一计算设备架构"
+          ],
+          "caseSensitive": false,
+          "displayAnswer": "Compute Unified Device Architecture（统一计算设备架构）",
+          "explanationMd": "CUDA 是 **Compute Unified Device Architecture** 的缩写，中文通常译为“统一计算设备架构”。CUDA 使通用计算负载能够使用 NVIDIA GPU。",
+          "articleRoute": "../#section-1-1-1",
+          "officialAnswerUrl": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/introduction.html",
+          "provenance": {
+            "type": "official-derived",
+            "company": "NVIDIA",
+            "role": "官方技术资料",
+            "sourceTitle": "CUDA Programming Guide 13.3 — Graphics Processing Units",
+            "sourceUrl": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/introduction.html",
+            "adapted": true,
+            "accessedAt": "2026-07-16"
+          }
+        }
+      ]
+    },
+    {
+      "id": "quiz-1-2",
+      "chapter": "1.2",
+      "route": "#quiz-1-2",
+      "titleZh": "1.2 编程模型 · 课后练习",
+      "titleEn": "Programming Model · Exercises",
+      "sourcePageRoute": "../#page-1-2",
+      "questions": [
+        {
+          "id": "q-1-2-01",
+          "type": "single",
+          "difficulty": "easy",
+          "topic": "host、device 与 kernel",
+          "stemMd": "某 NVIDIA 编译器实习面试围绕 CUDA 基础概念展开。下列对 *host*、*device* 与 *kernel* 的描述哪项正确？",
+          "options": [
+            {
+              "id": "A",
+              "textMd": "host 指 GPU，device 指 CPU，kernel 指操作系统内核"
+            },
+            {
+              "id": "B",
+              "textMd": "host 通常指 CPU 及其直接连接的内存；device 通常指 GPU 及其内存；kernel 是在 GPU 上被启动执行的函数"
+            },
+            {
+              "id": "C",
+              "textMd": "host 与 device 必须是同一颗芯片，且不能并发执行代码"
+            },
+            {
+              "id": "D",
+              "textMd": "CUDA 应用程序从 device 代码开始，完全不需要 host 代码"
+            }
+          ],
+          "correctOptionIds": [
+            "B"
+          ],
+          "explanationMd": "CUDA 使用异构系统术语：CPU 及其直接连接的内存称为主机和主机内存，GPU 及其直接连接的内存称为设备和设备内存；在 GPU 上被调用执行的函数称为内核。CUDA 应用程序从 CPU 上的主机代码开始。",
+          "articleRoute": "../#section-1-2-1",
+          "officialAnswerUrl": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/programming-model.html",
+          "provenance": {
+            "type": "reported-interview-adapted",
+            "company": "NVIDIA",
+            "role": "Compiler Intern（候选人自述）",
+            "sourceTitle": "NVIDIA Interview Experience for Compiler Intern (6 Months)",
+            "sourceUrl": "https://www.geeksforgeeks.org/interview-experiences/nvidia-interview-experience-for-compiler-intern-6-months/",
+            "adapted": true,
+            "accessedAt": "2026-07-16"
+          }
+        },
+        {
+          "id": "q-1-2-02",
+          "type": "multiple",
+          "difficulty": "medium",
+          "topic": "CUDA 内存层次",
+          "stemMd": "某 NVIDIA 编译器实习候选人回忆面试涉及 CUDA 内存。根据 CUDA 13.3 编程模型，下列说法哪些正确？（多选）",
+          "options": [
+            {
+              "id": "A",
+              "textMd": "寄存器通常保存线程局部变量，由编译器为各线程分配"
+            },
+            {
+              "id": "B",
+              "textMd": "共享内存位于 SM 片上，可供同一线程块中的线程交换数据"
+            },
+            {
+              "id": "C",
+              "textMd": "全局内存指 GPU 直接连接的 DRAM，该 GPU 的所有 SM 都可访问"
+            },
+            {
+              "id": "D",
+              "textMd": "每个 SM 都有独占的 L2 缓存，其他 SM 无法访问"
+            }
+          ],
+          "correctOptionIds": [
+            "A",
+            "B",
+            "C"
+          ],
+          "explanationMd": "寄存器文件和共享内存属于每个 SM 的片上资源；寄存器通常服务于线程局部变量，共享内存支持块内通信。全局内存是 GPU DRAM，可被该 GPU 的所有 SM 访问。L1 缓存属于各 SM，而容量更大的 L2 缓存由 GPU 的所有 SM 共享。",
+          "articleRoute": "../#section-1-2-3-2",
+          "officialAnswerUrl": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/programming-model.html",
+          "provenance": {
+            "type": "reported-interview-adapted",
+            "company": "NVIDIA",
+            "role": "Compiler Intern（候选人自述）",
+            "sourceTitle": "NVIDIA Interview Experience for Compiler Intern (6 Months)",
+            "sourceUrl": "https://www.geeksforgeeks.org/interview-experiences/nvidia-interview-experience-for-compiler-intern-6-months/",
+            "adapted": true,
+            "accessedAt": "2026-07-16"
+          }
+        },
+        {
+          "id": "q-1-2-03",
+          "type": "single",
+          "difficulty": "medium",
+          "topic": "二维数据映射",
+          "stemMd": "某 Qualcomm 图形工程候选人回忆被考查 GPU 线程组织。若用一次二维 CUDA 内核启动处理矩阵，通常最清晰的映射方式是哪一种？",
+          "options": [
+            {
+              "id": "A",
+              "textMd": "只启动一个线程，并在其中串行遍历所有元素"
+            },
+            {
+              "id": "B",
+              "textMd": "使用二维网格和二维线程块，根据块索引与块内线程索引计算每个线程负责的矩阵坐标"
+            },
+            {
+              "id": "C",
+              "textMd": "让每个线程块跨多个 SM 同时执行，以获得唯一坐标"
+            },
+            {
+              "id": "D",
+              "textMd": "依赖线程块的实际调度顺序确定矩阵行号"
+            }
+          ],
+          "correctOptionIds": [
+            "B"
+          ],
+          "explanationMd": "线程块和网格都可采用一维、二维或三维布局。二维布局能自然映射矩阵坐标；每个线程可通过块位置、块内位置及维度计算唯一的全局坐标。不能依赖线程块调度顺序，因为该顺序不受保证。",
+          "articleRoute": "../#section-1-2-2-1",
+          "officialAnswerUrl": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/programming-model.html",
+          "provenance": {
+            "type": "reported-interview-adapted",
+            "company": "Qualcomm",
+            "role": "Graphics Engineer（候选人自述）",
+            "sourceTitle": "Qualcomm Graphics Engineer Interview Experience — India",
+            "sourceUrl": "https://leetcode.com/discuss/interview-experience/2718740/Qualcomm-or-Graphics-Engineer-or-India-%28Selected-On-Campus%29/",
+            "adapted": true,
+            "accessedAt": "2026-07-16"
+          }
+        },
+        {
+          "id": "q-1-2-04",
+          "type": "single",
+          "difficulty": "medium",
+          "topic": "线程束与分歧",
+          "stemMd": "某 Qualcomm 图形工程面试题涉及线程束。一个线程束中的部分线程进入 `if` 分支、其余线程不进入时，CUDA 的 SIMT 模型如何描述这一现象？",
+          "options": [
+            {
+              "id": "A",
+              "textMd": "整个线程束立即终止，因为线程不能有不同控制流"
+            },
+            {
+              "id": "B",
+              "textMd": "发生线程束分歧；执行该分支时，不进入分支的通道被屏蔽"
+            },
+            {
+              "id": "C",
+              "textMd": "该线程束自动拆成两个永久独立的线程块"
+            },
+            {
+              "id": "D",
+              "textMd": "所有线程都会被强制改为进入该分支"
+            }
+          ],
+          "correctOptionIds": [
+            "B"
+          ],
+          "explanationMd": "同一线程束中的线程可沿不同控制流路径执行，这称为线程束分歧。执行某一路径时，不参与该路径的通道会被屏蔽，因此让同一线程束尽量遵循一致的控制流通常有利于提高利用率。",
+          "articleRoute": "../#section-1-2-2-2",
+          "officialAnswerUrl": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/programming-model.html",
+          "provenance": {
+            "type": "reported-interview-adapted",
+            "company": "Qualcomm",
+            "role": "Graphics Engineer（候选人自述）",
+            "sourceTitle": "Qualcomm Graphics Engineer Interview Experience — India",
+            "sourceUrl": "https://leetcode.com/discuss/interview-experience/2718740/Qualcomm-or-Graphics-Engineer-or-India-%28Selected-On-Campus%29/",
+            "adapted": true,
+            "accessedAt": "2026-07-16"
+          }
+        },
+        {
+          "id": "q-1-2-05",
+          "type": "single",
+          "difficulty": "hard",
+          "topic": "线程块调度与同步",
+          "stemMd": "某 GPU 同步类面试场景中，线程块 B 直接读取线程块 A 刚写出的结果，但两者位于同一次普通内核启动中，且没有采用专门的跨块协作机制。根本风险是什么？",
+          "options": [
+            {
+              "id": "A",
+              "textMd": "同一网格的线程块必定按索引递增顺序执行，所以不存在风险"
+            },
+            {
+              "id": "B",
+              "textMd": "线程块调度顺序不受保证；B 可能先执行，而 A 甚至尚未获得调度"
+            },
+            {
+              "id": "C",
+              "textMd": "一个线程块必然同时占用 GPU 的所有 SM"
+            },
+            {
+              "id": "D",
+              "textMd": "风险仅来自线程束大小不是 64"
+            }
+          ],
+          "correctOptionIds": [
+            "B"
+          ],
+          "explanationMd": "普通 CUDA 网格要求线程块可按任意顺序并行或串行执行。调度器不保证块间顺序，因此一个块不能假定另一个块已经产生结果；需要重新组织为独立块、拆分内核，或使用适用且明确的协作机制。",
+          "articleRoute": "../#section-1-2-2-1",
+          "officialAnswerUrl": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/programming-model.html",
+          "provenance": {
+            "type": "official-derived",
+            "company": "NVIDIA",
+            "role": "面试型原创（官方资料校验）",
+            "sourceTitle": "CUDA Programming Guide 13.3 — Thread Blocks and Grids",
+            "sourceUrl": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/programming-model.html",
+            "adapted": true,
+            "accessedAt": "2026-07-16"
+          }
+        },
+        {
+          "id": "q-1-2-06",
+          "type": "single",
+          "difficulty": "medium",
+          "topic": "Tile 与 SIMT 编程",
+          "stemMd": "关于 CUDA 13.3 中的 Tile 编程模型，下列哪项正确？",
+          "options": [
+            {
+              "id": "A",
+              "textMd": "程序员编写逐线程代码，并必须手工决定每个 Tile 操作映射到哪个线程"
+            },
+            {
+              "id": "B",
+              "textMd": "程序员在整个线程块级描述 Tile 操作，由编译器把这些操作映射到块内线程"
+            },
+            {
+              "id": "C",
+              "textMd": "Tile 编程完全取代 SIMT，同一应用不能同时包含两类内核"
+            },
+            {
+              "id": "D",
+              "textMd": "Tile 是一种必须永久存放在全局内存中的可变数组"
+            }
+          ],
+          "correctOptionIds": [
+            "B"
+          ],
+          "explanationMd": "Tile 编程让程序员以线程块为执行层次描述对多维 Tile 的操作，线程级工作分配由编译器完成。Tile 与 SIMT 在 CUDA 中并存；Tile 是块内不可变值集合，不一定具有固定的内存表示。",
+          "articleRoute": "../#section-1-2-2-3",
+          "officialAnswerUrl": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/programming-model.html",
+          "provenance": {
+            "type": "official-derived",
+            "company": "NVIDIA",
+            "role": "官方技术资料",
+            "sourceTitle": "CUDA Programming Guide 13.3 — Tile CUDA Programming",
+            "sourceUrl": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/programming-model.html",
+            "adapted": true,
+            "accessedAt": "2026-07-16"
+          }
+        },
+        {
+          "id": "q-1-2-07",
+          "type": "multiple",
+          "difficulty": "medium",
+          "topic": "统一内存",
+          "stemMd": "关于统一内存（Unified Memory），下列说法哪些正确？（多选）",
+          "options": [
+            {
+              "id": "A",
+              "textMd": "它允许创建可从 CPU 或 GPU 访问的内存分配"
+            },
+            {
+              "id": "B",
+              "textMd": "CUDA 运行时或底层硬件可在需要时访问数据或把数据重新放置到适当位置"
+            },
+            {
+              "id": "C",
+              "textMd": "使用统一内存后，数据局部性和迁移开销永远不再影响性能"
+            },
+            {
+              "id": "D",
+              "textMd": "即使使用统一内存，尽量减少迁移并从靠近数据的处理器访问数据仍可能提升性能"
+            }
+          ],
+          "correctOptionIds": [
+            "A",
+            "B",
+            "D"
+          ],
+          "explanationMd": "统一内存简化 CPU/GPU 共同访问和数据放置，但不消除物理内存层次与迁移成本。数据局部性仍然重要；减少迁移并尽量从直接连接数据所在内存的处理器访问数据，通常更有利于性能。",
+          "articleRoute": "../#section-1-2-3-3",
+          "officialAnswerUrl": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/programming-model.html",
+          "provenance": {
+            "type": "official-derived",
+            "company": "NVIDIA",
+            "role": "官方技术资料",
+            "sourceTitle": "CUDA Programming Guide 13.3 — Unified Memory",
+            "sourceUrl": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/programming-model.html",
+            "adapted": true,
+            "accessedAt": "2026-07-16"
+          }
+        },
+        {
+          "id": "q-1-2-08",
+          "type": "multiple",
+          "difficulty": "hard",
+          "topic": "Tile 数据语义",
+          "stemMd": "关于 CUDA 13.3 Tile 内核中的数组与 Tile，下列说法哪些正确？（多选）",
+          "options": [
+            {
+              "id": "A",
+              "textMd": "数组存储在设备内存中，并可由内核的存储操作修改"
+            },
+            {
+              "id": "B",
+              "textMd": "Tile 局部于单个线程块，对 Tile 的操作产生新 Tile，而不修改原 Tile"
+            },
+            {
+              "id": "C",
+              "textMd": "Tile 每一维的大小必须是 2 的幂，并且在编译时已知"
+            },
+            {
+              "id": "D",
+              "textMd": "Tile 可以直接作为内核参数从主机传入"
+            }
+          ],
+          "correctOptionIds": [
+            "A",
+            "B",
+            "C"
+          ],
+          "explanationMd": "数组是设备内存中的可变多维容器；Tile 是仅存在于 Tile 代码内部、局部于线程块的不可变值集合。Tile 维度大小必须是编译时已知的 2 的幂，且 Tile 不能作为内核参数传递。",
+          "articleRoute": "../#section-1-2-2-3-1",
+          "officialAnswerUrl": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/programming-model.html",
+          "provenance": {
+            "type": "official-derived",
+            "company": "NVIDIA",
+            "role": "官方技术资料",
+            "sourceTitle": "CUDA Programming Guide 13.3 — Arrays and Tiles",
+            "sourceUrl": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/programming-model.html",
+            "adapted": true,
+            "accessedAt": "2026-07-16"
+          }
+        },
+        {
+          "id": "q-1-2-09",
+          "type": "fill",
+          "difficulty": "easy",
+          "topic": "线程束大小",
+          "stemMd": "填空：在本章所述 CUDA 编程模型中，一个线程束包含 ____ 个线程。",
+          "acceptedAnswers": [
+            "32"
+          ],
+          "caseSensitive": true,
+          "displayAnswer": "32",
+          "explanationMd": "线程块中的线程按每组 **32** 个组织成线程束，线程束通道编号为 0 到 31。线程块总线程数取 32 的倍数，通常可避免最后一个线程束存在长期闲置通道。",
+          "articleRoute": "../#section-1-2-2-2",
+          "officialAnswerUrl": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/programming-model.html",
+          "provenance": {
+            "type": "official-derived",
+            "company": "NVIDIA",
+            "role": "官方课程与技术资料",
+            "sourceTitle": "Fundamentals of Accelerated Computing with CUDA C/C++ — Learning Objectives",
+            "sourceUrl": "https://www.nvidia.com/content/dam/en-zz/Solutions/deep-learning/deep-learning-education/Fundamentals_of_Accelerated_Computing_with_CUDA_C_C%2B%2B.pdf",
+            "adapted": true,
+            "accessedAt": "2026-07-16"
+          }
+        },
+        {
+          "id": "q-1-2-10",
+          "type": "fill",
+          "difficulty": "easy",
+          "topic": "流式多处理器",
+          "stemMd": "填空：CUDA 硬件模型中，执行线程块并包含寄存器文件、统一数据缓存和多个功能单元的硬件单元，英文缩写为 ____。",
+          "acceptedAnswers": [
+            "SM",
+            "Streaming Multiprocessor",
+            "流式多处理器"
+          ],
+          "caseSensitive": false,
+          "displayAnswer": "SM（Streaming Multiprocessor，流式多处理器）",
+          "explanationMd": "GPU 可视为一组 **SM（Streaming Multiprocessor）**，并进一步组织为 GPC。一个线程块的所有线程都在同一个 SM 上执行，这使块内线程能够高效通信和同步。",
+          "articleRoute": "../#section-1-2-2",
+          "officialAnswerUrl": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/programming-model.html",
+          "provenance": {
+            "type": "official-derived",
+            "company": "NVIDIA",
+            "role": "官方技术资料",
+            "sourceTitle": "CUDA Programming Guide 13.3 — GPU Hardware Model",
+            "sourceUrl": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/programming-model.html",
+            "adapted": true,
+            "accessedAt": "2026-07-16"
+          }
+        }
+      ]
+    },
+    {
+      "id": "quiz-1-3",
+      "chapter": "1.3",
+      "route": "#quiz-1-3",
+      "titleZh": "1.3 CUDA 平台 · 课后练习",
+      "titleEn": "The CUDA Platform · Exercises",
+      "sourcePageRoute": "../#page-1-3",
+      "questions": [
+        {
+          "id": "q-1-3-01",
+          "type": "single",
+          "difficulty": "easy",
+          "topic": "计算能力与 SM 版本",
+          "stemMd": "某 GPU 的计算能力为 12.0。按照 CUDA 平台的命名规则，它对应的 SM 版本标识是什么？",
+          "options": [
+            {
+              "id": "A",
+              "textMd": "`compute_12`"
+            },
+            {
+              "id": "B",
+              "textMd": "`sm_120`"
+            },
+            {
+              "id": "C",
+              "textMd": "`ptx_12_0`"
+            },
+            {
+              "id": "D",
+              "textMd": "`gpu_1200`"
+            }
+          ],
+          "correctOptionIds": [
+            "B"
+          ],
+          "explanationMd": "计算能力采用 X.Y 形式，并与 SM 版本直接对应；CC 12.0 的 SM 标识是 `sm_120`。`sm_*` 也用于标记面向特定物理 GPU ISA 构建的二进制代码。",
+          "articleRoute": "../#section-1-3-1",
+          "officialAnswerUrl": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/cuda-platform.html",
+          "provenance": {
+            "type": "official-derived",
+            "company": "NVIDIA",
+            "role": "面试型原创（官方资料校验）",
+            "sourceTitle": "CUDA Programming Guide 13.3 — Compute Capability and SM Version",
+            "sourceUrl": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/cuda-platform.html",
+            "adapted": true,
+            "accessedAt": "2026-07-16"
+          }
+        },
+        {
+          "id": "q-1-3-02",
+          "type": "single",
+          "difficulty": "easy",
+          "topic": "Toolkit、Driver 与 Runtime",
+          "stemMd": "下列哪项最准确地区分 NVIDIA 驱动程序、CUDA 工具包与 CUDA 运行时？",
+          "options": [
+            {
+              "id": "A",
+              "textMd": "三者只是同一软件的三个名称"
+            },
+            {
+              "id": "B",
+              "textMd": "驱动程序是主机系统使用 GPU 的基础；工具包提供开发工具、头文件与库；运行时是工具包中的重要库，提供内存管理和内核启动等 API"
+            },
+            {
+              "id": "C",
+              "textMd": "CUDA 工具包属于 GPU 固件，不能独立于驱动程序发布"
+            },
+            {
+              "id": "D",
+              "textMd": "CUDA 运行时只负责显示输出，不参与计算"
+            }
+          ],
+          "correctOptionIds": [
+            "B"
+          ],
+          "explanationMd": "NVIDIA 驱动程序必须安装在主机操作系统中，是访问 GPU 的基础。CUDA 工具包是独立的软件产品，提供开发和分析所需的工具、头文件与库；CUDA 运行时则是工具包中的关键库。",
+          "articleRoute": "../#section-1-3-2",
+          "officialAnswerUrl": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/cuda-platform.html",
+          "provenance": {
+            "type": "official-derived",
+            "company": "NVIDIA",
+            "role": "面试型原创（官方资料校验）",
+            "sourceTitle": "CUDA Programming Guide 13.3 — CUDA Toolkit and NVIDIA Driver",
+            "sourceUrl": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/cuda-platform.html",
+            "adapted": true,
+            "accessedAt": "2026-07-16"
+          }
+        },
+        {
+          "id": "q-1-3-03",
+          "type": "single",
+          "difficulty": "medium",
+          "topic": "运行时 API 与驱动程序 API",
+          "stemMd": "关于 CUDA 运行时 API 与 CUDA 驱动程序 API 的关系，下列哪项正确？",
+          "options": [
+            {
+              "id": "A",
+              "textMd": "运行时 API 构建在更底层的驱动程序 API 之上，应用程序可选择其中一种或混合使用"
+            },
+            {
+              "id": "B",
+              "textMd": "驱动程序 API 构建在运行时 API 之上，且二者绝不能共存"
+            },
+            {
+              "id": "C",
+              "textMd": "运行时 API 只能查询显示器分辨率，不能启动内核"
+            },
+            {
+              "id": "D",
+              "textMd": "所有 CUDA 功能都只能通过运行时 API 使用"
+            }
+          ],
+          "correctOptionIds": [
+            "A"
+          ],
+          "explanationMd": "CUDA 运行时 API 建立在 CUDA 驱动程序 API 之上。仅使用驱动程序 API 可以实现运行时 API 的功能，且部分高级功能只在驱动程序 API 中提供；应用程序也可以混合使用两者。",
+          "articleRoute": "../#section-1-3-2-1",
+          "officialAnswerUrl": "https://docs.nvidia.com/cuda/cuda-runtime-api/driver-vs-runtime-api.html",
+          "provenance": {
+            "type": "official-derived",
+            "company": "NVIDIA",
+            "role": "官方技术资料",
+            "sourceTitle": "Differences between the Driver and Runtime APIs",
+            "sourceUrl": "https://docs.nvidia.com/cuda/cuda-runtime-api/driver-vs-runtime-api.html",
+            "adapted": true,
+            "accessedAt": "2026-07-16"
+          }
+        },
+        {
+          "id": "q-1-3-04",
+          "type": "single",
+          "difficulty": "medium",
+          "topic": "PTX 与 cubin",
+          "stemMd": "在典型 CUDA 编译链中，PTX 与 cubin 的关系是什么？",
+          "options": [
+            {
+              "id": "A",
+              "textMd": "PTX 是物理 GPU 的最终机器码，cubin 是与硬件无关的源代码"
+            },
+            {
+              "id": "B",
+              "textMd": "PTX 是抽象物理 GPU ISA 的虚拟指令集表示，可进一步编译成面向特定 SM 版本的 cubin"
+            },
+            {
+              "id": "C",
+              "textMd": "PTX 与 cubin 都只包含 CPU 代码"
+            },
+            {
+              "id": "D",
+              "textMd": "cubin 只能由浏览器在网页中解释执行"
+            }
+          ],
+          "correctOptionIds": [
+            "B"
+          ],
+          "explanationMd": "PTX 是位于真实 GPU ISA 之上的虚拟 ISA，常作为编译器中间表示。离线工具或驱动程序 JIT 编译器可把 PTX 转换为针对具体 `sm_*` 目标的可执行 GPU 二进制 cubin。",
+          "articleRoute": "../#section-1-3-3",
+          "officialAnswerUrl": "https://developer.nvidia.com/blog/understanding-ptx-the-assembly-language-of-cuda-gpu-computing/",
+          "provenance": {
+            "type": "official-derived",
+            "company": "NVIDIA",
+            "role": "官方技术资料",
+            "sourceTitle": "Understanding PTX, the Assembly Language of CUDA GPU Computing",
+            "sourceUrl": "https://developer.nvidia.com/blog/understanding-ptx-the-assembly-language-of-cuda-gpu-computing/",
+            "adapted": true,
+            "accessedAt": "2026-07-16"
+          }
+        },
+        {
+          "id": "q-1-3-05",
+          "type": "multiple",
+          "difficulty": "medium",
+          "topic": "fatbin 内容与选择",
+          "stemMd": "关于胖二进制（fatbin），下列说法哪些正确？（多选）",
+          "options": [
+            {
+              "id": "A",
+              "textMd": "它是可执行文件或库中用于容纳 GPU 代码的容器"
+            },
+            {
+              "id": "B",
+              "textMd": "一个 fatbin 可以包含面向多个 SM 版本的 cubin"
+            },
+            {
+              "id": "C",
+              "textMd": "一个 fatbin 也可以包含一个或多个 PTX 版本，以支持运行时 JIT"
+            },
+            {
+              "id": "D",
+              "textMd": "运行时必须无条件执行 fatbin 中列出的第一个条目，不能按 GPU 选择"
+            }
+          ],
+          "correctOptionIds": [
+            "A",
+            "B",
+            "C"
+          ],
+          "explanationMd": "fatbin 将 GPU 代码嵌入应用程序或库，可同时包含多个物理目标的 cubin 和多个虚拟目标的 PTX。加载时会为具体 GPU 选择适用代码；必要时可对 PTX 进行 JIT 编译。",
+          "articleRoute": "../#section-1-3-4",
+          "officialAnswerUrl": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/cuda-platform.html",
+          "provenance": {
+            "type": "official-derived",
+            "company": "NVIDIA",
+            "role": "官方技术资料",
+            "sourceTitle": "CUDA Programming Guide 13.3 — Cubins and Fat Binaries",
+            "sourceUrl": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/cuda-platform.html",
+            "adapted": true,
+            "accessedAt": "2026-07-16"
+          }
+        },
+        {
+          "id": "q-1-3-06",
+          "type": "multiple",
+          "difficulty": "hard",
+          "topic": "二进制兼容性与 PTX 兼容性",
+          "stemMd": "应用程序同时嵌入了面向 `sm_86` 的 cubin 和面向 `compute_80` 的 PTX。根据 CUDA 13.3 的兼容性规则，下列判断哪些正确？（多选）",
+          "options": [
+            {
+              "id": "A",
+              "textMd": "CC 8.9 GPU 可加载该 `sm_86` cubin，因为主版本相同且目标 GPU 次版本不低于 6"
+            },
+            {
+              "id": "B",
+              "textMd": "CC 8.0 GPU 可加载该 `sm_86` cubin，因为 8.0 与 8.6 主版本相同"
+            },
+            {
+              "id": "C",
+              "textMd": "CC 9.0 GPU 不保证能加载 `sm_86` cubin，但可把 `compute_80` PTX JIT 编译为适用的后续 SM 二进制"
+            },
+            {
+              "id": "D",
+              "textMd": "`compute_80` PTX 只能编译到 `sm_80`，不能面向任何更高计算能力"
+            }
+          ],
+          "correctOptionIds": [
+            "A",
+            "C"
+          ],
+          "explanationMd": "cubin 的二进制兼容性只在同一计算能力主版本内向更高或相同次版本保证，因此 `sm_86` 可用于 CC 8.9，但不能用于 CC 8.0，跨到 CC 9.x 也不保证兼容。`compute_80` PTX 则可 JIT 到不低于其目标计算能力的后续 SM。",
+          "articleRoute": "../#section-1-3-4-1",
+          "officialAnswerUrl": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/cuda-platform.html",
+          "provenance": {
+            "type": "official-derived",
+            "company": "NVIDIA",
+            "role": "面试型原创（官方资料校验）",
+            "sourceTitle": "CUDA Programming Guide 13.3 — Binary and PTX Compatibility",
+            "sourceUrl": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/cuda-platform.html",
+            "adapted": true,
+            "accessedAt": "2026-07-16"
+          }
+        },
+        {
+          "id": "q-1-3-07",
+          "type": "fill",
+          "difficulty": "easy",
+          "topic": "SM 目标标识",
+          "stemMd": "填空：面向计算能力 12.0 的物理 GPU 二进制目标标识写作 ____。",
+          "acceptedAnswers": [
+            "sm_120"
+          ],
+          "caseSensitive": false,
+          "displayAnswer": "sm_120",
+          "explanationMd": "`sm_120` 表示面向 CC 12.0 对应物理 SM ISA 构建的二进制目标。不要与虚拟 PTX 目标使用的 `compute_*` 标识混淆。",
+          "articleRoute": "../#section-1-3-1",
+          "officialAnswerUrl": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/cuda-platform.html",
+          "provenance": {
+            "type": "official-derived",
+            "company": "NVIDIA",
+            "role": "官方技术资料",
+            "sourceTitle": "CUDA Programming Guide 13.3 — Compute Capability and SM Version",
+            "sourceUrl": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/cuda-platform.html",
+            "adapted": true,
+            "accessedAt": "2026-07-16"
+          }
+        },
+        {
+          "id": "q-1-3-08",
+          "type": "fill",
+          "difficulty": "medium",
+          "topic": "PTX 虚拟目标标识",
+          "stemMd": "填空：表示支持计算能力 8.0 功能的 PTX 虚拟目标标识写作 ____。",
+          "acceptedAnswers": [
+            "compute_80"
+          ],
+          "caseSensitive": false,
+          "displayAnswer": "compute_80",
+          "explanationMd": "PTX 版本与计算能力对应，面向计算能力 8.0 的虚拟目标标识为 `compute_80`。它可在运行时 JIT 编译为 `sm_80` 或满足兼容条件的后续 SM 二进制。",
+          "articleRoute": "../#section-1-3-3",
+          "officialAnswerUrl": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/cuda-platform.html",
+          "provenance": {
+            "type": "official-derived",
+            "company": "NVIDIA",
+            "role": "官方技术资料",
+            "sourceTitle": "CUDA Programming Guide 13.3 — Parallel Thread Execution",
+            "sourceUrl": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/cuda-platform.html",
+            "adapted": true,
+            "accessedAt": "2026-07-16"
+          }
+        }
+      ]
+    }
+  ]
+}

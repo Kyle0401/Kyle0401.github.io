@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="CUDA Programming Guide Release 13.3 第一章课后练习与即时解析">
+  <meta name="theme-color" id="theme-color" content="#76b900">
+  <script>
+    (function () {
+      'use strict';
+      var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      try {
+        var savedTheme = window.localStorage.getItem('cuda-docs-theme');
+        if (savedTheme === 'dark' || savedTheme === 'light') dark = savedTheme === 'dark';
+      } catch (error) {
+        // Storage may be unavailable in privacy modes; the system preference remains the fallback.
+      }
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      document.getElementById('theme-color').setAttribute('content', dark ? '#10140e' : '#76b900');
+    })();
+  </script>
+  <title>CUDA 第一章课后练习 · Kyle</title>
+  <link rel="icon" type="image/svg+xml" href="../../../../static/img/logo-jy.svg">
+  <link rel="stylesheet" href="../../../../static/css/java-note.css">
+  <link rel="stylesheet" href="../cuda-docs.css">
+  <link rel="stylesheet" href="../dark-mode.css">
+  <link rel="stylesheet" href="./quiz.css">
+</head>
+<body>
+  <a class="skip-link" href="#quiz-main">跳到练习内容</a>
+
+  <header class="note-topbar">
+    <a class="note-brand" href="../../../../" aria-label="返回 Kyle 主页">
+      <span class="note-brand-mark">K</span>
+      <span>Kyle · Learning Records</span>
+    </a>
+    <div class="topbar-actions">
+      <button class="mobile-nav-toggle" id="mobile-nav-toggle" type="button" aria-expanded="false" aria-controls="quiz-sidebar">
+        <span class="menu-icon" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span>练习目录</span>
+      </button>
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-pressed="false" aria-label="切换到夜览模式" title="切换到夜览模式">
+        <span class="theme-toggle-icon" id="theme-toggle-icon" aria-hidden="true">☾</span>
+        <span class="theme-toggle-label" id="theme-toggle-label">夜览</span>
+      </button>
+      <a class="note-back" href="../">← 返回 CUDA 正文</a>
+    </div>
+  </header>
+
+  <div class="docs-layout quiz-layout" id="quiz-shell" aria-busy="true">
+    <aside class="docs-sidebar quiz-sidebar" id="quiz-sidebar" aria-label="CUDA 第一章练习目录">
+      <div class="docs-sidebar-heading">
+        <span class="docs-sidebar-kicker">CUDA SELF CHECK</span>
+        <strong>第一章课后练习</strong>
+        <span class="docs-sidebar-release">Release 13.3</span>
+      </div>
+      <nav class="page-nav quiz-set-nav" id="quiz-set-nav" aria-label="练习集导航">
+        <p class="nav-loading">正在加载题库…</p>
+      </nav>
+      <p class="quiz-sidebar-note">答案只保存在当前页面内存中，刷新后即清空。</p>
+    </aside>
+
+    <main class="note-main" id="quiz-main" tabindex="-1">
+      <nav class="breadcrumb" aria-label="面包屑导航">
+        <a href="../../../../">主页</a><span>/</span><a href="../../">AI Infra</a><span>/</span><a href="../">CUDA 基础</a><span>/</span><span>课后练习</span>
+      </nav>
+
+      <section class="release-banner quiz-release-banner" aria-label="练习说明">
+        <div class="release-banner-copy">
+          <div class="release-badges">
+            <span class="release-badge is-unofficial">非官方自测题</span>
+            <span class="release-badge">Release 13.3</span>
+          </div>
+          <p>本页答案在客户端公开，仅用于学习自测，不是防作弊考试。答题记录不会上传或持久化。</p>
+        </div>
+        <a class="official-link" href="https://docs.nvidia.com/cuda/cuda-programming-guide/" target="_blank" rel="noopener noreferrer">官方依据 →</a>
+      </section>
+
+      <div class="quiz-load-status" id="quiz-load-status" role="status" aria-live="polite">正在加载练习题…</div>
+      <div class="quiz-app" id="quiz-app"></div>
+
+      <footer class="article-footer quiz-footer">
+        <span>CUDA Programming Guide · Release 13.3</span>
+        <a href="../">返回非官方中文译本 →</a>
+      </footer>
+    </main>
+
+    <aside class="page-outline quiz-status-rail" id="quiz-status-rail" aria-label="当前练习状态">
+      <p class="page-outline-title">练习状态</p>
+      <div id="quiz-status-content">
+        <p class="outline-empty">选择一套练习开始作答。</p>
+      </div>
+    </aside>
+  </div>
+
+  <button class="docs-overlay" id="docs-overlay" type="button" aria-label="关闭练习目录"></button>
+
+  <noscript><p class="noscript-message">此练习需要 JavaScript 才能即时评分和显示解析。</p></noscript>
+
+  <script src="../vendor/markdown-it/markdown-it.min.js"></script>
+  <script src="./quiz.js"></script>
+</body>
+</html>

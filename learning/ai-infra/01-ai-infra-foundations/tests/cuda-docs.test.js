@@ -17,6 +17,20 @@ assert.deepStrictEqual(docs.parseHash('#page-4-20'), { kind: 'page', chapter: '4
 assert.deepStrictEqual(docs.parseHash('#section-4-20-1'), { kind: 'section', section: '4.20.1', id: 'section-4-20-1' });
 assert.strictEqual(docs.parseHash('#not-a-route').kind, 'default');
 
+assert.deepStrictEqual(docs.getExerciseCta('1.1'), {
+  id: 'quiz-1-1',
+  chapter: '1.1',
+  questionCount: 6,
+  typeSummary: '4 道单选 · 1 道多选 · 1 道填空',
+  href: './exercises/#quiz-1-1'
+});
+assert.strictEqual(docs.getExerciseCta('1.2').questionCount, 10);
+assert.strictEqual(docs.getExerciseCta('1.3').questionCount, 8);
+assert.strictEqual(docs.getExerciseCta('2.1'), null);
+assert.ok(docs.renderExerciseCta('1.1').indexOf('href="./exercises/#quiz-1-1"') !== -1);
+assert.ok(docs.renderExerciseCta('1.1').indexOf('刷新即清空') !== -1);
+assert.strictEqual(docs.renderExerciseCta('4.20'), '');
+
 assert.deepStrictEqual(docs.extractHeadingNumber('### 4.1.4.2 Device scope'), {
   level: 3,
   number: '4.1.4.2',

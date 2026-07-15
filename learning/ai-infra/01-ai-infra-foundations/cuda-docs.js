@@ -21,6 +21,50 @@
       .replace(/'/g, '&#039;');
   }
 
+  var exerciseCtas = {
+    '1.1': {
+      id: 'quiz-1-1',
+      questionCount: 6,
+      typeSummary: '4 道单选 · 1 道多选 · 1 道填空'
+    },
+    '1.2': {
+      id: 'quiz-1-2',
+      questionCount: 10,
+      typeSummary: '5 道单选 · 3 道多选 · 2 道填空'
+    },
+    '1.3': {
+      id: 'quiz-1-3',
+      questionCount: 8,
+      typeSummary: '4 道单选 · 2 道多选 · 2 道填空'
+    }
+  };
+
+  function getExerciseCta(chapter) {
+    var meta = exerciseCtas[String(chapter || '').trim()];
+    if (!meta) return null;
+    return {
+      id: meta.id,
+      chapter: String(chapter).trim(),
+      questionCount: meta.questionCount,
+      typeSummary: meta.typeSummary,
+      href: './exercises/#' + meta.id
+    };
+  }
+
+  function renderExerciseCta(chapter) {
+    var meta = getExerciseCta(chapter);
+    if (!meta) return '';
+    return '<aside class="exercise-cta" aria-labelledby="exercise-cta-title-' + escapeHtml(meta.id) + '">' +
+      '<div class="exercise-cta-copy">' +
+        '<p class="exercise-cta-eyebrow">课后自测 · ' + escapeHtml(String(meta.questionCount)) + ' 题</p>' +
+        '<h2 id="exercise-cta-title-' + escapeHtml(meta.id) + '">完成本节练习</h2>' +
+        '<p>' + escapeHtml(meta.typeSummary) + '。支持分题检查与整卷交卷，提交后立即查看答案依据和解析。</p>' +
+        '<p class="exercise-cta-note">无需登录；答题仅保存在当前标签页内存中，刷新即清空。</p>' +
+      '</div>' +
+      '<a class="exercise-cta-link" href="' + escapeHtml(meta.href) + '">开始练习<span aria-hidden="true"> →</span></a>' +
+    '</aside>';
+  }
+
   function chapterToRoute(chapter) {
     return '#page-' + String(chapter || '').trim().replace(/\./g, '-');
   }
@@ -820,6 +864,7 @@
       var chapter = currentChapterMeta(page.topLevelChapter);
       var chapterTitle = chapter ? chapter.titleZh : 'CUDA Programming Guide';
       var body = state.md.render(page.body || '', { page: page, manifest: state.manifest });
+      var exerciseCta = renderExerciseCta(page.chapter);
 
       elements.content.innerHTML =
         '<header class="doc-page-header">' +
@@ -828,7 +873,8 @@
           '<p class="doc-page-subtitle" lang="en">' + escapeHtml(page.titleEn) + '</p>' +
           '<p class="doc-page-source"><a href="' + escapeHtml(page.officialSourceUrl || state.manifest.officialUrl) + '" target="_blank" rel="noopener noreferrer">本页官方英文来源 ↗</a></p>' +
         '</header>' +
-        '<div class="doc-page-body">' + body + '</div>';
+        '<div class="doc-page-body">' + body + '</div>' +
+        exerciseCta;
 
       document.title = page.chapter + ' ' + page.titleZh + ' · CUDA Programming Guide v' + state.manifest.release + ' · Kyle';
       elements.officialLink.href = page.officialSourceUrl || state.manifest.officialUrl;
@@ -930,6 +976,8 @@
     isSafeOfficialUrl: isSafeOfficialUrl,
     findPageByChapter: findPageByChapter,
     findPageBySection: findPageBySection,
-    normalizeAssetPath: normalizeAssetPath
+    normalizeAssetPath: normalizeAssetPath,
+    getExerciseCta: getExerciseCta,
+    renderExerciseCta: renderExerciseCta
   };
 });

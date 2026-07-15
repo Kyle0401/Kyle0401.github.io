@@ -43,7 +43,12 @@ $required = @(
     'cuda-programming-guide-zh.md',
     'vendor-lock.json',
     'tests/cuda-docs.test.js',
-    'tests/cuda-docs-stress.test.js'
+    'tests/cuda-docs-stress.test.js',
+    'tests/cuda-exercises.test.js',
+    'exercises/index.html',
+    'exercises/quiz.css',
+    'exercises/quiz.js',
+    'exercises/question-bank.json'
 )
 
 foreach ($relative in $required) {
@@ -69,6 +74,11 @@ $markdown = Read-Utf8 $markdownPath
 $index = Read-Utf8 (Resolve-ChildPath 'index.html')
 $scriptText = Read-Utf8 (Resolve-ChildPath 'cuda-docs.js')
 $styleText = Read-Utf8 (Resolve-ChildPath 'cuda-docs.css')
+$exerciseIndex = Read-Utf8 (Resolve-ChildPath 'exercises/index.html')
+$quizScriptText = Read-Utf8 (Resolve-ChildPath 'exercises/quiz.js')
+$quizStyleText = Read-Utf8 (Resolve-ChildPath 'exercises/quiz.css')
+$questionBankText = Read-Utf8 (Resolve-ChildPath 'exercises/question-bank.json')
+$questionBank = $questionBankText | ConvertFrom-Json
 
 Assert-Check ($manifest.schemaVersion -eq 1) '内容清单 schemaVersion 必须为 1。'
 Assert-Check ([bool]($manifest.release -match '^\d+\.\d+$')) 'Release 字段格式无效。'
@@ -98,6 +108,100 @@ foreach ($page in $manifest.pages) {
     $routes[$page.route] = $true
     $anchors[$page.titleAnchor] = $true
 }
+
+# 第一章练习中心是独立静态应用，不进入正式译文或 content-manifest.json。
+Assert-Check ($questionBank.schemaVersion -eq 1) '练习题库 schemaVersion 必须为 1。'
+Assert-Check ([string]$questionBank.release -eq '13.3') '练习题库必须锁定 Release 13.3。'
+Assert-Check ([string]$questionBank.disclaimerZh -eq '公开面经来自候选人自述，不代表企业官方题库，也不保证再次出现。') '练习题库缺少固定的公开面经声明。'
+Assert-Check (@($questionBank.sets).Count -eq 3) '练习题库必须恰好包含 1.1、1.2、1.3 三套题。'
+
+$expectedQuizSets = @(
+    @{ Id = 'quiz-1-1'; Chapter = '1.1'; Count = 6; Single = 4; Multiple = 1; Fill = 1 },
+    @{ Id = 'quiz-1-2'; Chapter = '1.2'; Count = 10; Single = 5; Multiple = 3; Fill = 2 },
+    @{ Id = 'quiz-1-3'; Chapter = '1.3'; Count = 8; Single = 4; Multiple = 2; Fill = 2 }
+)
+$questionIds = @{}
+$interviewAdapted = 0
+foreach ($expectedSet in $expectedQuizSets) {
+    $matchingSets = @($questionBank.sets | Where-Object { [string]$_.id -eq $expectedSet.Id })
+    Assert-Check ($matchingSets.Count -eq 1) "练习题集缺失或重复：$($expectedSet.Id)"
+    if ($matchingSets.Count -ne 1) { continue }
+    $quizSet = $matchingSets[0]
+    $questions = @($quizSet.questions)
+    Assert-Check ([string]$quizSet.chapter -eq $expectedSet.Chapter) "练习题集章节错误：$($expectedSet.Id)"
+    Assert-Check ([string]$quizSet.route -eq ('#' + $expectedSet.Id)) "练习题集路由错误：$($expectedSet.Id)"
+    Assert-Check ([string]$quizSet.sourcePageRoute -eq ('../#page-' + ($expectedSet.Chapter -replace '\.', '-'))) "练习题集正文回链必须指向对应数字分页路由：$($expectedSet.Id)"
+    Assert-Check (-not [string]::IsNullOrWhiteSpace([string]$quizSet.titleZh)) "练习题集缺少中文标题：$($expectedSet.Id)"
+    Assert-Check (-not [string]::IsNullOrWhiteSpace([string]$quizSet.titleEn)) "练习题集缺少英文标题：$($expectedSet.Id)"
+    Assert-Check ($questions.Count -eq $expectedSet.Count) "练习题量错误：$($expectedSet.Id)"
+    Assert-Check (@($questions | Where-Object { $_.type -eq 'single' }).Count -eq $expectedSet.Single) "单选题分配错误：$($expectedSet.Id)"
+    Assert-Check (@($questions | Where-Object { $_.type -eq 'multiple' }).Count -eq $expectedSet.Multiple) "多选题分配错误：$($expectedSet.Id)"
+    Assert-Check (@($questions | Where-Object { $_.type -eq 'fill' }).Count -eq $expectedSet.Fill) "填空题分配错误：$($expectedSet.Id)"
+
+    foreach ($question in $questions) {
+        $questionId = [string]$question.id
+        Assert-Check ([bool]($questionId -match '^q-1-[123]-\d{2}$')) "练习题 ID 格式无效：$questionId"
+        Assert-Check (-not $questionIds.ContainsKey($questionId)) "练习题 ID 重复：$questionId"
+        $questionIds[$questionId] = $true
+        Assert-Check (@('single','multiple','fill') -contains [string]$question.type) "练习题类型无效：$questionId"
+        Assert-Check (-not [string]::IsNullOrWhiteSpace([string]$question.difficulty)) "练习题缺少难度：$questionId"
+        Assert-Check (-not [string]::IsNullOrWhiteSpace([string]$question.topic)) "练习题缺少考点：$questionId"
+        Assert-Check (@('easy','medium','hard') -contains [string]$question.difficulty) "练习题难度值无效：$questionId"
+        Assert-Check (-not [string]::IsNullOrWhiteSpace([string]$question.stemMd)) "练习题缺少题干：$questionId"
+        Assert-Check (-not [string]::IsNullOrWhiteSpace([string]$question.explanationMd)) "练习题缺少解析：$questionId"
+        $expectedSectionPrefix = '^\.\./#section-' + ($expectedSet.Chapter -replace '\.', '-') + '(?:-|$)'
+        $articleRouteValid = [bool]([string]$question.articleRoute -match $expectedSectionPrefix)
+        Assert-Check $articleRouteValid "练习题正文引用必须指向本节数字锚点：$questionId"
+        if ($articleRouteValid) {
+            $articleSection = ([string]$question.articleRoute -replace '^\.\./#section-', '') -replace '-', '.'
+            $articleHeadingPattern = '(?m)^#{2,6}\s+' + [regex]::Escape($articleSection) + '(?:\.)?\s+'
+            Assert-Check ([regex]::IsMatch($markdown, $articleHeadingPattern)) "练习题正文锚点不存在：$questionId -> $articleSection"
+        }
+        Assert-Check ([bool]([string]$question.officialAnswerUrl -match '^https://(?:docs\.nvidia\.com|developer\.nvidia\.com|www\.nvidia\.com)/')) "练习题官方答案依据必须是 NVIDIA HTTPS 链接：$questionId"
+        Assert-Check (-not [string]::IsNullOrWhiteSpace([string]$question.provenance.type)) "练习题缺少来源类型：$questionId"
+        Assert-Check (-not [string]::IsNullOrWhiteSpace([string]$question.provenance.company)) "练习题缺少来源公司：$questionId"
+        Assert-Check (-not [string]::IsNullOrWhiteSpace([string]$question.provenance.role)) "练习题缺少来源岗位或资料角色：$questionId"
+        Assert-Check (-not [string]::IsNullOrWhiteSpace([string]$question.provenance.sourceTitle)) "练习题缺少来源标题：$questionId"
+        Assert-Check ([bool]([string]$question.provenance.sourceUrl -match '^https://')) "练习题来源必须使用 HTTPS：$questionId"
+        Assert-Check ([bool]([string]$question.provenance.accessedAt -match '^\d{4}-\d{2}-\d{2}$')) "练习题来源缺少访问日期：$questionId"
+        Assert-Check ($question.provenance.adapted -is [bool]) "练习题来源必须声明是否改编：$questionId"
+        if ([string]$question.provenance.type -match 'interview') { $interviewAdapted++ }
+
+        if ($question.type -eq 'single' -or $question.type -eq 'multiple') {
+            $options = @($question.options)
+            $correctOptionIds = @($question.correctOptionIds)
+            $optionIds = @($options | ForEach-Object { [string]$_.id })
+            Assert-Check ($options.Count -ge 2) "选择题选项不足：$questionId"
+            Assert-Check (@($optionIds | Sort-Object -Unique).Count -eq $optionIds.Count) "选择题选项 ID 重复：$questionId"
+            Assert-Check (@($options | Where-Object { [string]::IsNullOrWhiteSpace([string]$_.textMd) }).Count -eq 0) "选择题存在空选项：$questionId"
+            Assert-Check ($correctOptionIds.Count -ge 1) "选择题缺少正确答案：$questionId"
+            Assert-Check (@($correctOptionIds | Where-Object { $optionIds -notcontains [string]$_ }).Count -eq 0) "选择题答案引用未知选项：$questionId"
+            if ($question.type -eq 'single') {
+                Assert-Check ($correctOptionIds.Count -eq 1) "单选题必须恰好有一个正确选项：$questionId"
+            }
+        } else {
+            Assert-Check (@($question.acceptedAnswers).Count -gt 0) "填空题缺少 acceptedAnswers：$questionId"
+            Assert-Check (-not [string]::IsNullOrWhiteSpace([string]$question.displayAnswer)) "填空题缺少展示答案：$questionId"
+            Assert-Check ($question.PSObject.Properties.Name -contains 'caseSensitive') "填空题必须声明大小写策略：$questionId"
+        }
+    }
+}
+Assert-Check ($questionIds.Count -eq 24) '练习题库必须恰好包含 24 个唯一题目。'
+Assert-Check ($interviewAdapted -ge 6) '练习题库至少需要 6 道公开面经改编题。'
+
+Assert-Check ($exerciseIndex -match '<meta\s+name="viewport"') '练习页缺少 viewport。'
+Assert-Check ($exerciseIndex -match 'lang="zh-CN"') '练习页缺少 zh-CN 语言标记。'
+Assert-Check ($exerciseIndex -notmatch '(?i)<script[^>]+src\s*=\s*["'']https?://') '练习页不得加载远程脚本。'
+Assert-Check ($exerciseIndex -notmatch '(?i)<link[^>]+(?:rel\s*=\s*["'']stylesheet["''][^>]+href\s*=\s*["'']https?://|href\s*=\s*["'']https?://[^>]+rel\s*=\s*["'']stylesheet)') '练习页不得加载远程样式。'
+Assert-Check ($quizStyleText -notmatch '(?i)(?:@import|url\s*\()\s*["'']?https?://') '练习样式不得加载远程资源。'
+Assert-Check ($questionBankText -notmatch '(?i)!\[[^\]]*\]\(https?://') '练习题 Markdown 不得使用外部图片热链。'
+Assert-Check ($questionBankText -notmatch '(?i)<\s*(?:script|style|iframe|object|embed)\b') '练习题库不得包含可执行的原始 HTML。'
+$exerciseStorageText = $exerciseIndex + "`n" + $quizScriptText
+$themeStorageCalls = [regex]::Matches($exerciseStorageText, '(?:window|root)\.localStorage\.(?:getItem|setItem)\(\s*[''"]([^''"]+)[''"]')
+Assert-Check ($themeStorageCalls.Count -eq 2) '练习页只能读取和写入一次现有主题偏好。'
+Assert-Check (@($themeStorageCalls | Where-Object { $_.Groups[1].Value -ne 'cuda-docs-theme' }).Count -eq 0) '练习页 localStorage 仅允许使用 cuda-docs-theme。'
+Assert-Check ([regex]::Matches($exerciseStorageText, '\blocalStorage\b').Count -eq $themeStorageCalls.Count) '练习页存在未授权的 localStorage 用法。'
+Assert-Check ($exerciseStorageText -notmatch '(?i)\b(?:sessionStorage|indexedDB|document\.cookie|serviceWorker|sendBeacon)\b') '答题逻辑不得持久化或遥测答题数据。'
 
 if ($RequireFormal) {
     Assert-Check (-not [bool]$manifest.fixture) '要求正式验证，但内容清单仍标记为 fixture。'
@@ -256,12 +360,16 @@ $node = Get-Command node -ErrorAction SilentlyContinue
 if ($node) {
     & $node.Source --check (Resolve-ChildPath 'cuda-docs.js')
     Assert-Check ($LASTEXITCODE -eq 0) 'cuda-docs.js 未通过 node --check。'
+    & $node.Source --check (Resolve-ChildPath 'exercises/quiz.js')
+    Assert-Check ($LASTEXITCODE -eq 0) 'exercises/quiz.js 未通过 node --check。'
     & $node.Source (Resolve-ChildPath 'tests/cuda-docs.test.js')
     Assert-Check ($LASTEXITCODE -eq 0) 'renderer contract tests 失败。'
+    & $node.Source (Resolve-ChildPath 'tests/cuda-exercises.test.js')
+    Assert-Check ($LASTEXITCODE -eq 0) 'exercise contract tests 失败。'
     & $node.Source (Resolve-ChildPath 'tests/cuda-docs-stress.test.js')
     Assert-Check ($LASTEXITCODE -eq 0) 'large-content stress tests 失败。'
 } else {
-    Write-Warning '未找到 Node.js；已跳过 JavaScript 语法、renderer contract tests 与 stress tests。'
+    Write-Warning '未找到 Node.js；已跳过 JavaScript 语法、renderer/exercise contract tests 与 stress tests。'
 }
 
 if ($script:Failures.Count -gt 0) {
