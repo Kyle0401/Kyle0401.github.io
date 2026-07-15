@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="../../static/css/java-note.css">
     <link rel="stylesheet" href="./docker-page.css?v=20260711a">
     <link rel="stylesheet" href="./docker-page-images.css?v=20260706g">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css" integrity="sha512-rO+olRTkcf304DQBxSWxln8JXCzTHlKnIdnMUwYvQa9/Jd4cQaNkItIUj6Z4nvW1dqK0SKXLbn9h4KwZTNtAyw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/styles/github-dark-dimmed.min.css">
     <style>
         .doc-page-summary { display: none; }
         .article .page-pagination a[href^="#"],
@@ -80,9 +80,9 @@
         <span class="reading-progress-arrow" aria-hidden="true">↑</span>
     </button>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js" integrity="sha512-EBLzUL8XLl+va/zAsmXwS7Z2B1F9HUHkZwyS/VKwh3S7T/U0nF4BaU29EP/ZSf6zgiIxYAnKLu6bJ8dqpmX5uw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/dockerfile.min.js" integrity="sha512-I2X0xPYARYkIy70gPRp7+04UsyKccIdvUSR7WI+7L8n9h7hVT/cg4+3QDBoiQZKMQVdefkdh+J5VieA48ziT4A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="./docker-page.js?v=20260716a"></script>
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/languages/dockerfile.min.js"></script>
+    <script src="./docker-page.js?v=20260716b"></script>
     <script src="./docker-page-images.js?v=20260707b"></script>
     <script>
         (function () {
@@ -91,6 +91,42 @@
             var currentIssueTerm = '';
             var syncScheduled = false;
             if (!root) return;
+
+            function normalizeEscapedBreaks() {
+                var paragraphs = root.querySelectorAll('.doc-page-body p');
+                Array.prototype.forEach.call(paragraphs, function (paragraph) {
+                    var walker = document.createTreeWalker(paragraph, 4);
+                    var textNodes = [];
+                    var current;
+
+                    while ((current = walker.nextNode())) {
+                        if (current.nodeValue.indexOf('<br>') !== -1) textNodes.push(current);
+                    }
+
+                    textNodes.forEach(function (textNode) {
+                        var parts = textNode.nodeValue.split('<br>');
+                        var fragment = document.createDocumentFragment();
+
+                        parts.forEach(function (part, index) {
+                            if (index > 0) fragment.appendChild(document.createElement('br'));
+                            if (part) fragment.appendChild(document.createTextNode(part));
+                        });
+
+                        textNode.parentNode.replaceChild(fragment, textNode);
+                    });
+                });
+            }
+
+            function syncSyntaxHighlighting() {
+                if (!window.hljs || typeof window.hljs.highlightElement !== 'function') return;
+                var codeBlocks = root.querySelectorAll('.code-block pre code');
+
+                Array.prototype.forEach.call(codeBlocks, function (code) {
+                    if (code.classList.contains('hljs')) return;
+                    code.classList.remove('nohighlight');
+                    try { window.hljs.highlightElement(code); } catch (error) { /* 保留原始代码显示 */ }
+                });
+            }
 
             function syncCampLink() {
                 var kicker = root.querySelector('.doc-page-kicker');
@@ -127,6 +163,8 @@
 
             function syncPageExtras() {
                 syncScheduled = false;
+                normalizeEscapedBreaks();
+                syncSyntaxHighlighting();
                 syncCampLink();
                 syncComments();
             }
