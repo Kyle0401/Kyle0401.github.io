@@ -117,8 +117,27 @@
         });
       }
 
-      new MutationObserver(removeLegalNoticeItems).observe(content, { childList: true, subtree: true });
-      removeLegalNoticeItems();
+      function addCudaFullName() {
+        Array.prototype.forEach.call(content.querySelectorAll('em'), function (term) {
+          if (term.textContent.trim() !== '统一计算设备架构') return;
+          var node = term.nextSibling;
+          while (node) {
+            if (node.nodeType === Node.TEXT_NODE && node.nodeValue.indexOf('（CUDA）') !== -1) {
+              node.nodeValue = node.nodeValue.replace('（CUDA）', '（Compute Unified Device Architecture，CUDA）');
+              return;
+            }
+            node = node.nextSibling;
+          }
+        });
+      }
+
+      function syncArticleAdjustments() {
+        removeLegalNoticeItems();
+        addCudaFullName();
+      }
+
+      new MutationObserver(syncArticleAdjustments).observe(content, { childList: true, subtree: true });
+      syncArticleAdjustments();
     })();
   </script>
 </body>
