@@ -203,6 +203,18 @@
         });
       }
 
+      function addDslFullName() {
+        Array.prototype.forEach.call(content.querySelectorAll('.doc-page-body > p'), function (paragraph) {
+          if (paragraph.textContent.indexOf('领域特定语言（DSL）') === -1) return;
+          var walker = document.createTreeWalker(paragraph, NodeFilter.SHOW_TEXT);
+          var node;
+          while ((node = walker.nextNode())) {
+            if (node.nodeValue.indexOf('领域特定语言（DSL）') === -1) continue;
+            node.nodeValue = node.nodeValue.replace('领域特定语言（DSL）', '领域特定语言（Domain-Specific Language，DSL）');
+          }
+        });
+      }
+
       function addCudaExplanationNote() {
         Array.prototype.forEach.call(content.querySelectorAll('.doc-page-body > p'), function (paragraph) {
           if (paragraph.textContent.indexOf('使各种计算工作负载都能脱离图形 API，利用 GPU 的高吞吐能力') === -1) return;
@@ -229,6 +241,7 @@
       function syncArticleAdjustments() {
         removeLegalNoticeItems();
         addCudaFullName();
+        addDslFullName();
         addCudaExplanationNote();
       }
 
