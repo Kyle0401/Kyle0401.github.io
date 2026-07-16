@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     var profileTagContainer = document.querySelector('.left-tag');
-    var profileTags = ['网瘾', '研0', 'OS', 'linux', '跑者', '嵌入式', '羽毛球', '小提琴'];
+    var profileTags = ['网瘾', '研0', 'OS', 'Linux', '跑者', '嵌入式', '羽毛球', '小提琴'];
     if (profileTagContainer) {
         profileTagContainer.innerHTML = '';
         profileTags.forEach(function (tagText) {
