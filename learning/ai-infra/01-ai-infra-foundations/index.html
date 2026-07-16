@@ -247,6 +247,28 @@
       function addGpuArchitectureFullNames() {
         var body = content.querySelector('.doc-page-body');
         if (!body) return;
+
+        function expandEmphasizedTerm(label, abbreviation, fullName) {
+          Array.prototype.forEach.call(body.querySelectorAll('em'), function (term) {
+            if (term.textContent.trim() !== label) return;
+            var node = term.nextSibling;
+            while (node) {
+              if (node.nodeType === Node.TEXT_NODE && node.nodeValue.indexOf('（' + abbreviation + '）') !== -1) {
+                node.nodeValue = node.nodeValue.replace(
+                  '（' + abbreviation + '）',
+                  '（' + fullName + '，' + abbreviation + '）'
+                );
+                return;
+              }
+              if (node.nodeType === Node.ELEMENT_NODE) return;
+              node = node.nextSibling;
+            }
+          });
+        }
+
+        expandEmphasizedTerm('流式多处理器', 'SM', 'Streaming Multiprocessor');
+        expandEmphasizedTerm('图形处理簇', 'GPC', 'Graphics Processing Cluster');
+
         var replacements = {
           '流式多处理器（SM）': '流式多处理器（Streaming Multiprocessor，SM）',
           '图形处理簇（GPC）': '图形处理簇（Graphics Processing Cluster，GPC）'
