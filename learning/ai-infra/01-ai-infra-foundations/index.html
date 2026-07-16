@@ -244,6 +244,24 @@
         });
       }
 
+      function addGpuArchitectureFullNames() {
+        var body = content.querySelector('.doc-page-body');
+        if (!body) return;
+        var replacements = {
+          '流式多处理器（SM）': '流式多处理器（Streaming Multiprocessor，SM）',
+          '图形处理簇（GPC）': '图形处理簇（Graphics Processing Cluster，GPC）'
+        };
+        var walker = document.createTreeWalker(body, NodeFilter.SHOW_TEXT);
+        var node;
+        while ((node = walker.nextNode())) {
+          Object.keys(replacements).forEach(function (source) {
+            if (node.nodeValue.indexOf(source) !== -1) {
+              node.nodeValue = node.nodeValue.split(source).join(replacements[source]);
+            }
+          });
+        }
+      }
+
       function addCudaExplanationNote() {
         Array.prototype.forEach.call(content.querySelectorAll('.doc-page-body > p'), function (paragraph) {
           if (paragraph.textContent.indexOf('使各种计算工作负载都能脱离图形 API，利用 GPU 的高吞吐能力') === -1) return;
@@ -271,6 +289,7 @@
         removeLegalNoticeItems();
         addCudaFullName();
         addDslFullName();
+        addGpuArchitectureFullNames();
         addCudaExplanationNote();
       }
 
