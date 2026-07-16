@@ -98,5 +98,26 @@
 
   <script src="../vendor/markdown-it/markdown-it.min.js"></script>
   <script src="./quiz.js"></script>
+  <script>
+    (function () {
+      'use strict';
+      var quizApp = document.getElementById('quiz-app');
+      if (!quizApp) return;
+
+      function markTranslationLinks() {
+        quizApp.querySelectorAll('.quiz-sources a').forEach(function (link) {
+          if (link.textContent.trim().indexOf('回看译文知识点') !== 0) return;
+          link.setAttribute('target', '_blank');
+          link.setAttribute('rel', 'noopener noreferrer');
+        });
+      }
+
+      new MutationObserver(markTranslationLinks).observe(quizApp, {
+        childList: true,
+        subtree: true
+      });
+      markTranslationLinks();
+    })();
+  </script>
 </body>
 </html>
