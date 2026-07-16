@@ -158,6 +158,24 @@ html[data-theme="dark"] .article a:hover {
   color: #c2ed86;
 }
 
+html[data-theme="dark"] .article .exercise-cta-link {
+  color: #10140e;
+  background: #76b900;
+  border: 1px solid #9bdc3d;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, .34), 0 0 0 1px rgba(145, 211, 45, .08);
+}
+
+html[data-theme="dark"] .article .exercise-cta-link:hover {
+  color: #10140e;
+  background: #91d32d;
+  border-color: #b7ea69;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, .4), 0 0 0 1px rgba(183, 234, 105, .12);
+}
+
+html[data-theme="dark"] .article .exercise-cta-link:focus-visible {
+  outline-color: #b7ea69;
+}
+
 html[data-theme="dark"] .doc-page-subtitle,
 html[data-theme="dark"] .comments-heading p,
 html[data-theme="dark"] .figure figcaption,
