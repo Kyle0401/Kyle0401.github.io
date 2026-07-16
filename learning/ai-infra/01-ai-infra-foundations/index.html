@@ -51,6 +51,21 @@
       border-color: #b7ea69;
       box-shadow: 0 10px 26px rgba(0, 0, 0, .4), 0 0 0 1px rgba(183, 234, 105, .12);
     }
+
+    @media (max-width: 900px) {
+      .docs-sidebar {
+        box-sizing: border-box;
+        height: calc(100dvh - var(--docs-header-height));
+        max-height: calc(100dvh - var(--docs-header-height));
+        padding-bottom: max(36px, env(safe-area-inset-bottom));
+        overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior-x: none;
+        overscroll-behavior-y: contain;
+        -webkit-overflow-scrolling: touch;
+        touch-action: pan-y;
+      }
+    }
   </style>
 </head>
 <body>
