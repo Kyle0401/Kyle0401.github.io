@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "<stdin>", line 49, in <module>
+  File "<stdin>", line 20, in compact_svg
+RuntimeError: static/svg/skillPc.svg: expected 35 skill groups, found 36
