@@ -284,6 +284,40 @@
         }
       }
 
+      function addInterconnectExplanationNote() {
+        var figures = content.querySelectorAll('.doc-page-body .figure');
+        var figure = null;
+        Array.prototype.some.call(figures, function (item) {
+          var caption = item.querySelector('figcaption');
+          if (!caption || !/^图\s*2(?:\s|$)/.test(caption.textContent.trim())) return false;
+          figure = item;
+          return true;
+        });
+        if (!figure) return;
+        var next = figure.nextElementSibling;
+        if (next && next.hasAttribute('data-interconnect-explanation-note')) return;
+
+        var note = document.createElement('aside');
+        note.className = 'markdown-alert markdown-alert-note';
+        note.setAttribute('role', 'note');
+        note.setAttribute('data-interconnect-explanation-note', '');
+
+        var title = document.createElement('p');
+        title.className = 'markdown-alert-title';
+        title.textContent = '补充：PCIe 与 NVLink';
+
+        var pcie = document.createElement('p');
+        pcie.textContent = 'PCIe（Peripheral Component Interconnect Express）是通用高速互连总线，通常用于连接 CPU、GPU 与其他外设。在独立显卡系统中，主机内存与设备内存之间的数据传输通常经过 PCIe；其实际带宽和时延取决于 PCIe 代际、链路宽度以及整机拓扑。';
+
+        var nvlink = document.createElement('p');
+        nvlink.textContent = 'NVLink 是 NVIDIA 设计的高带宽、低时延互连技术，主要用于受支持平台中的 GPU–GPU 通信，也可在部分系统中用于 CPU–GPU 互连。它通常能提供比单条 PCIe 链路更高的聚合带宽，但是否支持，以及具体拓扑和带宽，均取决于 GPU 架构与整机平台。两者都是设备间的数据通路，并不会改变 CUDA 的主机—设备编程模型。';
+
+        note.appendChild(title);
+        note.appendChild(pcie);
+        note.appendChild(nvlink);
+        figure.insertAdjacentElement('afterend', note);
+      }
+
       function addCudaExplanationNote() {
         Array.prototype.forEach.call(content.querySelectorAll('.doc-page-body > p'), function (paragraph) {
           if (paragraph.textContent.indexOf('使各种计算工作负载都能脱离图形 API，利用 GPU 的高吞吐能力') === -1) return;
@@ -312,6 +346,7 @@
         addCudaFullName();
         addDslFullName();
         addGpuArchitectureFullNames();
+        addInterconnectExplanationNote();
         addCudaExplanationNote();
       }
 
