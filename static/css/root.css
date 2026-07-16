@@ -105,6 +105,7 @@ html {
 
 
 
+
 html {
     /*白色简约+黑色svg**/
     --name: 主题4;
@@ -195,4 +196,11 @@ html {
 .left-tag-item {
     margin: 0 4px 4px 0 !important;
     padding: 8px !important;
+}
+
+/* 主页头像：覆盖 HTML 中原有的 logo.png。 */
+.logo,
+.index-logo {
+    background-image: url(../img/avatar.svg) !important;
+    background-position: center;
 }
