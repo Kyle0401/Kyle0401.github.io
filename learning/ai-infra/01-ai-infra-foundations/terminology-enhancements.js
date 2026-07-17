@@ -72,6 +72,42 @@
     });
   }
 
-  new MutationObserver(expandWarpAndSimt).observe(content, { childList: true, subtree: true });
-  expandWarpAndSimt();
+  function explainInstructionIssueCycle() {
+    Array.prototype.some.call(content.querySelectorAll('.doc-page-body > p'), function (paragraph) {
+      if (paragraph.textContent.indexOf('每个指令发射周期中，线程束调度器') === -1) return false;
+
+      var next = paragraph.nextElementSibling;
+      if (!next || !next.hasAttribute('data-instruction-issue-cycle-note')) {
+        var note = document.createElement('aside');
+        note.className = 'markdown-alert markdown-alert-note';
+        note.setAttribute('role', 'note');
+        note.setAttribute('data-instruction-issue-cycle-note', '');
+
+        var title = document.createElement('p');
+        title.className = 'markdown-alert-title';
+        title.textContent = '补充：什么是指令发射周期？';
+
+        var definition = document.createElement('p');
+        definition.textContent = '指令发射周期（instruction issue cycle）是线程束调度器进行一次调度选择，并尝试将某个已就绪线程束的下一条指令送入相应执行流水线的时机。它描述的是“发射”动作的节拍，并不等同于一条指令从开始执行到完成所需的总时间；指令进入流水线后，可能还需要多个时钟周期才能完成。';
+
+        var scheduling = document.createElement('p');
+        scheduling.textContent = '当某个线程束因数据依赖、内存访问或执行资源冲突而尚未就绪时，调度器可以在后续发射周期选择其他已就绪线程束，从而隐藏等待延迟。每个周期能够发射多少条指令、由多少个线程束调度器并行发射，则取决于具体的 GPU 架构。';
+
+        note.appendChild(title);
+        note.appendChild(definition);
+        note.appendChild(scheduling);
+        paragraph.insertAdjacentElement('afterend', note);
+      }
+
+      return true;
+    });
+  }
+
+  function enhanceTerminology() {
+    expandWarpAndSimt();
+    explainInstructionIssueCycle();
+  }
+
+  new MutationObserver(enhanceTerminology).observe(content, { childList: true, subtree: true });
+  enhanceTerminology();
 })();
