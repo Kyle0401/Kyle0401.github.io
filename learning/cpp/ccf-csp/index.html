@@ -5,10 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Kyle 的 CCF-CSP C++ 学习总结：语言基础、STL、数据结构与常用算法">
     <title>CCF-CSP 总结 · C++学习 · Kyle</title>
+    <script>
+        (function () {
+            var theme = 'light';
+            try {
+                var saved = window.localStorage.getItem('ccf-csp-theme');
+                theme = saved === 'dark' || saved === 'light'
+                    ? saved
+                    : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            } catch (error) {
+                theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            }
+            document.documentElement.setAttribute('data-theme', theme);
+            document.documentElement.style.colorScheme = theme;
+        })();
+    </script>
     <link rel="icon" type="image/svg+xml" href="../../../static/img/logo-jy.svg">
     <link rel="stylesheet" href="../../../static/css/java-note.css">
+    <link rel="stylesheet" href="../../docker/docker-page.css?v=20260718a">
     <link rel="stylesheet" href="../../ai-infra/01-ai-infra-foundations/vendor/highlight.js/github-dark.min.css">
-    <link rel="stylesheet" href="./ccf-csp-page.css?v=20260717a">
+    <link rel="stylesheet" href="./ccf-csp-page.css?v=20260718a">
 </head>
 <body>
     <a class="skip-link" href="#article-content">跳到正文</a>
@@ -19,34 +35,33 @@
             <span>Kyle · Learning Records</span>
         </a>
         <div class="topbar-actions">
-            <a class="source-link" href="./CCF-CSP总结.md">查看 Markdown</a>
+            <button class="mobile-nav-toggle" id="mobile-nav-toggle" type="button" aria-expanded="false" aria-controls="docs-sidebar">
+                <span aria-hidden="true">☰</span><span>目录</span>
+            </button>
+            <button class="theme-toggle" id="theme-toggle" type="button" aria-label="切换到夜览模式" aria-pressed="false">
+                <svg class="theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.2 15.3A8.5 8.5 0 0 1 8.7 3.8 8.5 8.5 0 1 0 20.2 15.3Z"></path></svg>
+                <svg class="theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.5"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
+                <span class="theme-label theme-label-night">夜览</span>
+                <span class="theme-label theme-label-day">日间</span>
+            </button>
+            <a class="source-link" href="./CCF-CSP总结.md">Markdown</a>
             <a class="note-back" href="../">← 返回 C++学习</a>
         </div>
     </header>
 
-    <div class="reading-progress" aria-hidden="true">
-        <span id="reading-progress-value"></span>
-    </div>
-
-    <div class="note-layout" id="note-layout">
-        <aside class="toc" id="toc" aria-label="文章目录">
-            <button class="toc-toggle" id="toc-toggle" type="button" aria-expanded="true" aria-controls="toc-content" aria-label="收起文章目录">
-                <span class="toc-toggle-icon" aria-hidden="true">☰</span>
-                <span class="toc-toggle-text">目录</span>
-                <span class="toc-toggle-chevron" aria-hidden="true">⌄</span>
-            </button>
-            <div class="toc-content" id="toc-content">
-                <div class="toc-title-row">
-                    <p class="toc-title">On this page</p>
-                    <button class="toc-bulk-toggle" id="toc-bulk-toggle" type="button">全部折叠</button>
-                </div>
-                <nav id="toc-links" aria-label="文章目录链接">
-                    <p class="toc-loading">正在加载目录…</p>
-                </nav>
+    <div class="docs-layout" id="docs-layout">
+        <aside class="docs-sidebar" id="docs-sidebar" aria-label="CCF-CSP 章节目录">
+            <div class="docs-sidebar-heading">
+                <span class="docs-sidebar-kicker">CCF-CSP · C++ NOTES</span>
+                <strong id="docs-title">CCF-CSP 总结</strong>
+                <span class="docs-sidebar-release" id="chapter-count">按章节分页</span>
             </div>
+            <nav class="page-nav" id="page-nav" aria-label="章节导航">
+                <p class="nav-loading">正在加载目录…</p>
+            </nav>
         </aside>
 
-        <main class="note-main">
+        <main class="note-main" id="main-content">
             <nav class="breadcrumb" aria-label="面包屑导航">
                 <a href="../../../">主页</a><span>/</span>
                 <a href="../../">学习记录</a><span>/</span>
@@ -55,19 +70,11 @@
             </nav>
 
             <article class="article">
-                <header class="article-preface">
-                    <p class="article-kicker">CCF-CSP · C++ REFERENCE</p>
-                    <div class="article-tags" aria-label="内容主题">
-                        <span>C++</span>
-                        <span>STL</span>
-                        <span>数据结构</span>
-                        <span>算法</span>
-                    </div>
-                </header>
-
                 <div id="article-content" tabindex="-1" aria-live="polite">
-                    <p class="article-loading">正在加载笔记…</p>
+                    <p class="nav-loading">正在加载笔记…</p>
                 </div>
+
+                <nav class="page-pagination" id="page-pagination" aria-label="上一章和下一章"></nav>
 
                 <footer class="article-footer">
                     <span>学习记录 · CCF-CSP 总结</span>
@@ -75,9 +82,23 @@
                 </footer>
             </article>
         </main>
+
+        <aside class="page-outline" id="page-outline" aria-label="当前章内容目录">
+            <p class="page-outline-title">本章内容</p>
+            <nav id="outline-links"><p class="outline-empty">正在加载…</p></nav>
+        </aside>
     </div>
 
-    <button class="back-to-top" id="back-to-top" type="button" aria-label="返回页面顶部" title="返回页面顶部">↑</button>
+    <button class="docs-overlay" id="docs-overlay" type="button" aria-label="关闭目录"></button>
+
+    <button class="reading-progress" id="reading-progress" type="button" aria-label="返回页面顶部" title="返回顶部">
+        <svg viewBox="0 0 52 52" aria-hidden="true">
+            <circle class="reading-progress-track" cx="26" cy="26" r="21"></circle>
+            <circle class="reading-progress-value" id="reading-progress-value" cx="26" cy="26" r="21"></circle>
+        </svg>
+        <span class="reading-progress-label" id="reading-progress-label">0%</span>
+        <span class="reading-progress-arrow" aria-hidden="true">↑</span>
+    </button>
 
     <noscript>
         <p class="noscript-message">此页面需要 JavaScript 渲染。你也可以直接查看 <a href="./CCF-CSP总结.md">Markdown 原文</a>。</p>
@@ -85,6 +106,6 @@
 
     <script src="../../ai-infra/01-ai-infra-foundations/vendor/markdown-it/markdown-it.min.js"></script>
     <script src="../../ai-infra/01-ai-infra-foundations/vendor/highlight.js/highlight.min.js"></script>
-    <script src="./ccf-csp-page.js?v=20260717a"></script>
+    <script src="./ccf-csp-page.js?v=20260718a"></script>
 </body>
 </html>
