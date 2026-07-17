@@ -106,6 +106,7 @@ html {
 
 
 
+
 html {
     /*白色简约+黑色svg**/
     --name: 主题4;
@@ -203,4 +204,20 @@ html {
 .index-logo {
     background-image: url(../img/avatar.svg) !important;
     background-position: center;
+}
+
+/* 首页导航卡片：只保留标题，并在内容区域垂直居中。 */
+.projectItemLeft {
+    display: flex;
+    align-items: center;
+}
+
+.projectItemLeft p {
+    display: none !important;
+}
+
+.projectItemLeft h1,
+.projectItem:hover .projectItemLeft h1 {
+    font-size: 20px;
+    line-height: 1.35;
 }
