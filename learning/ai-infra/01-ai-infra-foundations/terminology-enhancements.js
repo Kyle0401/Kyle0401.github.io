@@ -133,10 +133,49 @@
     });
   }
 
+  function explainSmRegisterAllocation() {
+    Array.prototype.some.call(content.querySelectorAll('.doc-page-body > p'), function (paragraph) {
+      if (paragraph.textContent.indexOf('每个 SM 都有一组在线程束之间划分的 32 位寄存器') === -1) return false;
+      if (paragraph.textContent.indexOf('确定一个线程块所分配寄存器总数与共享内存总量的方法') === -1) return false;
+
+      var sibling = paragraph.nextElementSibling;
+      while (sibling && sibling.classList.contains('markdown-alert')) {
+        if (sibling.hasAttribute('data-sm-register-allocation-note')) return true;
+        sibling = sibling.nextElementSibling;
+      }
+
+      var note = document.createElement('aside');
+      note.className = 'markdown-alert markdown-alert-note';
+      note.setAttribute('role', 'note');
+      note.setAttribute('data-sm-register-allocation-note', '');
+
+      var title = document.createElement('p');
+      title.className = 'markdown-alert-title';
+      title.textContent = '补充：SM 的寄存器如何划分？';
+
+      var allocation = document.createElement('p');
+      allocation.textContent = '“在线程束之间划分”表示：所有驻留在同一个 SM 上的线程束共同消耗该 SM 有限的物理寄存器资源。寄存器在 CUDA 编程模型中仍然是线程私有的；由于一个线程束通常包含 32 个线程，一个线程束所需的寄存器数量来自这 32 个线程各自的寄存器需求。它并不表示每个线程束会永久获得一块大小固定且彼此相等的寄存器区域。';
+
+      var quantity = document.createElement('p');
+      quantity.textContent = '这里的“一组”没有统一的固定数量，而是取决于 GPU 架构和设备的计算能力。CUDA 设备属性 regsPerMultiprocessor 表示每个 SM 可用的 32 位寄存器数量；这里统计的是“多少个 32 位寄存器”，而不是字节数。某个内核每个线程实际使用多少寄存器则由编译器决定，并可通过编译器的资源使用报告查看。';
+
+      var registerFile = document.createElement('p');
+      registerFile.textContent = '从 CUDA 编程模型的角度看，这组 32 位寄存器就是前文所说的 SM 寄存器文件（register file），也就是供当前驻留线程和线程束分配使用的物理寄存器池。具体 GPU 的硬件实现可能还会把寄存器文件进一步分区或分 bank，但 CUDA 文档通常以每个 SM 的可用寄存器总量来描述和计算资源限制。';
+
+      note.appendChild(title);
+      note.appendChild(allocation);
+      note.appendChild(quantity);
+      note.appendChild(registerFile);
+      paragraph.insertAdjacentElement('afterend', note);
+      return true;
+    });
+  }
+
   function enhanceTerminology() {
     expandWarpAndSimt();
     explainInstructionIssueCycle();
     explainKernelHistoricalName();
+    explainSmRegisterAllocation();
   }
 
   new MutationObserver(enhanceTerminology).observe(content, { childList: true, subtree: true });
