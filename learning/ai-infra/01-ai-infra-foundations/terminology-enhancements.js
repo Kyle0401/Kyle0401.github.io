@@ -103,9 +103,40 @@
     });
   }
 
+  function explainKernelHistoricalName() {
+    Array.prototype.some.call(content.querySelectorAll('.doc-page-body > p'), function (paragraph) {
+      if (paragraph.textContent.indexOf('出于历史原因，在 GPU 上被调用执行的函数称为') === -1) return false;
+      if (paragraph.textContent.indexOf('启动内核') === -1) return false;
+
+      var sibling = paragraph.nextElementSibling;
+      while (sibling && sibling.classList.contains('markdown-alert')) {
+        if (sibling.hasAttribute('data-kernel-history-explanation-note')) return true;
+        sibling = sibling.nextElementSibling;
+      }
+
+      var note = document.createElement('aside');
+      note.className = 'markdown-alert markdown-alert-note';
+      note.setAttribute('role', 'note');
+      note.setAttribute('data-kernel-history-explanation-note', '');
+
+      var title = document.createElement('p');
+      title.className = 'markdown-alert-title';
+      title.textContent = '补充：为什么称为“内核”？';
+
+      var explanation = document.createElement('p');
+      explanation.textContent = '这里的“历史原因”是指 CUDA 沿用了在它之前已经存在的流式并行计算和 GPGPU 编程术语。例如，早期的 Brook GPU 流式编程系统就把对输入流中各个元素重复应用的并行函数称为 kernel；CUDA 延续了这一叫法，用它表示由大量 GPU 线程并行执行的设备函数。这里的 kernel 与操作系统内核不是同一概念：前者是计算函数，后者是负责管理硬件、进程和内存等系统资源的核心软件。';
+
+      note.appendChild(title);
+      note.appendChild(explanation);
+      paragraph.insertAdjacentElement('afterend', note);
+      return true;
+    });
+  }
+
   function enhanceTerminology() {
     expandWarpAndSimt();
     explainInstructionIssueCycle();
+    explainKernelHistoricalName();
   }
 
   new MutationObserver(enhanceTerminology).observe(content, { childList: true, subtree: true });
