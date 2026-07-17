@@ -68,9 +68,32 @@
     target.insertAdjacentElement('afterend', note);
   }
 
+  function explainNumbaCudaCorrection() {
+    var notes = Array.prototype.slice.call(article.querySelectorAll('.markdown-alert-note'));
+
+    notes.some(function (note) {
+      var text = String(note.textContent || '');
+      if (text.indexOf('原文勘误') === -1 || text.indexOf('Numba CUDA 的真实 API 语义') === -1) return false;
+      if (note.querySelector('[data-numba-cuda-explanation]')) return true;
+
+      var explanation = document.createElement('p');
+      explanation.setAttribute('data-numba-cuda-explanation', '');
+      explanation.innerHTML =
+        '<strong>Numba-CUDA 是什么：</strong>Numba 是面向 Python 的即时编译（JIT）编译器；' +
+        '<strong>Numba-CUDA</strong> 是其面向 NVIDIA GPU 的 CUDA 编程后端，可将受支持的 Python 代码编译为遵循 CUDA 执行模型的 GPU 内核和设备函数。' +
+        '本节中的 <code>cuda.threadIdx.x</code>、<code>cuda.gridDim.x</code> 等属于 Numba-CUDA 的 Python API；' +
+        '在 CUDA C++ 中，对应写法分别是 <code>threadIdx.x</code>、<code>gridDim.x</code>。' +
+        '二者表达的是同一套线程、线程块与网格层次，只是所使用的语言接口不同。';
+
+      note.appendChild(explanation);
+      return true;
+    });
+  }
+
   function enhanceArticle() {
     expandTerm();
     insertDimensionNote();
+    explainNumbaCudaCorrection();
   }
 
   var observer = new MutationObserver(enhanceArticle);
