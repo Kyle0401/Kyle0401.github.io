@@ -70,18 +70,47 @@
     target.insertAdjacentElement('afterend', note);
   }
 
-  function insertCudaThreadMeaningNote() {
-    if (article.querySelector('[data-cuda-thread-meaning-note]')) return;
+  function findThreadBlocksAndGridParagraph() {
+    var anchor = article.querySelector('#section-1-2-2-1');
+    var heading = anchor && anchor.closest ? anchor.closest('h1, h2, h3, h4, h5, h6') : null;
 
-    var target = findDimensionParagraph();
+    if (!heading) {
+      Array.prototype.some.call(article.querySelectorAll('h1, h2, h3, h4, h5, h6'), function (candidate) {
+        if (String(candidate.textContent || '').indexOf('线程块和网格') === -1) return false;
+        heading = candidate;
+        return true;
+      });
+    }
+
+    if (!heading) return null;
+
+    var headingLevel = Number(heading.tagName.slice(1));
+    var node = heading.nextElementSibling;
+
+    while (node) {
+      if (/^H[1-6]$/.test(node.tagName)) {
+        var nextLevel = Number(node.tagName.slice(1));
+        if (nextLevel <= headingLevel) break;
+      }
+
+      if (node.tagName === 'P') return node;
+
+      var paragraph = node.querySelector && node.querySelector('p');
+      if (paragraph) return paragraph;
+      node = node.nextElementSibling;
+    }
+
+    return null;
+  }
+
+  function insertCudaThreadMeaningNote() {
+    var target = findThreadBlocksAndGridParagraph();
     if (!target) return;
 
-    var insertAfter = target;
-    var sibling = target.nextElementSibling;
-    while (sibling && sibling.classList.contains('markdown-alert')) {
-      if (sibling.hasAttribute('data-cuda-thread-meaning-note')) return;
-      if (sibling.hasAttribute('data-dim-index-note')) insertAfter = sibling;
-      sibling = sibling.nextElementSibling;
+    var existing = article.querySelector('[data-cuda-thread-meaning-note]');
+    if (existing) {
+      if (existing.previousElementSibling === target) return;
+      existing.remove();
     }
 
     var note = document.createElement('aside');
@@ -106,7 +135,7 @@
     note.appendChild(distinction);
     note.appendChild(lifetime);
     note.appendChild(instruction);
-    insertAfter.insertAdjacentElement('afterend', note);
+    target.insertAdjacentElement('afterend', note);
   }
 
   function explainNumbaCudaCorrection() {
