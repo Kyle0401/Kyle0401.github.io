@@ -1,11 +1,13 @@
-# Official skill icon sources
+# Skill icon sources
 
 These files replace the hand-drawn approximations previously embedded in
 `static/svg/skillPc.svg` and `static/svg/skillWap.svg`. The combined SVGs embed
 the source files as data URIs without changing their logo artwork. The
 presentation layer may scale an asset with
 `preserveAspectRatio="xMidYMid meet"` and place it on a solid rounded card for
-visual consistency; no logo paths were traced or redrawn.
+visual consistency; no logo paths were traced or redrawn. Unless explicitly
+marked otherwise, assets come from first-party product pages or locally
+installed official application packages.
 
 | Skill | Local asset | First-party source |
 | --- | --- | --- |
@@ -13,7 +15,7 @@ visual consistency; no logo paths were traced or redrawn.
 | Adobe Lightroom | `lightroom.svg` | [Adobe Milo product mnemonic](https://milo.adobe.com/libs/img/mnemonics/svg/lightroom-64.svg) |
 | DaVinci Resolve | `davinci-resolve.png` | Application icon exported at 256 px from the locally installed official `ResolveIcon.exe`; [DaVinci Resolve](https://www.blackmagicdesign.com/products/davinciresolve) |
 | Visual Studio | `visual-studio.webp` | [Microsoft Visual Studio 2026 icon](https://visualstudio.microsoft.com/wp-content/uploads/2025/11/visual-studio-26-icon.webp) |
-| AMD Vivado | `vivado.jpg` | [AMD Vivado product image](https://www.amd.com/content/dam/amd/en/images/logos/products/2772127-vivado-teaser.jpg), published on the [Vivado product page](https://www.amd.com/en/products/software/adaptive-socs-and-fpgas/vivado.html) |
+| AMD Vivado | `vivado.png` | User-selected Vivado application icon supplied by the site owner and hosted on [GitHub user images](https://user-images.githubusercontent.com/56430787/105164182-1afa8a80-5b15-11eb-8ac3-7ae5c9f0e15e.png); this is the documented exception to the first-party-source rule |
 | STM32CubeMX | `stm32cubemx.png` | Official `STM32CubeMX.ico` exported from the locally installed STMicroelectronics package; [STM32CubeMX product page](https://www.st.com/en/development-tools/stm32cubemx.html) |
 | OpenAI Codex | `codex.png` | Application icon exported at 256 px from the installed official `OpenAI.Codex` Windows package; [Get started with Codex](https://openai.com/codex/get-started/) |
 | Google Gemini | `gemini.svg` | [Google-hosted transparent Gemini favicon](https://www.gstatic.com/lamda/images/gemini_sparkle_aurora_33f86dc0c0257da337c63.svg), declared by the official [Gemini web app](https://gemini.google.com/) |
