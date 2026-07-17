@@ -16,19 +16,16 @@
   ];
 
   function expandTerm() {
+    if (article.textContent.indexOf(expandedTerm) !== -1) return;
+
     var walker = document.createTreeWalker(article, NodeFilter.SHOW_TEXT);
-    var nodes = [];
     var node;
 
     while ((node = walker.nextNode())) {
-      if (node.nodeValue && node.nodeValue.indexOf(sourceTerm) !== -1 && node.nodeValue.indexOf(expandedTerm) === -1) {
-        nodes.push(node);
-      }
+      if (!node.nodeValue || node.nodeValue.indexOf(sourceTerm) === -1) continue;
+      node.nodeValue = node.nodeValue.replace(sourceTerm, expandedTerm);
+      return;
     }
-
-    nodes.forEach(function (textNode) {
-      textNode.nodeValue = textNode.nodeValue.replace(sourceTerm, expandedTerm);
-    });
   }
 
   function isDimensionParagraph(paragraph) {
