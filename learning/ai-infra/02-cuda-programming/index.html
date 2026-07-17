@@ -23,6 +23,21 @@
   <link rel="stylesheet" href="../01-ai-infra-foundations/cuda-docs.css">
   <link rel="stylesheet" href="../01-ai-infra-foundations/dark-mode.css">
   <link rel="stylesheet" href="./cutlass.css">
+  <style>
+    @media (min-width: 1181px) {
+      .docs-layout.cutlass-layout {
+        grid-template-columns: minmax(220px, 258px) minmax(0, 960px);
+        width: min(1320px, calc(100% - 48px));
+      }
+    }
+
+    .doc-page-body #contents,
+    .doc-page-body #contents + ol,
+    .doc-page-body hr:has(+ #contents),
+    .doc-page-body #contents + ol + hr {
+      display: none;
+    }
+  </style>
 </head>
 <body>
   <a class="skip-link" href="#article-content">跳到正文</a>
@@ -45,7 +60,7 @@
     </div>
   </header>
 
-  <div class="docs-layout" id="docs-app" aria-busy="true">
+  <div class="docs-layout cutlass-layout" id="docs-app" aria-busy="true">
     <aside class="docs-sidebar" id="docs-sidebar" aria-label="CUTLASS 教程章节目录">
       <div class="docs-sidebar-heading">
         <span class="docs-sidebar-kicker">AI INFRA · STAGE 02</span>
@@ -62,18 +77,6 @@
         <a href="../../../">主页</a><span>/</span><a href="../">AI Infra</a><span>/</span><span>CUTLASS</span>
       </nav>
 
-      <section class="release-banner cutlass-banner" aria-label="教程概览">
-        <div class="release-banner-copy">
-          <div class="release-badges">
-            <span class="release-badge">中文教程</span>
-            <span class="release-badge">GEMM</span>
-            <span class="release-badge">Hopper</span>
-          </div>
-          <p>从 CPU 三重循环一路走到 GPU 分块、Tensor Core、TMA 与 WGMMA，建立高性能矩阵乘的完整直觉。</p>
-        </div>
-        <a class="official-link" href="https://github.com/NVIDIA/cutlass" target="_blank" rel="noopener noreferrer">CUTLASS GitHub ↗</a>
-      </section>
-
       <article class="article">
         <div id="article-content" tabindex="-1">
           <header class="doc-page-header">
@@ -82,7 +85,6 @@
             <p class="doc-page-subtitle">高性能 GEMM 模板库与 GPU Tensor Core 编程范式</p>
             <p class="doc-page-source">
               <a href="https://github.com/NVIDIA/cutlass" target="_blank" rel="noopener noreferrer">项目主页 ↗</a>
-              <a href="./CUTLASS.md">查看 Markdown 源文 ↗</a>
             </p>
           </header>
           <div class="load-status" id="load-status" role="status" aria-live="polite">正在加载教程…</div>
@@ -95,12 +97,9 @@
         </footer>
       </article>
     </main>
-
-    <aside class="page-outline" id="page-outline" aria-label="当前页内容目录">
-      <p class="page-outline-title">此页内容</p>
-      <nav id="outline-links"><p class="outline-empty">正在加载…</p></nav>
-    </aside>
   </div>
+
+  <nav id="outline-links" hidden aria-hidden="true"></nav>
 
   <button class="docs-overlay" id="docs-overlay" type="button" aria-label="关闭目录"></button>
 
