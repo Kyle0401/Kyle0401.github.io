@@ -1,0 +1,82 @@
+.page-nav-chapter {
+  margin-bottom: 4px;
+  padding: 0;
+}
+
+.page-nav-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  min-height: 34px;
+  padding: 6px 9px 6px 10px;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  font: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+  text-align: left;
+  text-transform: inherit;
+  cursor: pointer;
+  transition: color .18s ease, background .18s ease;
+}
+
+.page-nav-toggle:hover {
+  color: var(--cuda-dark);
+  background: rgba(118, 185, 0, .08);
+}
+
+.page-nav-toggle:focus-visible {
+  outline: 2px solid var(--cuda);
+  outline-offset: 2px;
+}
+
+.page-nav-toggle-label {
+  min-width: 0;
+}
+
+.page-nav-chevron {
+  flex: 0 0 auto;
+  width: 7px;
+  height: 7px;
+  margin-right: 2px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg) translate(-1px, -1px);
+  transform-origin: center;
+  transition: transform .18s ease;
+}
+
+.page-nav-group.is-collapsed .page-nav-chevron {
+  transform: rotate(-45deg);
+}
+
+.page-nav-items {
+  display: grid;
+  gap: 3px;
+}
+
+.page-nav-items[hidden] {
+  display: none;
+}
+
+html[data-theme="dark"] .page-nav-toggle:hover {
+  color: var(--cuda-ink);
+  background: rgba(145, 211, 45, .09);
+}
+
+@media (max-width: 900px) {
+  .page-nav-toggle {
+    min-height: 40px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-nav-toggle,
+  .page-nav-chevron {
+    transition: none;
+  }
+}
