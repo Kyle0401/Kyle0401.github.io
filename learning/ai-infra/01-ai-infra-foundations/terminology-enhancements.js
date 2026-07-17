@@ -72,6 +72,45 @@
     });
   }
 
+  function explainWarpParallelExecution() {
+    Array.prototype.some.call(content.querySelectorAll('.doc-page-body > p'), function (paragraph) {
+      if (paragraph.textContent.indexOf('在线程块中，线程被组织成每组 32 个线程的') === -1) return false;
+
+      var insertAfter = paragraph;
+      var sibling = paragraph.nextElementSibling;
+      while (sibling && sibling.classList.contains('markdown-alert')) {
+        if (sibling.hasAttribute('data-warp-parallel-execution-note')) return true;
+        if (sibling.hasAttribute('data-simt-explanation-note')) insertAfter = sibling;
+        sibling = sibling.nextElementSibling;
+      }
+
+      var note = document.createElement('aside');
+      note.className = 'markdown-alert markdown-alert-note';
+      note.setAttribute('role', 'note');
+      note.setAttribute('data-warp-parallel-execution-note', '');
+
+      var title = document.createElement('p');
+      title.className = 'markdown-alert-title';
+      title.textContent = '补充：线程束中的 32 个线程是真正并行的吗？';
+
+      var simtSemantics = document.createElement('p');
+      simtSemantics.textContent = '从 CUDA 的 SIMT 语义看，是并行的：一个线程束中当前处于活动状态的线程通常共同执行同一条指令，但每个线程使用自己的寄存器和数据，因此可以同时处理 32 份不同的数据。';
+
+      var controlFlow = document.createElement('p');
+      controlFlow.textContent = '不过，这 32 个线程并不是 32 个完全独立、能够任意执行 32 条不同指令的 CPU 核心。一个线程束通常由一条公共的线程束指令驱动；当线程选择不同的条件分支时，各条路径需要分别执行，执行某条路径时不属于该路径的线程会被暂时屏蔽，因此此时未必有 32 个线程都在进行有效计算。';
+
+      var hardware = document.createElement('p');
+      hardware.textContent = '还要区分编程模型与物理实现：32 个逻辑线程具有并行执行语义，但不保证它们对应的底层操作一定在同一个物理时钟周期开始并完成。指令的实际执行宽度、流水线阶段和所需周期取决于具体 GPU 架构。因此，最准确的理解是：线程束中的活动线程以 SIMT 方式并行处理不同数据，同时在控制流和指令发射上受线程束组织约束。';
+
+      note.appendChild(title);
+      note.appendChild(simtSemantics);
+      note.appendChild(controlFlow);
+      note.appendChild(hardware);
+      insertAfter.insertAdjacentElement('afterend', note);
+      return true;
+    });
+  }
+
   function explainInstructionIssueCycle() {
     Array.prototype.some.call(content.querySelectorAll('.doc-page-body > p'), function (paragraph) {
       if (paragraph.textContent.indexOf('每个指令发射周期中，线程束调度器') === -1) return false;
@@ -173,6 +212,7 @@
 
   function enhanceTerminology() {
     expandWarpAndSimt();
+    explainWarpParallelExecution();
     explainInstructionIssueCycle();
     explainKernelHistoricalName();
     explainSmRegisterAllocation();
