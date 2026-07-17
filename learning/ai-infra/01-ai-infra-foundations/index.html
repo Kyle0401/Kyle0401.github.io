@@ -303,6 +303,34 @@
         }
       }
 
+      function addSmExplanationNote() {
+        Array.prototype.forEach.call(content.querySelectorAll('.doc-page-body > p'), function (paragraph) {
+          if (paragraph.textContent.indexOf('每个 SM 都包含本地寄存器文件、统一数据缓存，以及多个执行计算的功能单元') === -1) return;
+          var next = paragraph.nextElementSibling;
+          if (next && next.hasAttribute('data-sm-explanation-note')) return;
+
+          var note = document.createElement('aside');
+          note.className = 'markdown-alert markdown-alert-note';
+          note.setAttribute('role', 'note');
+          note.setAttribute('data-sm-explanation-note', '');
+
+          var title = document.createElement('p');
+          title.className = 'markdown-alert-title';
+          title.textContent = '补充：什么是 SM？';
+
+          var scheduling = document.createElement('p');
+          scheduling.textContent = 'SM 是 GPU 执行线程的基本硬件单元。CUDA 内核启动后，线程会先组成线程块；一个线程块会被整体调度到某个 SM 上，并在该 SM 上使用寄存器、共享内存和执行单元完成计算。一个 SM 通常可以同时驻留并交错执行多个线程块和多个 warp，以隐藏访存或指令等待带来的延迟。';
+
+          var comparison = document.createElement('p');
+          comparison.textContent = 'SM 不能简单等同于一个 CPU 核心。CPU 核心强调低延迟和强单线程性能；SM 则包含大量面向并行吞吐的执行资源，负责同时管理和执行许多线程。不同 GPU 架构中的 SM 组成、可驻留线程数、寄存器容量、共享内存容量及功能单元配置可能不同，因此性能优化需要结合具体架构分析。';
+
+          note.appendChild(title);
+          note.appendChild(scheduling);
+          note.appendChild(comparison);
+          paragraph.insertAdjacentElement('afterend', note);
+        });
+      }
+
       function addInterconnectExplanationNote() {
         var figures = content.querySelectorAll('.doc-page-body .figure');
         var figure = null;
@@ -365,6 +393,7 @@
         addCudaFullName();
         addDslFullName();
         addGpuArchitectureFullNames();
+        addSmExplanationNote();
         addInterconnectExplanationNote();
         addCudaExplanationNote();
       }
