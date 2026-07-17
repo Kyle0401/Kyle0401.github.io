@@ -35,9 +35,7 @@
     });
   }
 
-  function insertDimensionNote() {
-    if (article.querySelector('[data-dim-index-note]')) return;
-
+  function findDimensionParagraph() {
     var paragraphs = Array.prototype.slice.call(article.querySelectorAll('p'));
     var target = null;
 
@@ -47,6 +45,13 @@
       return true;
     });
 
+    return target;
+  }
+
+  function insertDimensionNote() {
+    if (article.querySelector('[data-dim-index-note]')) return;
+
+    var target = findDimensionParagraph();
     if (!target) return;
 
     var note = document.createElement('aside');
@@ -63,6 +68,45 @@
       '<code>blockIdx.x * blockDim.x + threadIdx.x</code>。</p>';
 
     target.insertAdjacentElement('afterend', note);
+  }
+
+  function insertCudaThreadMeaningNote() {
+    if (article.querySelector('[data-cuda-thread-meaning-note]')) return;
+
+    var target = findDimensionParagraph();
+    if (!target) return;
+
+    var insertAfter = target;
+    var sibling = target.nextElementSibling;
+    while (sibling && sibling.classList.contains('markdown-alert')) {
+      if (sibling.hasAttribute('data-cuda-thread-meaning-note')) return;
+      if (sibling.hasAttribute('data-dim-index-note')) insertAfter = sibling;
+      sibling = sibling.nextElementSibling;
+    }
+
+    var note = document.createElement('aside');
+    note.className = 'markdown-alert markdown-alert-note';
+    note.setAttribute('role', 'note');
+    note.setAttribute('data-cuda-thread-meaning-note', '');
+
+    var title = document.createElement('p');
+    title.className = 'markdown-alert-title';
+    title.textContent = '补充：这里的“线程”是什么？';
+
+    var distinction = document.createElement('p');
+    distinction.textContent = '这里的线程不是由操作系统单独创建和调度的 CPU 线程，而是 CUDA 编程模型中的 GPU 逻辑线程。它不是独立的进程或操作系统线程对象；一次内核启动会按照网格和线程块配置批量产生大量 CUDA 线程，再由 GPU 将它们组织成线程束并调度到 SM 上执行。';
+
+    var lifetime = document.createElement('p');
+    lifetime.textContent = '一个 CUDA 线程对应某一次内核启动中的一个独立逻辑执行实例。它从内核函数入口开始，根据自己的 blockIdx 和 threadIdx 处理相应数据，并在该内核实例执行结束时终止。同一个内核函数被再次启动时，会产生一批新的 CUDA 线程。';
+
+    var instruction = document.createElement('p');
+    instruction.textContent = '线程也不是针对某一条指令而言的。一个线程在其生命周期内会执行内核中的许多语句和机器指令，也可以经历循环、条件分支以及设备函数调用；指令只是该线程执行内核代码过程中的一个步骤。';
+
+    note.appendChild(title);
+    note.appendChild(distinction);
+    note.appendChild(lifetime);
+    note.appendChild(instruction);
+    insertAfter.insertAdjacentElement('afterend', note);
   }
 
   function explainNumbaCudaCorrection() {
@@ -90,6 +134,7 @@
   function enhanceArticle() {
     expandTerm();
     insertDimensionNote();
+    insertCudaThreadMeaningNote();
     explainNumbaCudaCorrection();
   }
 
