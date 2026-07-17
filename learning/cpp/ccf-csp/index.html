@@ -3,43 +3,89 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Kyle 的 CCF-CSP 认证学习记录">
-    <title>CCF-CSP认证 · C++学习 · Kyle</title>
+    <meta name="description" content="Kyle 的 CCF-CSP C++ 学习总结：语言基础、STL、数据结构与常用算法">
+    <title>CCF-CSP 总结 · C++学习 · Kyle</title>
     <link rel="icon" type="image/svg+xml" href="../../../static/img/logo-jy.svg">
-    <link rel="stylesheet" href="../../../static/css/learning.css">
+    <link rel="stylesheet" href="../../../static/css/java-note.css">
+    <link rel="stylesheet" href="../../ai-infra/01-ai-infra-foundations/vendor/highlight.js/github-dark.min.css">
+    <link rel="stylesheet" href="./ccf-csp-page.css?v=20260717a">
 </head>
 <body>
-    <div class="learning-shell">
-        <header class="topbar">
-            <a class="brand" href="../../../" aria-label="返回 Kyle 主页">
-                <span class="brand-mark">K</span>
-                <span>Kyle · Learning Records</span>
-            </a>
-            <a class="back-link" href="../">← 返回 C++学习</a>
-        </header>
+    <a class="skip-link" href="#article-content">跳到正文</a>
 
-        <section class="hero">
-            <p class="eyebrow">CCF-CSP archive</p>
-            <h1>CCF-CSP认证学习记录。</h1>
-            <p>用于整理认证知识点、历年真题、解题思路、代码实现与复盘总结。</p>
-            <div class="hero-meta">
-                <span class="pill">CCF-CSP</span>
-                <span class="pill">历年真题</span>
-                <span class="pill">算法训练</span>
-            </div>
-        </section>
+    <header class="note-topbar">
+        <a class="note-brand" href="../../../" aria-label="返回 Kyle 主页">
+            <span class="note-brand-mark">K</span>
+            <span>Kyle · Learning Records</span>
+        </a>
+        <div class="topbar-actions">
+            <a class="source-link" href="./CCF-CSP总结.md">查看 Markdown</a>
+            <a class="note-back" href="../">← 返回 C++学习</a>
+        </div>
+    </header>
 
-        <section class="section">
-            <div class="record-grid">
-                <div class="record-card empty">
-                    <span class="status">持续补充</span>
-                    <h2>学习内容整理中</h2>
-                    <p>后续将在这里加入知识专题、真题分类、题解与代码笔记。</p>
-                </div>
-            </div>
-        </section>
-
-        <footer class="page-footer">Kyle Learning Records · CCF-CSP认证</footer>
+    <div class="reading-progress" aria-hidden="true">
+        <span id="reading-progress-value"></span>
     </div>
+
+    <div class="note-layout" id="note-layout">
+        <aside class="toc" id="toc" aria-label="文章目录">
+            <button class="toc-toggle" id="toc-toggle" type="button" aria-expanded="true" aria-controls="toc-content" aria-label="收起文章目录">
+                <span class="toc-toggle-icon" aria-hidden="true">☰</span>
+                <span class="toc-toggle-text">目录</span>
+                <span class="toc-toggle-chevron" aria-hidden="true">⌄</span>
+            </button>
+            <div class="toc-content" id="toc-content">
+                <div class="toc-title-row">
+                    <p class="toc-title">On this page</p>
+                    <button class="toc-bulk-toggle" id="toc-bulk-toggle" type="button">全部折叠</button>
+                </div>
+                <nav id="toc-links" aria-label="文章目录链接">
+                    <p class="toc-loading">正在加载目录…</p>
+                </nav>
+            </div>
+        </aside>
+
+        <main class="note-main">
+            <nav class="breadcrumb" aria-label="面包屑导航">
+                <a href="../../../">主页</a><span>/</span>
+                <a href="../../">学习记录</a><span>/</span>
+                <a href="../">C++学习</a><span>/</span>
+                <span>CCF-CSP 总结</span>
+            </nav>
+
+            <article class="article">
+                <header class="article-preface">
+                    <p class="article-kicker">CCF-CSP · C++ REFERENCE</p>
+                    <p class="article-summary">从语言基础与 STL，到 BFS、动态规划和常用算法模板的个人备考笔记。</p>
+                    <div class="article-tags" aria-label="内容主题">
+                        <span>C++</span>
+                        <span>STL</span>
+                        <span>数据结构</span>
+                        <span>算法</span>
+                    </div>
+                </header>
+
+                <div id="article-content" tabindex="-1" aria-live="polite">
+                    <p class="article-loading">正在加载笔记…</p>
+                </div>
+
+                <footer class="article-footer">
+                    <span>学习记录 · CCF-CSP 总结</span>
+                    <a href="../">返回 C++学习目录 →</a>
+                </footer>
+            </article>
+        </main>
+    </div>
+
+    <button class="back-to-top" id="back-to-top" type="button" aria-label="返回页面顶部" title="返回页面顶部">↑</button>
+
+    <noscript>
+        <p class="noscript-message">此页面需要 JavaScript 渲染。你也可以直接查看 <a href="./CCF-CSP总结.md">Markdown 原文</a>。</p>
+    </noscript>
+
+    <script src="../../ai-infra/01-ai-infra-foundations/vendor/markdown-it/markdown-it.min.js"></script>
+    <script src="../../ai-infra/01-ai-infra-foundations/vendor/highlight.js/highlight.min.js"></script>
+    <script src="./ccf-csp-page.js?v=20260717a"></script>
 </body>
 </html>
