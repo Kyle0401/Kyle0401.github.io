@@ -1,1 +1,124 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><meta name="description" content="CUTLASS 学习记录"><title>阶段 2 · CUTLASS · Kyle</title><link rel="icon" type="image/svg+xml" href="../../../static/img/logo-jy.svg"><link rel="stylesheet" href="../../../static/css/learning.css"></head><body><div class="learning-shell"><header class="topbar"><a class="brand" href="../../../"><span class="brand-mark">K</span><span>Kyle · Learning Records</span></a><a class="back-link" href="../">← 返回 AI Infra 路线</a></header><section class="hero"><p class="eyebrow">AI Infra · Stage 02</p><h1>CUTLASS</h1><p>高性能 GEMM 模板库，学习 GPU Tensor Core 编程范式。</p><div class="hero-meta"><span class="pill">阶段 2</span><span class="pill">进阶</span><span class="pill">CUTLASS</span></div></section><section class="section"><div class="section-heading"><div><h2>学习笔记</h2><p>本阶段的知识梳理、资料链接与实践记录将在这里持续补充。</p></div></div><div class="record-grid"><div class="record-card empty"><span class="status">待补充</span><h2>第一篇笔记</h2><p>从 GEMM、Tensor Core 与 CUTLASS 编程模型开始。</p></div></div></section><footer class="page-footer">Kyle Learning Records · CUTLASS</footer></div></body></html>
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="从 CPU 朴素矩阵乘法出发，逐步理解 GPU 分块、Tensor Core，以及 Hopper 上的 TMA 与 WGMMA。">
+  <meta name="theme-color" id="theme-color" content="#76b900">
+  <script>
+    (function () {
+      'use strict';
+      var theme = 'light';
+      try {
+        if (localStorage.getItem('cutlass-docs-theme') === 'dark') theme = 'dark';
+      } catch (error) {}
+      document.documentElement.setAttribute('data-theme', theme);
+      document.getElementById('theme-color').setAttribute('content', theme === 'dark' ? '#10140e' : '#76b900');
+    })();
+  </script>
+  <title>从零理解 GEMM：从 CPU 矩阵乘到 Hopper GPU 高性能实现 · CUTLASS · Kyle</title>
+  <link rel="icon" type="image/svg+xml" href="../../../static/img/logo-jy.svg">
+  <link rel="stylesheet" href="../../../static/css/java-note.css">
+  <link rel="stylesheet" href="../01-ai-infra-foundations/vendor/highlight.js/github-dark.min.css">
+  <link rel="stylesheet" href="../01-ai-infra-foundations/cuda-docs.css">
+  <link rel="stylesheet" href="../01-ai-infra-foundations/dark-mode.css">
+  <link rel="stylesheet" href="./cutlass.css">
+</head>
+<body>
+  <a class="skip-link" href="#article-content">跳到正文</a>
+
+  <header class="note-topbar">
+    <a class="note-brand" href="../../../" aria-label="返回 Kyle 主页">
+      <span class="note-brand-mark">K</span>
+      <span>Kyle · Learning Records</span>
+    </a>
+    <div class="topbar-actions">
+      <button class="mobile-nav-toggle" id="mobile-nav-toggle" type="button" aria-expanded="false" aria-controls="docs-sidebar">
+        <span class="menu-icon" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span>目录</span>
+      </button>
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-pressed="false" aria-label="切换到夜览模式" title="切换到夜览模式">
+        <span class="theme-toggle-icon" id="theme-toggle-icon" aria-hidden="true">☾</span>
+        <span class="theme-toggle-label" id="theme-toggle-label">夜览</span>
+      </button>
+      <a class="note-back" href="../">← 返回 AI Infra 路线</a>
+    </div>
+  </header>
+
+  <div class="docs-layout" id="docs-app" aria-busy="true">
+    <aside class="docs-sidebar" id="docs-sidebar" aria-label="CUTLASS 教程章节目录">
+      <div class="docs-sidebar-heading">
+        <span class="docs-sidebar-kicker">AI INFRA · STAGE 02</span>
+        <strong>CUTLASS 与高性能 GEMM</strong>
+        <span class="docs-sidebar-release">12 个章节</span>
+      </div>
+      <nav class="page-nav" id="page-nav" aria-label="章节导航">
+        <p class="nav-loading">正在加载目录…</p>
+      </nav>
+    </aside>
+
+    <main class="note-main" id="main-content">
+      <nav class="breadcrumb" aria-label="面包屑导航">
+        <a href="../../../">主页</a><span>/</span><a href="../">AI Infra</a><span>/</span><span>CUTLASS</span>
+      </nav>
+
+      <section class="release-banner cutlass-banner" aria-label="教程概览">
+        <div class="release-banner-copy">
+          <div class="release-badges">
+            <span class="release-badge">中文教程</span>
+            <span class="release-badge">GEMM</span>
+            <span class="release-badge">Hopper</span>
+          </div>
+          <p>从 CPU 三重循环一路走到 GPU 分块、Tensor Core、TMA 与 WGMMA，建立高性能矩阵乘的完整直觉。</p>
+        </div>
+        <a class="official-link" href="https://github.com/NVIDIA/cutlass" target="_blank" rel="noopener noreferrer">CUTLASS GitHub ↗</a>
+      </section>
+
+      <article class="article">
+        <div id="article-content" tabindex="-1">
+          <header class="doc-page-header">
+            <p class="doc-page-kicker">CUTLASS 学习笔记 · 从基础到 Hopper</p>
+            <h1>从零理解 GEMM：从 CPU 矩阵乘到 Hopper GPU 高性能实现</h1>
+            <p class="doc-page-subtitle">高性能 GEMM 模板库与 GPU Tensor Core 编程范式</p>
+            <p class="doc-page-source">
+              <a href="https://github.com/NVIDIA/cutlass" target="_blank" rel="noopener noreferrer">项目主页 ↗</a>
+              <a href="./CUTLASS.md">查看 Markdown 源文 ↗</a>
+            </p>
+          </header>
+          <div class="load-status" id="load-status" role="status" aria-live="polite">正在加载教程…</div>
+          <div class="doc-page-body" id="doc-body"></div>
+        </div>
+
+        <footer class="article-footer">
+          <span>Kyle Learning Records · CUTLASS</span>
+          <a href="https://github.com/NVIDIA/cutlass" target="_blank" rel="noopener noreferrer">NVIDIA CUTLASS ↗</a>
+        </footer>
+      </article>
+    </main>
+
+    <aside class="page-outline" id="page-outline" aria-label="当前页内容目录">
+      <p class="page-outline-title">此页内容</p>
+      <nav id="outline-links"><p class="outline-empty">正在加载…</p></nav>
+    </aside>
+  </div>
+
+  <button class="docs-overlay" id="docs-overlay" type="button" aria-label="关闭目录"></button>
+
+  <button class="reading-progress" id="reading-progress" type="button" aria-label="返回页面顶部" title="返回页面顶部">
+    <svg viewBox="0 0 52 52" aria-hidden="true">
+      <circle class="reading-progress-track" cx="26" cy="26" r="21"></circle>
+      <circle class="reading-progress-value" id="reading-progress-value" cx="26" cy="26" r="21"></circle>
+    </svg>
+    <span class="reading-progress-label" id="reading-progress-label">0%</span>
+    <span class="reading-progress-arrow" aria-hidden="true">↑</span>
+  </button>
+
+  <noscript>
+    <p class="noscript-message">此页面需要 JavaScript 来渲染 Markdown。你也可以直接阅读 <a href="./CUTLASS.md">Markdown 源文</a>。</p>
+  </noscript>
+
+  <script src="../01-ai-infra-foundations/vendor/markdown-it/markdown-it.min.js"></script>
+  <script src="../01-ai-infra-foundations/vendor/highlight.js/highlight.min.js"></script>
+  <script src="./cutlass.js"></script>
+</body>
+</html>
