@@ -206,10 +206,12 @@ html {
     background-position: center;
 }
 
-/* 首页导航卡片：只保留标题，并在内容区域垂直居中。 */
+/* 首页导航卡片：只保留标题，并在左侧文字区域内水平、垂直居中。 */
 .projectItemLeft {
     display: flex;
     align-items: center;
+    justify-content: center;
+    text-align: center;
 }
 
 .projectItemLeft p {
