@@ -2,35 +2,126 @@
     'use strict';
 
     var content = document.getElementById('article-content');
-    var toc = document.getElementById('toc');
-    var tocContent = document.getElementById('toc-content');
-    var tocLinks = document.getElementById('toc-links');
-    var tocToggle = document.getElementById('toc-toggle');
-    var tocBulkToggle = document.getElementById('toc-bulk-toggle');
-    var layout = document.getElementById('note-layout');
+    var pageNav = document.getElementById('page-nav');
+    var outlineLinks = document.getElementById('outline-links');
+    var pagination = document.getElementById('page-pagination');
+    var docsTitle = document.getElementById('docs-title');
+    var chapterCount = document.getElementById('chapter-count');
+    var mobileNavToggle = document.getElementById('mobile-nav-toggle');
+    var docsOverlay = document.getElementById('docs-overlay');
+    var progressButton = document.getElementById('reading-progress');
     var progressValue = document.getElementById('reading-progress-value');
-    var backToTop = document.getElementById('back-to-top');
-    var skipLink = document.querySelector('.skip-link');
+    var progressLabel = document.getElementById('reading-progress-label');
+    var themeToggle = document.getElementById('theme-toggle');
 
-    if (!content || !toc || !tocLinks || !tocToggle || !layout) return;
+    if (!content || !pageNav || !outlineLinks || !pagination || !window.markdownit) return;
 
-    var imageDimensions = {
-        'image-20250316215315593.png': [1826, 1163],
-        'image-20250316220211614.png': [1152, 741],
-        'image-20250317185849010.png': [1057, 873],
-        'image-20250317190133448.png': [2178, 3476],
-        'image-20250320113023799.png': [1418, 8778],
-        'image-20250320113131585.png': [1380, 8778],
-        'image-20250320113346712.png': [1312, 996],
-        'image-20250320113406829.png': [1225, 1046],
-        'image-20250327104949371.png': [1820, 3305],
-        'image-20250328105937596.png': [2134, 5769],
-        'image-20250913022829207.png': [1565, 298]
-    };
+    var pages = [];
+    var siteTitle = 'CCF-CSP 总结';
+    var currentPageIndex = 0;
+    var outlineObserver = null;
+    var circleLength = 2 * Math.PI * 21;
+    var md = window.markdownit({
+        html: false,
+        linkify: true,
+        typographer: false
+    });
 
-    var articleHeadings = [];
-    var activeHeadingId = '';
-    var scrollScheduled = false;
+    function escapeHtml(value) {
+        return String(value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function plainText(value) {
+        var node = document.createElement('div');
+        node.innerHTML = String(value || '');
+        return (node.textContent || node.innerText || '').trim();
+    }
+
+    function inlineMarkdown(value) {
+        return md.renderInline(String(value || ''));
+    }
+
+    function fenceMarker(line) {
+        var match = String(line || '').match(/^\s*(`{3,}|~{3,})/);
+        return match ? match[1] : '';
+    }
+
+    function preparePages(markdown) {
+        var lines = markdown.replace(/\r\n/g, '\n').split('\n');
+        var titleLine = -1;
+        var intro = [];
+        var current = null;
+        var activeFence = '';
+
+        lines.forEach(function (line, index) {
+            if (titleLine >= 0) return;
+            if (fenceMarker(line)) return;
+            var title = line.match(/^#\s+(.+)$/);
+            if (title) {
+                titleLine = index;
+                siteTitle = plainText(inlineMarkdown(title[1]));
+            }
+        });
+
+        lines.forEach(function (line, index) {
+            var marker = fenceMarker(line);
+
+            if (activeFence) {
+                if (marker && marker.charAt(0) === activeFence.charAt(0) && marker.length >= activeFence.length) {
+                    activeFence = '';
+                }
+            } else if (marker) {
+                activeFence = marker;
+            }
+
+            var pageHeading = !activeFence && !marker ? line.match(/^##\s+(.+)$/) : null;
+            if (pageHeading) {
+                if (current) pages.push(current);
+                current = {
+                    title: pageHeading[1],
+                    lines: [],
+                    route: 'chapter-' + (pages.length + 1)
+                };
+                return;
+            }
+
+            if (!current) {
+                if (index !== titleLine) intro.push(line);
+            } else {
+                current.lines.push(line);
+            }
+        });
+
+        if (current) pages.push(current);
+
+        if (!pages.length) {
+            pages.push({
+                title: siteTitle,
+                lines: lines.filter(function (_, index) { return index !== titleLine; }),
+                route: 'chapter-1'
+            });
+        } else if (intro.some(function (line) { return line.trim(); })) {
+            pages[0].lines = intro.concat(pages[0].lines);
+        }
+
+        pages.forEach(function (page, index) {
+            page.index = index;
+            page.route = 'chapter-' + (index + 1);
+            page.titleHtml = inlineMarkdown(page.title);
+            page.plainTitle = plainText(page.titleHtml);
+        });
+
+        if (docsTitle) docsTitle.textContent = siteTitle;
+        if (chapterCount) chapterCount.textContent = pages.length + ' 个章节';
+    }
+
+    function renderMarkdown(markdown) {
+        return md.render(markdown);
+    }
 
     function normalizeLanguage(language) {
         var normalized = String(language || '').trim().toLowerCase();
@@ -79,35 +170,33 @@
     }
 
     function enhanceCodeBlocks() {
-        Array.prototype.forEach.call(content.querySelectorAll('pre > code'), function (code) {
+        Array.prototype.forEach.call(content.querySelectorAll('.doc-page-body pre > code'), function (code) {
             var pre = code.parentElement;
             if (!pre || (pre.parentElement && pre.parentElement.classList.contains('code-block'))) return;
 
             var languageMatch = (code.className || '').match(/(?:^|\s)language-([^\s]+)/);
             var language = normalizeLanguage(languageMatch ? languageMatch[1] : '');
-            code.className = (code.className || '').replace(/(?:^|\s)language-[^\s]+/g, '').trim();
-
-            if (language !== 'text' && window.hljs && typeof window.hljs.getLanguage === 'function' && window.hljs.getLanguage(language)) {
-                code.classList.add('language-' + language);
-                try { window.hljs.highlightElement(code); }
-                catch (error) { code.classList.add('nohighlight'); }
-            } else {
-                code.classList.add('nohighlight');
-            }
-
             var wrapper = document.createElement('div');
             var toolbar = document.createElement('div');
             var label = document.createElement('span');
             var button = document.createElement('button');
 
             wrapper.className = 'code-block';
-            toolbar.className = 'code-toolbar';
-            label.className = 'code-language';
+            toolbar.className = 'code-language';
+            label.className = 'code-language-text';
             label.textContent = displayLanguage(language);
             button.type = 'button';
             button.className = 'copy-code-button';
             button.textContent = '复制';
             button.setAttribute('aria-label', '复制这段代码');
+
+            if (language !== 'text' && window.hljs && typeof window.hljs.getLanguage === 'function' && window.hljs.getLanguage(language)) {
+                code.className = 'language-' + language;
+                try { window.hljs.highlightElement(code); }
+                catch (error) { code.classList.add('nohighlight'); }
+            } else {
+                code.classList.add('nohighlight');
+            }
 
             button.addEventListener('click', function () {
                 button.disabled = true;
@@ -121,10 +210,10 @@
                     }, 1400);
                 }, function () {
                     button.textContent = '复制失败';
-                    button.classList.add('is-failed');
+                    button.classList.add('is-copy-failed');
                     window.setTimeout(function () {
                         button.textContent = '复制';
-                        button.classList.remove('is-failed');
+                        button.classList.remove('is-copy-failed');
                         button.disabled = false;
                     }, 1800);
                 });
@@ -139,7 +228,7 @@
     }
 
     function enhanceTables() {
-        Array.prototype.forEach.call(content.querySelectorAll('table'), function (table) {
+        Array.prototype.forEach.call(content.querySelectorAll('.doc-page-body table'), function (table) {
             if (table.parentElement && table.parentElement.classList.contains('table-wrap')) return;
             var wrapper = document.createElement('div');
             wrapper.className = 'table-wrap';
@@ -149,19 +238,20 @@
     }
 
     function enhanceCallouts() {
-        Array.prototype.forEach.call(content.querySelectorAll('blockquote'), function (quote) {
+        Array.prototype.forEach.call(content.querySelectorAll('.doc-page-body blockquote'), function (quote) {
             var first = quote.firstElementChild;
             if (!first) return;
             var match = first.textContent.trim().match(/^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*/i);
             if (!match) return;
 
+            var type = match[1].toUpperCase();
             var remaining = first.textContent.replace(match[0], '').trim();
             if (remaining) first.textContent = remaining;
             else first.remove();
 
             var title = document.createElement('span');
             title.className = 'callout-title';
-            title.textContent = match[1].toUpperCase() === 'NOTE' ? '提示' : match[1].toUpperCase();
+            title.textContent = type === 'NOTE' ? '提示' : type;
             quote.classList.add('callout');
             quote.insertBefore(title, quote.firstChild);
         });
@@ -178,23 +268,17 @@
     }
 
     function enhanceImages() {
-        Array.prototype.forEach.call(content.querySelectorAll('img'), function (image, index) {
+        Array.prototype.forEach.call(content.querySelectorAll('.doc-page-body img'), function (image, index) {
             var source = image.getAttribute('src') || '';
-            var fileName = decodeURIComponent(source.split('/').pop() || '');
-            var dimensions = imageDimensions[fileName];
             var originalAlt = (image.getAttribute('alt') || '').trim();
+            var parent = image.parentElement;
 
             image.loading = 'lazy';
             image.decoding = 'async';
-            if (dimensions) {
-                image.width = dimensions[0];
-                image.height = dimensions[1];
-            }
             if (!originalAlt || /^image-\d+$/i.test(originalAlt)) {
                 image.alt = 'CCF-CSP 笔记配图 ' + (index + 1);
             }
 
-            var parent = image.parentElement;
             if (!parent || parent.tagName !== 'P' || parent.children.length !== 1) return;
 
             var figure = document.createElement('figure');
@@ -204,8 +288,6 @@
             var originalLink = document.createElement('a');
 
             figure.className = 'article-figure';
-            if (dimensions && dimensions[1] / dimensions[0] > 2.2) figure.classList.add('is-tall');
-
             imageLink.className = 'image-link';
             imageLink.href = source;
             imageLink.target = '_blank';
@@ -230,292 +312,213 @@
         });
     }
 
-    function slugify(value, fallbackIndex, used) {
-        var text = String(value || '').trim().toLowerCase();
-        try { text = text.normalize('NFKC'); }
-        catch (error) { /* Older browsers can use the unnormalized text. */ }
-
-        var base = text
-            .replace(/[`"'“”‘’]/g, '')
-            .replace(/[^a-z0-9\u3400-\u9fff\u2460-\u24ff]+/g, '-')
-            .replace(/^-+|-+$/g, '');
-
-        if (!base) base = 'section-' + fallbackIndex;
-        var count = used[base] || 0;
-        used[base] = count + 1;
-        return count ? base + '-' + (count + 1) : base;
-    }
-
     function assignHeadingIds() {
-        var used = {};
-        var headings = content.querySelectorAll('h1, h2, h3, h4, h5');
-
-        Array.prototype.forEach.call(headings, function (heading, index) {
+        var headingIndex = 0;
+        Array.prototype.forEach.call(content.querySelectorAll('.doc-page-body h2, .doc-page-body h3, .doc-page-body h4, .doc-page-body h5'), function (heading) {
+            headingIndex += 1;
             var label = heading.textContent.trim();
             var anchor = document.createElement('a');
-            heading.id = slugify(label, index + 1, used);
-            heading.dataset.headingLabel = label;
+            heading.id = 'section-' + (currentPageIndex + 1) + '-' + headingIndex;
             anchor.className = 'heading-anchor';
             anchor.href = '#' + heading.id;
             anchor.textContent = '#';
             anchor.setAttribute('aria-label', '定位到“' + label + '”');
             heading.appendChild(anchor);
         });
-
-        articleHeadings = Array.prototype.slice.call(content.querySelectorAll('h2, h3, h4, h5'));
     }
 
-    function createTocTree(headings) {
-        var roots = [];
-        var stack = [];
-
-        headings.forEach(function (heading) {
-            var node = {
-                id: heading.id,
-                label: heading.dataset.headingLabel || heading.textContent.trim(),
-                level: Number(heading.tagName.slice(1)),
-                children: []
-            };
-
-            while (stack.length && stack[stack.length - 1].level >= node.level) stack.pop();
-            if (stack.length) stack[stack.length - 1].children.push(node);
-            else roots.push(node);
-            stack.push(node);
-        });
-
-        return roots;
+    function buildPageNavigation() {
+        pageNav.innerHTML = pages.map(function (page, index) {
+            var active = index === currentPageIndex ? ' is-active' : '';
+            var current = index === currentPageIndex ? ' aria-current="page"' : '';
+            var number = String(index + 1).padStart(2, '0');
+            return '<a class="page-nav-link' + active + '" href="#' + page.route + '"' + current + '>' +
+                '<span class="page-nav-index">' + number + '</span>' +
+                '<span>' + escapeHtml(page.plainTitle) + '</span></a>';
+        }).join('');
     }
 
-    function setBranchCollapsed(item, toggle, collapsed) {
-        item.classList.toggle('is-collapsed', collapsed);
-        toggle.setAttribute('aria-expanded', String(!collapsed));
-        toggle.setAttribute('aria-label', collapsed ? '展开子目录' : '收起子目录');
-    }
-
-    function renderTocNodes(nodes, isRoot) {
-        var list = document.createElement('ul');
-        list.className = isRoot ? 'toc-tree' : 'toc-children';
-
-        nodes.forEach(function (node) {
-            var item = document.createElement('li');
-            var row = document.createElement('div');
-            var toggle = document.createElement('button');
-            var link = document.createElement('a');
-
-            item.className = 'toc-item toc-level-' + node.level;
-            row.className = 'toc-row';
-            toggle.type = 'button';
-            toggle.className = 'toc-item-toggle';
-            toggle.textContent = '⌄';
-            link.className = 'toc-link';
-            link.href = '#' + node.id;
-            link.dataset.target = node.id;
-            link.textContent = node.label;
-
-            if (node.children.length) {
-                var initiallyCollapsed = node.level >= 3;
-                setBranchCollapsed(item, toggle, initiallyCollapsed);
-                toggle.addEventListener('click', function () {
-                    setBranchCollapsed(item, toggle, !item.classList.contains('is-collapsed'));
-                    updateBulkToggle();
-                });
-            } else {
-                toggle.classList.add('is-placeholder');
-                toggle.tabIndex = -1;
-                toggle.setAttribute('aria-hidden', 'true');
-            }
-
-            row.appendChild(toggle);
-            row.appendChild(link);
-            item.appendChild(row);
-            if (node.children.length) item.appendChild(renderTocNodes(node.children, false));
-            list.appendChild(item);
-        });
-
-        return list;
-    }
-
-    function getBranchItems() {
-        return Array.prototype.slice.call(tocLinks.querySelectorAll('.toc-item')).filter(function (item) {
-            return item.querySelector(':scope > .toc-children');
+    function setActiveOutline(id) {
+        Array.prototype.forEach.call(outlineLinks.querySelectorAll('a'), function (link) {
+            link.classList.toggle('is-active', link.getAttribute('href') === '#' + id);
         });
     }
 
-    function updateBulkToggle() {
-        if (!tocBulkToggle) return;
-        var branches = getBranchItems();
-        var allCollapsed = branches.length > 0 && branches.every(function (item) {
-            return item.classList.contains('is-collapsed');
-        });
-        tocBulkToggle.disabled = branches.length === 0;
-        tocBulkToggle.textContent = allCollapsed ? '全部展开' : '全部折叠';
-        tocBulkToggle.setAttribute('aria-label', allCollapsed ? '展开全部子目录' : '折叠全部子目录');
-    }
+    function buildOutline() {
+        if (outlineObserver) {
+            outlineObserver.disconnect();
+            outlineObserver = null;
+        }
 
-    function setAllBranchesCollapsed(collapsed) {
-        getBranchItems().forEach(function (item) {
-            var toggle = item.querySelector(':scope > .toc-row > .toc-item-toggle');
-            if (toggle) setBranchCollapsed(item, toggle, collapsed);
-        });
-        updateBulkToggle();
-    }
-
-    function buildToc() {
-        tocLinks.innerHTML = '';
-        if (!articleHeadings.length) {
-            tocLinks.innerHTML = '<p class="toc-loading">本文暂无子标题。</p>';
-            updateBulkToggle();
+        var headings = Array.prototype.slice.call(content.querySelectorAll('.doc-page-body h2, .doc-page-body h3, .doc-page-body h4, .doc-page-body h5'));
+        if (!headings.length) {
+            outlineLinks.innerHTML = '<p class="outline-empty">本章暂无子标题</p>';
             return;
         }
 
-        tocLinks.appendChild(renderTocNodes(createTocTree(articleHeadings), true));
-        updateBulkToggle();
+        outlineLinks.innerHTML = headings.map(function (heading) {
+            var level = heading.tagName.toLowerCase().replace('h', '');
+            var label = heading.firstChild ? heading.firstChild.textContent : heading.textContent;
+            return '<a class="outline-link outline-level-' + level + '" href="#' + escapeHtml(heading.id) + '">' + escapeHtml(label.trim()) + '</a>';
+        }).join('');
+
+        setActiveOutline(headings[0].id);
+        if (!('IntersectionObserver' in window)) return;
+
+        outlineObserver = new IntersectionObserver(function (entries) {
+            var visible = entries.filter(function (entry) { return entry.isIntersecting; });
+            if (!visible.length) return;
+            visible.sort(function (a, b) { return a.boundingClientRect.top - b.boundingClientRect.top; });
+            setActiveOutline(visible[0].target.id);
+        }, { rootMargin: '-92px 0px -68% 0px', threshold: [0, 1] });
+
+        headings.forEach(function (heading) { outlineObserver.observe(heading); });
     }
 
-    function expandTocAncestors(link) {
-        var item = link ? link.closest('.toc-item') : null;
-        while (item) {
-            var parentItem = item.parentElement ? item.parentElement.closest('.toc-item') : null;
-            if (parentItem && parentItem.classList.contains('is-collapsed')) {
-                var toggle = parentItem.querySelector(':scope > .toc-row > .toc-item-toggle');
-                if (toggle) setBranchCollapsed(parentItem, toggle, false);
-            }
-            item = parentItem;
-        }
-        updateBulkToggle();
+    function buildPagination() {
+        var previous = pages[currentPageIndex - 1];
+        var next = pages[currentPageIndex + 1];
+        var previousHtml = previous
+            ? '<a class="previous" href="#' + previous.route + '"><span class="pagination-label">← 上一章</span><span class="pagination-title">' + escapeHtml(previous.plainTitle) + '</span></a>'
+            : '<span class="pagination-spacer" aria-hidden="true"></span>';
+        var nextHtml = next
+            ? '<a class="next" href="#' + next.route + '"><span class="pagination-label">下一章 →</span><span class="pagination-title">' + escapeHtml(next.plainTitle) + '</span></a>'
+            : '<span class="pagination-spacer" aria-hidden="true"></span>';
+        pagination.innerHTML = previousHtml + nextHtml;
     }
 
-    function setActiveHeading(id) {
-        if (!id || id === activeHeadingId) return;
-        activeHeadingId = id;
-        var activeLink = null;
+    function closeMobileNavigation() {
+        document.body.classList.remove('nav-open');
+        if (mobileNavToggle) mobileNavToggle.setAttribute('aria-expanded', 'false');
+    }
 
-        Array.prototype.forEach.call(tocLinks.querySelectorAll('.toc-link'), function (link) {
-            var active = link.dataset.target === id;
-            link.classList.toggle('is-active', active);
-            if (active) {
-                link.setAttribute('aria-current', 'location');
-                activeLink = link;
-            } else {
-                link.removeAttribute('aria-current');
-            }
+    function renderPage(index, targetId) {
+        if (!pages.length) return;
+
+        currentPageIndex = Math.max(0, Math.min(index, pages.length - 1));
+        var page = pages[currentPageIndex];
+        var bodyHtml = renderMarkdown(page.lines.join('\n'));
+
+        content.innerHTML =
+            '<header class="doc-page-header">' +
+                '<p class="doc-page-kicker">CCF-CSP · 第 ' + (currentPageIndex + 1) + ' / ' + pages.length + ' 章</p>' +
+                '<h1 id="' + escapeHtml(page.route) + '-title">' + page.titleHtml + '</h1>' +
+            '</header>' +
+            '<div class="doc-page-body">' + bodyHtml + '</div>';
+
+        assignHeadingIds();
+        enhanceCallouts();
+        enhanceTables();
+        enhanceLinks();
+        enhanceImages();
+        enhanceCodeBlocks();
+        buildPageNavigation();
+        buildOutline();
+        buildPagination();
+        closeMobileNavigation();
+        document.title = page.plainTitle + ' · CCF-CSP 总结 · Kyle';
+
+        window.requestAnimationFrame(function () {
+            var target = targetId ? document.getElementById(targetId) : null;
+            if (target) target.scrollIntoView({ block: 'start' });
+            else window.scrollTo({ top: 0, left: 0 });
+            updateReadingProgress();
         });
+    }
 
-        if (!activeLink) return;
-        expandTocAncestors(activeLink);
+    function routeFromHash() {
+        var hash = decodeURIComponent(window.location.hash.replace(/^#/, ''));
+        var pageMatch = hash.match(/^chapter-(\d+)$/);
+        var sectionMatch = hash.match(/^section-(\d+)-\d+$/);
 
-        if (tocContent && window.innerWidth > 1040) {
-            var containerRect = tocContent.getBoundingClientRect();
-            var linkRect = activeLink.getBoundingClientRect();
-            if (linkRect.top < containerRect.top + 42) {
-                tocContent.scrollTop -= containerRect.top + 42 - linkRect.top;
-            } else if (linkRect.bottom > containerRect.bottom - 16) {
-                tocContent.scrollTop += linkRect.bottom - containerRect.bottom + 16;
-            }
+        if (pageMatch) {
+            renderPage(Number(pageMatch[1]) - 1, null);
+            return;
+        }
+
+        if (sectionMatch) {
+            renderPage(Number(sectionMatch[1]) - 1, hash);
+            return;
+        }
+
+        renderPage(currentPageIndex, null);
+    }
+
+    function updateReadingProgress() {
+        if (!progressValue || !progressLabel || !progressButton) return;
+        var root = document.documentElement;
+        var scrollable = Math.max(0, root.scrollHeight - window.innerHeight);
+        var percent = scrollable > 0 ? Math.round((window.scrollY / scrollable) * 100) : 0;
+        percent = Math.max(0, Math.min(100, percent));
+        progressValue.style.strokeDasharray = String(circleLength);
+        progressValue.style.strokeDashoffset = String(circleLength * (1 - percent / 100));
+        progressLabel.textContent = percent + '%';
+        progressButton.setAttribute('aria-label', '已阅读 ' + percent + '%，返回页面顶部');
+    }
+
+    function applyTheme(theme, persist) {
+        var normalized = theme === 'dark' ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', normalized);
+        document.documentElement.style.colorScheme = normalized;
+
+        if (themeToggle) {
+            var isDark = normalized === 'dark';
+            themeToggle.setAttribute('aria-pressed', String(isDark));
+            themeToggle.setAttribute('aria-label', isDark ? '切换到日间模式' : '切换到夜览模式');
+        }
+
+        if (persist) {
+            try { window.localStorage.setItem('ccf-csp-theme', normalized); }
+            catch (error) {}
         }
     }
 
-    function updateScrollState() {
-        scrollScheduled = false;
-        var scrollable = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
-        var percent = scrollable ? Math.max(0, Math.min(1, window.scrollY / scrollable)) : 0;
-        if (progressValue) progressValue.style.width = (percent * 100).toFixed(2) + '%';
-        if (backToTop) backToTop.classList.toggle('is-visible', window.scrollY > 640);
-
-        if (!articleHeadings.length) return;
-        var active = articleHeadings[0];
-        articleHeadings.forEach(function (heading) {
-            if (heading.getBoundingClientRect().top <= 128) active = heading;
+    if (themeToggle) {
+        applyTheme(document.documentElement.getAttribute('data-theme'), false);
+        themeToggle.addEventListener('click', function () {
+            var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            applyTheme(next, true);
         });
-        if (window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 12) {
-            active = articleHeadings[articleHeadings.length - 1];
-        }
-        setActiveHeading(active.id);
     }
 
-    function scheduleScrollState() {
-        if (scrollScheduled) return;
-        scrollScheduled = true;
-        window.requestAnimationFrame(updateScrollState);
+    if (mobileNavToggle) {
+        mobileNavToggle.addEventListener('click', function () {
+            var open = document.body.classList.toggle('nav-open');
+            mobileNavToggle.setAttribute('aria-expanded', String(open));
+        });
     }
 
-    function setTocCollapsed(collapsed) {
-        toc.classList.toggle('is-collapsed', collapsed);
-        layout.classList.toggle('toc-collapsed', collapsed);
-        tocToggle.setAttribute('aria-expanded', String(!collapsed));
-        tocToggle.setAttribute('aria-label', collapsed ? '展开文章目录' : '收起文章目录');
-    }
+    if (docsOverlay) docsOverlay.addEventListener('click', closeMobileNavigation);
 
-    tocToggle.addEventListener('click', function () {
-        setTocCollapsed(!toc.classList.contains('is-collapsed'));
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') closeMobileNavigation();
     });
 
-    if (tocBulkToggle) {
-        tocBulkToggle.addEventListener('click', function () {
-            var branches = getBranchItems();
-            var shouldCollapse = !branches.length || !branches.every(function (item) {
-                return item.classList.contains('is-collapsed');
-            });
-            setAllBranchesCollapsed(shouldCollapse);
-        });
-    }
-
-    if (backToTop) {
-        backToTop.addEventListener('click', function () {
+    if (progressButton) {
+        progressButton.addEventListener('click', function () {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     }
 
-    if (skipLink) {
-        skipLink.addEventListener('click', function () {
-            window.requestAnimationFrame(function () {
-                try { content.focus({ preventScroll: true }); }
-                catch (error) { content.focus(); }
-            });
-        });
-    }
+    window.addEventListener('scroll', updateReadingProgress, { passive: true });
+    window.addEventListener('resize', updateReadingProgress);
+    window.addEventListener('hashchange', routeFromHash);
 
-    window.addEventListener('scroll', scheduleScrollState, { passive: true });
-    window.addEventListener('resize', scheduleScrollState);
-
-    fetch('./CCF-CSP总结.md?v=20260717a')
+    fetch('./CCF-CSP总结.md?v=20260718a')
         .then(function (response) {
             if (!response.ok) throw new Error('Markdown request failed');
             return response.text();
         })
         .then(function (markdown) {
-            if (!window.markdownit) throw new Error('Markdown renderer unavailable');
-            var renderer = window.markdownit({
-                html: false,
-                linkify: true,
-                breaks: false,
-                typographer: false
-            });
-
-            content.innerHTML = renderer.render(markdown);
-            enhanceCallouts();
-            enhanceTables();
-            enhanceLinks();
-            enhanceImages();
-            enhanceCodeBlocks();
-            assignHeadingIds();
-            buildToc();
-            scheduleScrollState();
-
-            if (window.location.hash) {
-                window.requestAnimationFrame(function () {
-                    var hashId = window.location.hash.slice(1);
-                    try { hashId = decodeURIComponent(hashId); }
-                    catch (error) { /* Keep the raw hash when it is not valid percent-encoding. */ }
-                    var target = document.getElementById(hashId);
-                    if (target) target.scrollIntoView({ block: 'start' });
-                });
-            }
+            preparePages(markdown);
+            routeFromHash();
         })
         .catch(function () {
-            content.innerHTML = '<h1>CCF-CSP 总结</h1><p>笔记暂时无法加载。你可以直接查看 <a href="./CCF-CSP总结.md">Markdown 原文</a>。</p>';
-            tocLinks.innerHTML = '<p class="toc-loading">目录暂时无法加载。</p>';
-            if (tocBulkToggle) tocBulkToggle.disabled = true;
-            scheduleScrollState();
+            pageNav.innerHTML = '<p class="nav-loading">目录暂时无法加载。</p>';
+            outlineLinks.innerHTML = '<p class="outline-empty">当前无可用目录</p>';
+            content.innerHTML =
+                '<header class="doc-page-header"><p class="doc-page-kicker">CCF-CSP</p><h1>CCF-CSP 总结</h1></header>' +
+                '<p>笔记文件暂时无法读取，请稍后刷新或直接查看 Markdown 原文。</p>';
+            updateReadingProgress();
         });
 })();
