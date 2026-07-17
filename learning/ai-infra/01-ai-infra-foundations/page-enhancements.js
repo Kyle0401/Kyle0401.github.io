@@ -150,11 +150,51 @@
     }
   }
 
+  function addRegisterFileExplanationNote() {
+    Array.prototype.forEach.call(content.querySelectorAll('.doc-page-body > p'), function (paragraph) {
+      if (paragraph.textContent.indexOf('每个 SM 都包含本地寄存器文件、统一数据缓存，以及多个执行计算的功能单元') === -1) return;
+
+      var sibling = paragraph.nextElementSibling;
+      var smNote = null;
+      while (sibling && sibling.classList.contains('markdown-alert')) {
+        if (sibling.hasAttribute('data-register-file-explanation-note')) return;
+        if (sibling.hasAttribute('data-sm-explanation-note')) smNote = sibling;
+        sibling = sibling.nextElementSibling;
+      }
+
+      var note = document.createElement('aside');
+      note.className = 'markdown-alert markdown-alert-note';
+      note.setAttribute('role', 'note');
+      note.setAttribute('data-register-file-explanation-note', '');
+
+      var title = document.createElement('p');
+      title.className = 'markdown-alert-title';
+      title.textContent = '补充：为什么叫“寄存器文件”？';
+
+      var explanation = document.createElement('p');
+      explanation.textContent = '寄存器文件（register file）不是磁盘上的文件，而是由大量寄存器及其读写电路组成的硬件集合。在计算机体系结构中，file 在这里表示“按编号组织、可以被选择读写的一组条目”；因此，一个寄存器只是其中的一个存储单元，而寄存器文件可以理解为“寄存器组”或“寄存器池”。在 GPU 中，SM 的物理寄存器文件由驻留在该 SM 上的线程共同划分，而每个线程在编程模型中看到的是自己私有的寄存器。';
+
+      note.appendChild(title);
+      note.appendChild(explanation);
+      if (smNote) {
+        smNote.insertAdjacentElement('beforebegin', note);
+      } else {
+        paragraph.insertAdjacentElement('afterend', note);
+      }
+    });
+  }
+
   function addSmExplanationNote() {
     Array.prototype.forEach.call(content.querySelectorAll('.doc-page-body > p'), function (paragraph) {
       if (paragraph.textContent.indexOf('每个 SM 都包含本地寄存器文件、统一数据缓存，以及多个执行计算的功能单元') === -1) return;
-      var next = paragraph.nextElementSibling;
-      if (next && next.hasAttribute('data-sm-explanation-note')) return;
+
+      var insertAfter = paragraph;
+      var sibling = paragraph.nextElementSibling;
+      while (sibling && sibling.classList.contains('markdown-alert')) {
+        if (sibling.hasAttribute('data-sm-explanation-note')) return;
+        if (sibling.hasAttribute('data-register-file-explanation-note')) insertAfter = sibling;
+        sibling = sibling.nextElementSibling;
+      }
 
       var note = document.createElement('aside');
       note.className = 'markdown-alert markdown-alert-note';
@@ -178,7 +218,7 @@
       note.appendChild(scheduling);
       note.appendChild(streaming);
       note.appendChild(comparison);
-      paragraph.insertAdjacentElement('afterend', note);
+      insertAfter.insertAdjacentElement('afterend', note);
     });
   }
 
@@ -263,6 +303,7 @@
     addCudaFullName();
     addDslFullName();
     addGpuArchitectureFullNames();
+    addRegisterFileExplanationNote();
     addSmExplanationNote();
     fixLocalReferenceTargets();
     addInterconnectExplanationNote();
