@@ -39,8 +39,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         cards.forEach((card) => {
             const searchableText = normalize(card.dataset.search || card.textContent || "");
+            const categories = (card.dataset.category || "").split(/\s+/).filter(Boolean);
             const matchesQuery = state.query === "" || searchableText.includes(state.query);
-            const matchesCategory = state.category === "all" || card.dataset.category === state.category;
+            const matchesCategory = state.category === "all" || categories.includes(state.category);
             const matchesStatus = state.status === "all" || card.dataset.status === state.status;
             const visible = matchesQuery && matchesCategory && matchesStatus;
 
