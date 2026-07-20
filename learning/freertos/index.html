@@ -3,50 +3,91 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Kyle 的 FreeRTOS 学习记录目录">
-    <title>FreeRTOS学习 · 学习记录 · Kyle</title>
+    <meta name="description" content="Kyle 的 FreeRTOS 学习记录：任务、调度、同步、通信与嵌入式实践">
+    <title>FreeRTOS 学习 · 学习记录 · Kyle</title>
     <link rel="icon" type="image/svg+xml" href="../../static/img/logo-jy.svg">
-    <link rel="stylesheet" href="../../static/css/learning.css">
+    <link rel="stylesheet" href="../../static/css/java-note.css">
+    <link rel="stylesheet" href="./freertos-page.css?v=20260721b">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/styles/github-dark-dimmed.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/styles/github-dark-dimmed.min.css"></noscript>
 </head>
 <body>
-    <div class="learning-shell">
-        <header class="topbar">
-            <a class="brand" href="../../" aria-label="返回 Kyle 主页">
-                <span class="brand-mark">K</span>
-                <span>Kyle · Learning Records</span>
-            </a>
-            <a class="back-link" href="../">← 返回学习记录</a>
-        </header>
+    <header class="note-topbar">
+        <a class="note-brand" href="../../" aria-label="返回 Kyle 主页">
+            <span class="note-brand-mark">K</span>
+            <span>Kyle · Learning Records</span>
+        </a>
+        <div class="topbar-actions">
+            <button class="mobile-nav-toggle" id="mobile-nav-toggle" type="button" aria-expanded="false" aria-controls="docs-sidebar">
+                <span aria-hidden="true">☰</span>
+                <span>目录</span>
+            </button>
+            <a class="note-back" href="../">← 返回学习记录</a>
+        </div>
+    </header>
 
-        <section class="hero">
-            <p class="eyebrow">FreeRTOS archive</p>
-            <h1>FreeRTOS 学习，<br>从实时操作系统基础开始。</h1>
-            <p>这里收录 FreeRTOS 的学习内容，逐步整理任务调度、队列、信号量、中断管理与嵌入式实践。</p>
-            <div class="hero-meta">
-                <span class="pill">FreeRTOS学习</span>
-                <span class="pill">实时操作系统</span>
-                <span class="pill">嵌入式开发</span>
+    <div class="docs-layout" id="docs-layout">
+        <aside class="docs-sidebar" id="docs-sidebar" aria-label="FreeRTOS 学习目录">
+            <div class="docs-sidebar-heading">
+                <span class="docs-sidebar-kicker">LEARNING DOCS</span>
+                <strong id="docs-title">FreeRTOS 学习记录</strong>
             </div>
-        </section>
+            <nav class="page-nav" id="page-nav" aria-label="章节导航">
+                <p class="nav-loading">正在加载目录…</p>
+            </nav>
+        </aside>
 
-        <section class="section">
-            <div class="section-heading">
-                <div>
-                    <h2>学习条目</h2>
-                    <p>FreeRTOS 学习笔记将在这里持续归档。</p>
-                </div>
-            </div>
+        <main class="note-main">
+            <nav class="breadcrumb" aria-label="面包屑导航">
+                <a href="../../">主页</a>
+                <span>/</span>
+                <a href="../">学习记录</a>
+                <span>/</span>
+                <span>FreeRTOS 学习</span>
+            </nav>
+            <article class="article">
+                <div id="article-content" aria-live="polite"><p>正在加载笔记…</p></div>
 
-            <div class="record-grid">
-                <div class="record-card empty">
-                    <span class="status">持续补充</span>
-                    <h2>第一篇笔记</h2>
-                    <p>新的 FreeRTOS 学习主题会在这里继续展开。</p>
-                </div>
-            </div>
-        </section>
+                <section class="comments-section" id="comments-section" aria-labelledby="comments-title">
+                    <div class="comments-heading">
+                        <h2 id="comments-title">评论区</h2>
+                        <p>使用 GitHub 账号登录后即可参与当前章节的讨论。</p>
+                    </div>
+                    <div class="comments-thread" id="comments-thread">
+                        <p class="nav-loading">正在加载评论区…</p>
+                    </div>
+                </section>
 
-        <footer class="page-footer">Kyle Learning Records · FreeRTOS学习</footer>
+                <nav class="page-pagination" id="page-pagination" aria-label="上一章和下一章"></nav>
+                <footer class="article-footer">
+                    <span>学习记录 · FreeRTOS 学习</span>
+                    <a href="../">返回学习记录目录 →</a>
+                </footer>
+            </article>
+        </main>
+
+        <aside class="page-outline" id="page-outline" aria-label="当前页内容目录">
+            <p class="page-outline-title">此页内容</p>
+            <nav id="outline-links"></nav>
+        </aside>
     </div>
+
+    <button class="docs-overlay" id="docs-overlay" type="button" aria-label="关闭目录"></button>
+
+    <button class="reading-progress" id="reading-progress" type="button" aria-label="返回页面顶部" title="返回顶部">
+        <svg viewBox="0 0 52 52" aria-hidden="true">
+            <circle class="reading-progress-track" cx="26" cy="26" r="21"></circle>
+            <circle class="reading-progress-value" id="reading-progress-value" cx="26" cy="26" r="21"></circle>
+        </svg>
+        <span class="reading-progress-label" id="reading-progress-label">0%</span>
+        <span class="reading-progress-arrow" aria-hidden="true">↑</span>
+    </button>
+
+    <script src="./freertos-page.js?v=20260721b" defer></script>
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js" defer fetchpriority="low"></script>
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/languages/c.min.js" defer fetchpriority="low"></script>
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/languages/cpp.min.js" defer fetchpriority="low"></script>
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/languages/armasm.min.js" defer fetchpriority="low"></script>
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/languages/bash.min.js" defer fetchpriority="low"></script>
 </body>
 </html>
