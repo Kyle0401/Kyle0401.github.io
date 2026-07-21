@@ -9,7 +9,10 @@
     'CNB 个人设置中的访问令牌创建界面': 'image-20260706032302171.png',
     'CNB 访问令牌创建成功页面': 'image-20260706032406427-redacted.png',
     'CNB 制品列表中的 docker-learning 镜像': 'image-20260706033226226.png',
-    'CNB docker-learning 镜像详情页': 'image-20260706033939536.png'
+    'CNB docker-learning 镜像详情页': 'image-20260706033939536.png',
+    'CNB 代码提交后的自动构建状态': 'image-20260721165646567.png',
+    'CNB 云原生构建记录列表': 'image-20260721165927017.png',
+    'CNB Docker 镜像构建与推送成功日志': 'image-20260721170004387.png'
   };
 
   function applyRealScreenshots() {
@@ -28,7 +31,7 @@
       link.title = '在新窗口查看原图';
 
       var image = document.createElement('img');
-      image.src = './assets/' + filename + '?v=20260707b';
+      image.src = './assets/' + filename + '?v=20260721a';
       image.alt = caption.textContent.trim();
       image.loading = 'lazy';
       image.decoding = 'async';
