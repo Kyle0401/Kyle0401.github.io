@@ -1,6 +1,6 @@
 # FreeRTOS 学习记录
 
-> 本文整理自百问网《FreeRTOS 入门与工程实践——基于 STM32F103》教程第 2～19 章；正文、代码与图片的转载及编号调整已获授权。原教程：[百问网 FreeRTOS 入门与工程实践](https://rtos.100ask.net/zh/FreeRTOS/DShanMCU-F103/)。
+> 本文整理自百问网《FreeRTOS 入门与工程实践——基于 STM32F103》教程第 2～19 章。原教程：[百问网 FreeRTOS 入门与工程实践](https://rtos.100ask.net/zh/FreeRTOS/DShanMCU-F103/)。
 
 ## 第1章 单片机程序设计模式
 
