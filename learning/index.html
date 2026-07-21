@@ -59,6 +59,7 @@
                             <button class="filter-chip" type="button" data-filter-value="language" aria-pressed="false">编程语言</button>
                             <button class="filter-chip" type="button" data-filter-value="engineering" aria-pressed="false">工程工具</button>
                             <button class="filter-chip" type="button" data-filter-value="embedded" aria-pressed="false">嵌入式</button>
+                            <button class="filter-chip" type="button" data-filter-value="system" aria-pressed="false">操作系统</button>
                             <button class="filter-chip" type="button" data-filter-value="ai" aria-pressed="false">人工智能</button>
                             <button class="filter-chip" type="button" data-filter-value="ai-system" aria-pressed="false">AI 系统</button>
                         </div>
@@ -75,12 +76,29 @@
                 </div>
 
                 <div class="filter-summary" aria-live="polite">
-                    <span id="result-count" class="result-count">共 7 项学习记录</span>
+                    <span id="result-count" class="result-count">共 8 项学习记录</span>
                     <button id="reset-filters" class="reset-filters" type="button" hidden>清除全部筛选</button>
                 </div>
             </div>
 
             <div class="record-grid" id="learning-grid">
+                <a
+                    class="record-card"
+                    href="./tsinghua-os-camp/"
+                    data-entry="learning"
+                    data-category="system"
+                    data-status="ongoing"
+                    data-search="清华大学 开源操作系统训练营 操作系统 os camp rust rustlings rcore 系统编程"
+                >
+                    <div class="card-meta">
+                        <span class="status">已建立·持续完善</span>
+                        <span class="category-label">操作系统</span>
+                    </div>
+                    <h2>清华大学开源操作系统训练营学习</h2>
+                    <p>记录训练营中的 Rust、系统编程与开源操作系统实践。</p>
+                    <span class="card-arrow">→</span>
+                </a>
+
                 <a
                     class="record-card"
                     href="./freertos/"
