@@ -693,3 +693,40 @@ ENV LANGUAGE C.UTF-8
 在 `.cnb.yml` 中使用 `build: .ide/Dockerfile` 指定构建文件，并可同时指定 `image` 作为回退镜像。
 
 将 `.cnb.yml` 提交到代码仓库后，下次启动云原生开发环境时，CNB 会按照该流水线配置创建并初始化工作区。
+
+------
+
+## 六、使用云原生构建自动构建并推送镜像
+
+目标：当代码（例如 `Dockerfile`）推送到 `main` 分支时，自动构建镜像并将其推送到 CNB Docker 制品库。
+
+参考文档：[云原生构建介绍](https://docs.cnb.cool/zh/build/intro.html)、[Docker 制品库](https://docs.cnb.cool/zh/artifact/docker.html)。
+
+### 使用 `.cnb.yml` 声明构建流水线
+
+在仓库根目录的 `.cnb.yml` 中添加：
+
+```yaml title=".cnb.yml"
+main:  # 匹配 main 分支
+  push:  # 每次向 main 分支推送提交时触发
+    - services:
+        # 提供 Docker daemon 和 CLI，并自动登录当前仓库的 CNB Docker 制品库
+        - docker
+      stages:
+        - name: docker build
+          script: docker build -t ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:latest .
+        - name: docker push
+          script: docker push ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:latest
+```
+
+`CNB_DOCKER_REGISTRY` 和 `CNB_REPO_SLUG_LOWERCASE` 是 CNB 提供的环境变量，会组合成当前仓库对应的镜像地址。声明 `services: docker` 后，流水线可以直接使用 Docker daemon 和 CLI，并能把镜像推送到当前仓库的 CNB Docker 制品库。
+
+将 `.cnb.yml` 提交并推送到 `main` 后，后续每次向 `main` 推送提交都会触发这条流水线；修改 `Dockerfile` 并推送只是其中一种触发场景。如果只希望在 `Dockerfile` 发生变化时运行，可在该流水线中增加 `ifModify: Dockerfile`。
+
+示例使用可变的 `latest` 标签：重复推送时，`latest` 会指向新构建的镜像。若需要保留可追溯的发布版本，可以同时推送版本号或提交 SHA 标签。
+
+![CNB 代码提交后的自动构建状态](assets/image-20260721165646567.png)
+
+![CNB 云原生构建记录列表](assets/image-20260721165927017.png)
+
+![CNB Docker 镜像构建与推送成功日志](assets/image-20260721170004387.png)

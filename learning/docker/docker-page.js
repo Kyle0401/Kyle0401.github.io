@@ -30,7 +30,10 @@
     'CNB 个人设置中的访问令牌创建界面': ['credential', '个人设置中的访问令牌入口', ['访问令牌', '创建新令牌', '权限与有效期']],
     'CNB 访问令牌创建成功页面': ['credential', '访问令牌创建成功页面', ['令牌名称', 'Git Username', 'Token']],
     'CNB 制品列表中的 docker-learning 镜像': ['list', '制品列表中的 docker-learning 镜像', ['docker-learning', 'latest', '镜像摘要与大小']],
-    'CNB docker-learning 镜像详情页': ['detail', 'docker-learning 镜像详情', ['标签与摘要', '镜像层', '拉取使用指引']]
+    'CNB docker-learning 镜像详情页': ['detail', 'docker-learning 镜像详情', ['标签与摘要', '镜像层', '拉取使用指引']],
+    'CNB 代码提交后的自动构建状态': ['build', '代码推送后自动启动构建流水线', ['push 触发', 'pipeline-1', '正在构建']],
+    'CNB 云原生构建记录列表': ['build', '查看仓库中的云原生构建历史', ['构建状态', '触发事件', '目标分支']],
+    'CNB Docker 镜像构建与推送成功日志': ['build', '流水线完成镜像构建与推送', ['docker build', 'docker push', '构建成功']]
   };
 
   function esc(value) {
@@ -90,7 +93,11 @@
     var rows = spec[2].map(function (row, index) {
       return '<div class="figure-ui-row"><span class="figure-ui-icon"></span><span>' + esc(row) + '</span><span class="figure-ui-badge">' + (index === 1 ? 'latest' : 'Docker') + '</span></div>';
     }).join('');
-    return '<figure class="figure"><div class="figure-ui" role="img" aria-label="' + esc(caption) + '"><div class="figure-ui-top"><span>CNB · Docker Registry</span><span>界面图</span></div><div class="figure-ui-body"><div><div class="figure-ui-title">' + esc(spec[0] === 'code-server' ? 'code-server · Browser IDE' : 'CNB Docker 制品') + '</div><div class="figure-ui-sub">' + esc(spec[1]) + '</div></div>' + rows + '<div class="figure-ui-actions"><span class="figure-ui-button">查看使用指引</span><span class="figure-ui-button ghost">更多操作</span></div></div></div><figcaption>' + inline(caption) + '</figcaption></figure>';
+    var panelTitle = spec[0] === 'code-server' ? 'code-server · Browser IDE'
+      : spec[0] === 'build' ? 'CNB 云原生构建'
+        : 'CNB Docker 制品';
+    var panelKicker = spec[0] === 'build' ? 'CNB · Cloud Native Build' : 'CNB · Docker Registry';
+    return '<figure class="figure"><div class="figure-ui" role="img" aria-label="' + esc(caption) + '"><div class="figure-ui-top"><span>' + esc(panelKicker) + '</span><span>界面图</span></div><div class="figure-ui-body"><div><div class="figure-ui-title">' + esc(panelTitle) + '</div><div class="figure-ui-sub">' + esc(spec[1]) + '</div></div>' + rows + '<div class="figure-ui-actions"><span class="figure-ui-button">查看使用指引</span><span class="figure-ui-button ghost">更多操作</span></div></div></div><figcaption>' + inline(caption) + '</figcaption></figure>';
   }
 
   function figure(caption) {
@@ -503,7 +510,7 @@
   window.addEventListener('resize', updateReadingProgress);
   window.addEventListener('hashchange', routeFromHash);
 
-  fetch('./Docker学习.md?v=20260716a')
+  fetch('./Docker学习.md?v=20260721a')
     .then(function (response) {
       if (!response.ok) throw new Error('Markdown request failed');
       return response.text();
