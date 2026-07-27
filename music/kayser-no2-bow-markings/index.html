@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="解读《开塞第二首》中的 Sp、Fr、M 与 p(A)：弓尖、弓根、中弓、力度及 A 弦提示。">
+    <title>读懂《开塞第二首》里的 Sp、Fr、M 与 p(A) · Kyle</title>
+    <link rel="icon" type="image/svg+xml" href="../../static/img/logo-jy.svg">
+    <link rel="stylesheet" href="../../static/css/learning.css">
+    <style>
+        .article-shell { width: min(920px, calc(100% - 40px)); margin: 0 auto; padding: 30px 0 72px; }
+        .article-header { margin: 38px 0 26px; }
+        .article-kicker { margin: 0 0 12px; color: #5b6ee1; font-size: 13px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+        .article-header h1 { margin: 0; font-size: clamp(31px, 5vw, 52px); line-height: 1.2; letter-spacing: -.035em; }
+        .article-summary { max-width: 760px; margin: 18px 0 0; color: #6d7687; font-size: 16px; line-height: 1.85; }
+        .article-meta { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 20px; }
+        .article-meta span { padding: 7px 11px; color: #5764ba; background: #eef0ff; border-radius: 999px; font-size: 13px; font-weight: 700; }
+        .score-figure { margin: 30px 0; padding: 14px; background: rgba(255,255,255,.9); border: 1px solid #e3e8f2; border-radius: 22px; box-shadow: 0 12px 32px rgba(35,45,80,.07); }
+        .score-figure img { display: block; width: 100%; height: auto; border-radius: 13px; }
+        .image-placeholder { display: grid; min-height: 280px; padding: 28px; place-items: center; color: #6d7687; background: linear-gradient(135deg, #f7f8fc, #eef0ff); border: 1px dashed #bfc8df; border-radius: 13px; text-align: center; line-height: 1.8; }
+        .score-figure figcaption { padding: 12px 4px 2px; color: #7b8391; font-size: 13px; line-height: 1.65; }
+        .article { padding: 34px 38px; background: rgba(255,255,255,.92); border: 1px solid rgba(255,255,255,.76); border-radius: 24px; box-shadow: 0 15px 42px rgba(35,45,80,.08); }
+        .article h2 { margin: 42px 0 14px; font-size: 27px; letter-spacing: -.02em; }
+        .article h2:first-child { margin-top: 0; }
+        .article h3 { margin: 28px 0 10px; font-size: 21px; }
+        .article p, .article li { color: #3e485c; font-size: 16px; line-height: 1.9; }
+        .article strong { color: #172033; }
+        .article code { padding: 2px 7px; color: #4c57a8; background: #eef0ff; border-radius: 7px; font-family: Consolas, "SFMono-Regular", monospace; }
+        .note-table-wrap { margin: 20px 0 28px; overflow-x: auto; border: 1px solid #e3e8f2; border-radius: 16px; }
+        .note-table { width: 100%; min-width: 650px; border-collapse: collapse; background: #fff; }
+        .note-table th, .note-table td { padding: 15px 17px; border-bottom: 1px solid #e9edf5; text-align: left; vertical-align: top; line-height: 1.65; }
+        .note-table th { color: #4e5870; background: #f6f7fb; font-size: 14px; }
+        .note-table td { color: #3e485c; font-size: 15px; }
+        .note-table tr:last-child td { border-bottom: 0; }
+        .callout { margin: 24px 0; padding: 18px 20px; color: #3e485c; background: #f4f2ff; border-left: 4px solid #7b6bd6; border-radius: 0 14px 14px 0; line-height: 1.85; }
+        .summary-box { margin-top: 36px; padding: 22px; background: linear-gradient(135deg, #eef0ff, #f7f2ff); border-radius: 17px; }
+        .summary-box p { margin: 0; }
+        .article-footer { margin-top: 28px; color: #7b8391; font-size: 13px; text-align: center; }
+        @media (max-width: 700px) {
+            .article-shell { width: min(100% - 28px, 920px); padding-top: 20px; }
+            .article-header { margin-top: 28px; }
+            .article { padding: 25px 21px; border-radius: 20px; }
+            .article p, .article li { font-size: 15px; line-height: 1.85; }
+            .image-placeholder { min-height: 210px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="article-shell">
+        <header class="topbar">
+            <a class="brand" href="../../" aria-label="返回 Kyle 主页">
+                <span class="brand-mark">K</span>
+                <span>Kyle · Music Notes</span>
+            </a>
+            <a class="back-link" href="../">← 返回音乐杂谈</a>
+        </header>
+
+        <section class="article-header">
+            <p class="article-kicker">Violin · Score Reading</p>
+            <h1>读懂《开塞第二首》里的 Sp、Fr、M 与 p(A)</h1>
+            <p class="article-summary">这几个标记分别涉及弓段位置、弓向、力度与指定琴弦。把它们分开理解，就能看清编订者如何安排这一段的运弓和音色。</p>
+            <div class="article-meta">
+                <span>开塞第二首</span>
+                <span>小提琴</span>
+                <span>弓段记号</span>
+                <span>2026-07-28</span>
+            </div>
+        </section>
+
+        <figure class="score-figure">
+            <img src="./kayser-no2-score.jpg" alt="《开塞第二首》中标有 Sp、Fr、M 与 p(A) 的乐谱片段"
+                 onload="this.nextElementSibling.hidden = true"
+                 onerror="this.hidden = true">
+            <div class="image-placeholder">
+                <div>
+                    <strong>谱例图片接口已预留</strong><br>
+                    将图片上传为本目录下的 <code>kayser-no2-score.jpg</code> 后会自动显示。
+                </div>
+            </div>
+            <figcaption>《开塞第二首》谱例：圈出的记号用于提示弓段位置和指定琴弦。</figcaption>
+        </figure>
+
+        <article class="article">
+            <h2>先看结论</h2>
+            <div class="note-table-wrap">
+                <table class="note-table">
+                    <thead>
+                        <tr>
+                            <th>谱面记号</th>
+                            <th>原词或构成</th>
+                            <th>含义</th>
+                            <th>演奏要求</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Sp.</strong></td>
+                            <td>德语 <em>Spitze</em></td>
+                            <td>弓尖；部分教材称“先弓”</td>
+                            <td>在靠近弓尖的区域演奏</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Fr.</strong></td>
+                            <td>德语 <em>Frosch</em></td>
+                            <td>弓根；部分教材称“元弓”</td>
+                            <td>在靠近弓根、弓毛库的一端演奏</td>
+                        </tr>
+                        <tr>
+                            <td><strong>M.</strong></td>
+                            <td>德语 <em>Mitte</em></td>
+                            <td>中弓</td>
+                            <td>使用弓子的中间区域</td>
+                        </tr>
+                        <tr>
+                            <td><strong>p (A)</strong></td>
+                            <td><em>piano</em> ＋ A 弦提示</td>
+                            <td>弱奏，并在 A 弦上演奏</td>
+                            <td><code>p</code> 管力度，<code>(A)</code> 管弦位，二者不是一个整体缩写</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2>Sp.：使用弓尖</h2>
+            <p><code>Sp.</code> 是德语 <em>Spitze</em> 的缩写，意思是弓尖。它要求演奏者把接下来的音放在弓子的尖端区域完成。</p>
+            <div class="callout"><strong>不要把这里的 Sp. 看成 spiccato。</strong> Spiccato 是跳弓奏法，而本谱同时出现了 <code>Fr.</code> 与 <code>M.</code>，说明这组字母是在统一标示弓尖、弓根和中弓三个弓段。</div>
+
+            <h2>Fr.：使用弓根</h2>
+            <p><code>Fr.</code> 是德语 <em>Frosch</em> 的缩写。<em>Frosch</em> 指弓毛库，也就是右手握弓附近的弓根部分。</p>
+            <p>谱面上 <code>Fr.</code> 旁边还有一个形似字母 V 的符号 <strong>∨</strong>。它不是字母，而是<strong>上弓记号</strong>。因此这里需要同时满足两个要求：</p>
+            <ul>
+                <li><code>Fr.</code> 决定从哪个<strong>弓段区域</strong>演奏；</li>
+                <li><strong>∨</strong> 决定弓子朝哪个<strong>方向</strong>运动。</li>
+            </ul>
+            <p>所以“在弓根用上弓”并不矛盾：可以从非常靠近弓根的位置开始，只使用一小段弓向弓尖方向运动。</p>
+
+            <h2>M.：使用中弓</h2>
+            <p><code>M.</code> 是德语 <em>Mitte</em> 的缩写，表示中间。它提示演奏者把相应音型安排在弓子的中部。</p>
+            <p>中弓通常兼顾控制力和弹性。结合这段连续的十六分音符与渐强记号，编订者很可能是希望演奏者避免弓子跑到极端位置，使后续乐句仍有足够的弓量和动态空间。</p>
+
+            <h2>p(A)：力度与弦位要拆开读</h2>
+            <p>这里并不存在一个名为 <code>p(A)</code> 的整体术语，应当拆成两部分：</p>
+            <ul>
+                <li><code>p</code> 是意大利语 <em>piano</em>，表示<strong>弱奏</strong>；</li>
+                <li><code>(A)</code> 表示<strong>在 A 弦上演奏</strong>。</li>
+            </ul>
+            <p>小提琴上的同一个音往往可以在不同琴弦、不同把位上取得。编订者指定 A 弦，是为了固定指法路线和音色。谱中该音上方还标有第四指，和 A 弦提示配合起来，就是要求按所标指法在 A 弦上取得该音。</p>
+            <p>括号通常意味着这是版本编订者补充的指法或弦位建议，而不一定属于作曲家的原始文字。实际演奏时可以结合自己的手型、版本说明以及老师的要求决定是否严格采用。</p>
+
+            <h2>读谱时要区分三个维度</h2>
+            <p>这一小段恰好展示了弦乐谱中容易混淆的三类信息：</p>
+            <ul>
+                <li><strong>弓段位置：</strong><code>Sp.</code>、<code>Fr.</code>、<code>M.</code>；</li>
+                <li><strong>运弓方向：</strong>上弓 <strong>∨</strong>、下弓 <strong>Π</strong>；</li>
+                <li><strong>力度与弦位：</strong><code>p</code> 表示弱奏，<code>(A)</code> 表示 A 弦。</li>
+            </ul>
+            <p>同一个音可以同时带有上述多类标记，因为它们分别回答“在哪里用弓”“往哪个方向走”“多强地演奏”和“在哪根弦上按音”等不同问题。</p>
+
+            <div class="summary-box">
+                <p><strong>一句话记忆：</strong><code>Sp.</code>＝弓尖（先弓），<code>Fr.</code>＝弓根（元弓），<code>M.</code>＝中弓；<code>p(A)</code> 要拆成“弱奏”和“使用 A 弦”两项要求。</p>
+            </div>
+        </article>
+
+        <footer class="article-footer">Kyle Music Notes · 《开塞第二首》谱面记号笔记</footer>
+    </div>
+</body>
+</html>
