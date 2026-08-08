@@ -3008,7 +3008,37 @@ constexpr int x = 10;  // 正确
 // constexpr int y;    // 错误：constexpr 变量必须初始化
 ```
 
-##### 19.1.1 `const` 与 `constexpr` 的区别
+##### 19.1.1 `constexpr` 在声明中的书写位置
+
+在变量声明中，`constexpr` 属于**声明说明符（declaration specifier）**，而 `Fibonacci` 这样的类型名属于类型说明符；它们共同组成声明中的说明符序列。因此在这种简单声明里，下面两种写法是等价的：
+
+```cpp
+constexpr Fibonacci FIB{{0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55}};
+Fibonacci constexpr FIB{{0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55}};
+```
+
+也就是说：
+
+```cpp
+Fibonacci constexpr FIB;
+```
+
+并不是把 `constexpr` “修饰在 `Fibonacci` 后面”产生了不同语义；它仍然是在声明变量 `FIB` 为 `constexpr` 对象。
+
+这和下面两种 `const` 写法类似：
+
+```cpp
+const int a = 10;
+int const b = 10;
+```
+
+二者都表示顶层 `const` 的 `int` 对象。
+
+> [!NOTE]
+>
+> 虽然 `Fibonacci constexpr FIB` 合法，但实际 C++ 代码中更常见、也更符合大多数代码风格的是把 `constexpr` 写在类型前：`constexpr Fibonacci FIB`。阅读代码时不要把关键字的位置机械地理解成“只修饰它左边或右边紧挨着的词”，而应结合整个声明语法判断。
+
+##### 19.1.2 `const` 与 `constexpr` 的区别
 
 `const` 的核心含义是**对象不能通过该名字被修改**；它本身并不要求初始化过程一定发生在编译期。`constexpr` 则进一步要求变量能够用常量表达式初始化。
 
