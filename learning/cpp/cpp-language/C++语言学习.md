@@ -2724,6 +2724,99 @@ catch (...) {
 }
 ```
 
+
+### 18、断言
+
+断言（assertion）用于检查程序运行时某个**本应成立的条件**。如果条件成立，程序继续执行；如果条件不成立，说明程序内部状态与预期不一致，断言会报告失败并终止程序。
+
+C++ 标准库提供了 `assert` 宏，定义在 `<cassert>` 中：
+
+```cpp
+#include <cassert>
+
+int main()
+{
+    int value = 99;
+
+    assert(value == 99);  // 条件为 true，程序继续执行
+    return 0;
+}
+```
+
+`assert` 的基本形式为：
+
+```cpp
+assert(expression);
+```
+
+当 `expression` 的结果为 `true` 时，没有可观察到的效果；当结果为 `false` 时，会输出断言失败相关的诊断信息，并调用 `std::abort()` 终止程序。
+
+例如：
+
+```cpp
+#include <cassert>
+
+int main()
+{
+    int value = 99;
+
+    assert(value == 100);  // 断言失败，程序终止
+}
+```
+
+> [!IMPORTANT]
+>
+> `assert` 主要用于检查程序员认为“逻辑上必须成立”的内部条件，例如算法不变量、函数执行后的状态等。它不适合用来处理用户输入错误、文件不存在、网络失败等正常的运行时错误；这些情况通常应使用普通的条件判断、错误码或异常处理。
+
+#### 18.1 `NDEBUG` 与关闭断言
+
+如果在包含 `<cassert>` 之前定义了宏 `NDEBUG`，标准 `assert` 会被禁用：
+
+```cpp
+#define NDEBUG
+#include <cassert>
+
+int main()
+{
+    int value = 99;
+    assert(value == 100);  // NDEBUG 已定义，该断言不会进行运行时检查
+}
+```
+
+因此，**不要在 `assert` 的表达式中编写程序必须依赖的副作用**。例如下面的代码是不安全的：
+
+```cpp
+assert(++count == 10);
+```
+
+如果断言被关闭，`++count` 也不会执行，程序行为就会发生变化。更合理的写法是先完成必要操作，再单独断言：
+
+```cpp
+++count;
+assert(count == 10);
+```
+
+#### 18.2 编译期断言 `static_assert`
+
+除了运行时的 `assert`，C++ 还提供语言级的 `static_assert`，用于在**编译期**检查常量表达式：
+
+```cpp
+static_assert(sizeof(int) >= 4, "int should be at least 4 bytes");
+```
+
+如果条件为 `false`，程序会直接编译失败。二者可以简单区分为：
+
+| 断言 | 检查时机 | 典型用途 |
+| --- | --- | --- |
+| `assert(...)` | 运行时 | 检查运行过程中本应成立的内部状态 |
+| `static_assert(...)` | 编译期 | 检查类型、模板参数和其他常量表达式 |
+
+> [!NOTE]
+>
+> 有些教学框架或测试框架会自定义大写的 `ASSERT(...)`。它不是 C++ 标准库的 `assert`；具体参数形式和失败行为取决于该框架自己的定义，应查看对应头文件或框架文档。
+
+参考：[`assert`](https://en.cppreference.com/w/cpp/error/assert)、[`static_assert`](https://en.cppreference.com/w/cpp/language/static_assert)。
+
 ## 二、C++特性
 
 ### 1、运算符重载
