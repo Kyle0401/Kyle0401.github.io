@@ -109,6 +109,98 @@
 
     <script src="../../ai-infra/01-ai-infra-foundations/vendor/markdown-it/markdown-it.min.js"></script>
     <script src="../../ai-infra/01-ai-infra-foundations/vendor/highlight.js/highlight.min.js"></script>
+    <script>
+        (function () {
+            var originalFetch = window.fetch;
+            var section = [
+                '#### 5.1 `static` 关键字',
+                '',
+                '`static` 在不同上下文中的作用并不相同。下面这个例子中两个 `static` 分别控制函数的链接属性和局部变量的存储期：',
+                '',
+                '```cpp',
+                'static int func(int param) {',
+                '    static int static_ = param;',
+                '    return static_++;',
+                '}',
+                '```',
+                '',
+                '##### 5.1.1 修饰命名空间作用域函数：内部链接',
+                '',
+                '函数定义前的 `static`：',
+                '',
+                '```cpp',
+                'static int func(int param)',
+                '```',
+                '',
+                '表示该函数具有 **internal linkage（内部链接）**。也就是说，这个名字只在当前翻译单元中可见，其他 `.cpp` 文件不能通过普通的外部声明链接到这个函数。',
+                '',
+                '> [!NOTE]',
+                '> 这里的 `static` 不会让函数“保存上一次调用的状态”。它影响的是函数名的链接属性。现代 C++ 中，如果只是想让命名空间作用域的实体只在当前翻译单元内部使用，也常使用匿名命名空间。',
+                '',
+                '##### 5.1.2 修饰局部变量：静态存储期',
+                '',
+                '函数内部的局部 `static` 变量：',
+                '',
+                '```cpp',
+                'static int static_ = param;',
+                '```',
+                '',
+                '仍然具有**局部作用域**，只能在所在代码块中访问；但它具有 **static storage duration（静态存储期）**，对象的存储会持续到程序结束。',
+                '',
+                '对于这里依赖运行期参数 `param` 的初始化表达式，初始化会在程序第一次执行到这条声明时发生，并且只发生一次。因此第一次调用 `func(5)` 时 `static_` 被初始化为 `5`；之后再调用 `func(4)`、`func(3)` 时，不会重新用新的 `param` 初始化它。',
+                '',
+                '又因为：',
+                '',
+                '```cpp',
+                'return static_++;',
+                '```',
+                '',
+                '`static_++` 是后置自增：先产生自增前的值作为表达式结果，再把 `static_` 加 `1`。所以连续调用的结果是：',
+                '',
+                '| 调用 | 返回值 | 调用结束后的 `static_` |',
+                '| --- | ---: | ---: |',
+                '| `func(5)` | 5 | 6 |',
+                '| `func(4)` | 6 | 7 |',
+                '| `func(3)` | 7 | 8 |',
+                '| `func(2)` | 8 | 9 |',
+                '| `func(1)` | 9 | 10 |',
+                '',
+                '> [!IMPORTANT]',
+                '> 局部 `static` 的关键点是：**作用域仍然是局部的，但存储期是静态的，并且动态初始化只执行一次。** 从 C++11 起，局部静态变量的初始化本身保证只执行一次；但初始化完成后，如果多个线程同时修改这个变量，仍然需要程序自己进行同步。',
+                '',
+                '参考：[cppreference：Storage duration and linkage](https://en.cppreference.com/w/cpp/language/storage_duration.html)',
+                ''
+            ].join('\n');
+
+            window.fetch = function () {
+                var args = arguments;
+                var input = args[0];
+                var url = typeof input === 'string' ? input : (input && input.url ? input.url : '');
+
+                return originalFetch.apply(window, args).then(function (response) {
+                    var decodedUrl = url;
+                    try { decodedUrl = decodeURIComponent(url); }
+                    catch (error) {}
+
+                    if (decodedUrl.indexOf('C++语言学习.md') === -1) return response;
+
+                    return response.text().then(function (markdown) {
+                        if (markdown.indexOf('#### 5.1 `static` 关键字') === -1) {
+                            markdown = markdown.replace('\n### 6、引用', '\n\n' + section + '\n### 6、引用');
+                        }
+
+                        var headers = new Headers(response.headers);
+                        headers.delete('content-length');
+                        return new Response(markdown, {
+                            status: response.status,
+                            statusText: response.statusText,
+                            headers: headers
+                        });
+                    });
+                });
+            };
+        })();
+    </script>
     <script src="./cpp-language-page.js?v=20260808a"></script>
     <script>
         (function () {
