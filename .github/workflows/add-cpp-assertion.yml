@@ -22,108 +22,16 @@ jobs:
         run: |
           python3 - <<'PY'
           from pathlib import Path
-
+          import base64
           path = Path('learning/cpp/cpp-language/C++语言学习.md')
           text = path.read_text(encoding='utf-8')
           heading = '### 18、断言'
           marker = '\n## 二、C++特性'
-
+          section_b64 = 'IyMjIDE444CB5pat6KiACgrmlq3oqIDvvIhhc3NlcnRpb27vvInnlKjkuo7mo4Dmn6XnqIvluo/ov5DooYzml7bmn5DkuKoqKuacrOW6lOaIkOeri+eahOadoeS7tioq44CC5aaC5p6c5p2h5Lu25oiQ56uL77yM56iL5bqP57un57ut5omn6KGM77yb5aaC5p6c5p2h5Lu25LiN5oiQ56uL77yM6K+05piO56iL5bqP5YaF6YOo54q25oCB5LiO6aKE5pyf5LiN5LiA6Ie077yM5pat6KiA5Lya5oql5ZGK5aSx6LSl5bm257uI5q2i56iL5bqP44CCCgpDKysg5qCH5YeG5bqT5o+Q5L6b5LqGIGBhc3NlcnRgIOWuj++8jOWumuS5ieWcqCBgPGNhc3NlcnQ+YCDkuK3vvJoKCmBgYGNwcAojaW5jbHVkZSA8Y2Fzc2VydD4KCmludCBtYWluKCkKewogICAgaW50IHZhbHVlID0gOTk7CgogICAgYXNzZXJ0KHZhbHVlID09IDk5KTsgIC8vIOadoeS7tuS4uiB0cnVl77yM56iL5bqP57un57ut5omn6KGMCiAgICByZXR1cm4gMDsKfQpgYGAKCmBhc3NlcnRgIOeahOWfuuacrOW9ouW8j+S4uu+8mgoKYGBgY3BwCmFzc2VydChleHByZXNzaW9uKTsKYGBgCgrlvZMgYGV4cHJlc3Npb25gIOeahOe7k+aenOS4uiBgdHJ1ZWAg5pe277yM5rKh5pyJ5Y+v6KeC5a+f5Yiw55qE5pWI5p6c77yb5b2T57uT5p6c5Li6IGBmYWxzZWAg5pe277yM5Lya6L6T5Ye65pat6KiA5aSx6LSl55u45YWz55qE6K+K5pat5L+h5oGv77yM5bm26LCD55SoIGBzdGQ6OmFib3J0KClgIOe7iOatoueoi+W6j+OAggoK5L6L5aaC77yaCgpgYGBjcHAKI2luY2x1ZGUgPGNhc3NlcnQ+CgppbnQgbWFpbigpCnsKICAgIGludCB2YWx1ZSA9IDk5OwoKICAgIGFzc2VydCh2YWx1ZSA9PSAxMDApOyAgLy8g5pat6KiA5aSx6LSl77yM56iL5bqP57uI5q2iCn0KYGBgCgo+IFshSU1QT1JUQU5UXQo+Cj4gYGFzc2VydGAg5Li76KaB55So5LqO5qOA5p+l56iL5bqP5ZGY6K6k5Li64oCc6YC76L6R5LiK5b+F6aG75oiQ56uL4oCd55qE5YaF6YOo5p2h5Lu277yM5L6L5aaC566X5rOV5LiN5Y+Y6YeP44CB5Ye95pWw5omn6KGM5ZCO55qE54q25oCB562J44CC5a6D5LiN6YCC5ZCI55So5p2l5aSE55CG55So5oi36L6T5YWl6ZSZ6K+v44CB5paH5Lu25LiN5a2Y5Zyo44CB572R57uc5aSx6LSl562J5q2j5bi455qE6L+Q6KGM5pe26ZSZ6K+v77yb6L+Z5Lqb5oOF5Ya16YCa5bi45bqU5L2/55So5pmu6YCa55qE5p2h5Lu25Yik5pat44CB6ZSZ6K+v56CB5oiW5byC5bi45aSE55CG44CCCgojIyMjIDE4LjEgYE5ERUJVR2Ag5LiO5YWz6Zet5pat6KiACgrlpoLmnpzlnKjljIXlkKsgYDxjYXNzZXJ0PmAg5LmL5YmN5a6a5LmJ5LqG5a6PIGBOREVCVUdg77yM5qCH5YeGIGBhc3NlcnRgIOS8muiiq+emgeeUqO+8mgoKYGBgY3BwCiNkZWZpbmUgTkRFQlVHCiNpbmNsdWRlIDxjYXNzZXJ0PgoKaW50IG1haW4oKQp7CiAgICBpbnQgdmFsdWUgPSA5OTsKICAgIGFzc2VydCh2YWx1ZSA9PSAxMDApOyAgLy8gTkRFQlVHIOW3suWumuS5ie+8jOivpeaWreiogOS4jeS8mui/m+ihjOi/kOihjOaXtuajgOafpQp9CmBgYAoK5Zug5q2k77yMKirkuI3opoHlnKggYGFzc2VydGAg55qE6KGo6L6+5byP5Lit57yW5YaZ56iL5bqP5b+F6aG75L6d6LWW55qE5Ymv5L2c55SoKirjgILkvovlpoLkuIvpnaLnmoTku6PnoIHmmK/kuI3lronlhajnmoTvvJoKCmBgYGNwcAphc3NlcnQoKytjb3VudCA9PSAxMCk7CmBgYAoK5aaC5p6c5pat6KiA6KKr5YWz6Zet77yMYCsrY291bnRgIOS5n+S4jeS8muaJp+ihjO+8jOeoi+W6j+ihjOS4uuWwseS8muWPkeeUn+WPmOWMluOAguabtOWQiOeQhueahOWGmeazleaYr+WFiOWujOaIkOW/heimgeaTjeS9nO+8jOWGjeWNleeLrOaWreiogO+8mgoKYGBgY3BwCisrY291bnQ7CmFzc2VydChjb3VudCA9PSAxMCk7CmBgYAoKIyMjIyAxOC4yIOe8luivkeacn+aWreiogCBgc3RhdGljX2Fzc2VydGAKCumZpOS6hui/kOihjOaXtueahCBgYXNzZXJ0YO+8jEMrKyDov5jmj5Dkvpvor63oqIDnuqfnmoQgYHN0YXRpY19hc3NlcnRg77yM55So5LqO5ZyoKirnvJbor5HmnJ8qKuajgOafpeW4uOmHj+ihqOi+vuW8j++8mgoKYGBgY3BwCnN0YXRpY19hc3NlcnQoc2l6ZW9mKGludCkgPj0gNCwgImludCBzaG91bGQgYmUgYXQgbGVhc3QgNCBieXRlcyIpOwpgYGAKCuWmguaenOadoeS7tuS4uiBgZmFsc2Vg77yM56iL5bqP5Lya55u05o6l57yW6K+R5aSx6LSl44CC5LqM6ICF5Y+v5Lul566A5Y2V5Yy65YiG5Li677yaCgp8IOaWreiogCB8IOajgOafpeaXtuacuiB8IOWFuOWei+eUqOmAlCB8CnwgLS0tIHwgLS0tIHwgLS0tIHwKfCBgYXNzZXJ0KC4uLilgIHwg6L+Q6KGM5pe2IHwg5qOA5p+l6L+Q6KGM6L+H56iL5Lit5pys5bqU5oiQ56uL55qE5YaF6YOo54q25oCBIHwKfCBgc3RhdGljX2Fzc2VydCguLi4pYCB8IOe8luivkeacnyB8IOajgOafpeexu+Wei+OAgeaooeadv+WPguaVsOWSjOWFtuS7luW4uOmHj+ihqOi+vuW8jyB8Cgo+IFshTk9URV0KPgo+IOacieS6m+aVmeWtpuahhuaetuaIlua1i+ivleahhuaetuS8muiHquWumuS5ieWkp+WGmeeahCBgQVNTRVJUKC4uLilg44CC5a6D5LiN5pivIEMrKyDmoIflh4blupPnmoQgYGFzc2VydGDvvJvlhbfkvZPlj4LmlbDlvaLlvI/lkozlpLHotKXooYzkuLrlj5blhrPkuo7or6XmoYbmnrboh6rlt7HnmoTlrprkuYnvvIzlupTmn6XnnIvlr7nlupTlpLTmlofku7bmiJbmoYbmnrbmlofmoaPjgIIKCuWPguiAg++8mltgYXNzZXJ0YF0oaHR0cHM6Ly9lbi5jcHByZWZlcmVuY2UuY29tL3cvY3BwL2Vycm9yL2Fzc2VydCnjgIFbYHN0YXRpY19hc3NlcnRgXShodHRwczovL2VuLmNwcHJlZmVyZW5jZS5jb20vdy9jcHAvbGFuZ3VhZ2Uvc3RhdGljX2Fzc2VydCnjgII='
           if heading not in text:
               if marker not in text:
                   raise SystemExit('target marker not found')
-
-              section = r'''### 18、断言
-
-断言（assertion）用于检查程序运行时某个**本应成立的条件**。如果条件成立，程序继续执行；如果条件不成立，说明程序内部状态与预期不一致，断言会报告失败并终止程序。
-
-C++ 标准库提供了 `assert` 宏，定义在 `<cassert>` 中：
-
-```cpp
-#include <cassert>
-
-int main()
-{
-    int value = 99;
-
-    assert(value == 99);  // 条件为 true，程序继续执行
-    return 0;
-}
-```
-
-`assert` 的基本形式为：
-
-```cpp
-assert(expression);
-```
-
-当 `expression` 的结果为 `true` 时，没有可观察到的效果；当结果为 `false` 时，会输出断言失败相关的诊断信息，并调用 `std::abort()` 终止程序。
-
-例如：
-
-```cpp
-#include <cassert>
-
-int main()
-{
-    int value = 99;
-
-    assert(value == 100);  // 断言失败，程序终止
-}
-```
-
-> [!IMPORTANT]
->
-> `assert` 主要用于检查程序员认为“逻辑上必须成立”的内部条件，例如算法不变量、函数执行后的状态等。它不适合用来处理用户输入错误、文件不存在、网络失败等正常的运行时错误；这些情况通常应使用普通的条件判断、错误码或异常处理。
-
-#### 18.1 `NDEBUG` 与关闭断言
-
-如果在包含 `<cassert>` 之前定义了宏 `NDEBUG`，标准 `assert` 会被禁用：
-
-```cpp
-#define NDEBUG
-#include <cassert>
-
-int main()
-{
-    int value = 99;
-    assert(value == 100);  // NDEBUG 已定义，该断言不会进行运行时检查
-}
-```
-
-因此，**不要在 `assert` 的表达式中编写程序必须依赖的副作用**。例如下面的代码是不安全的：
-
-```cpp
-assert(++count == 10);
-```
-
-如果断言被关闭，`++count` 也不会执行，程序行为就会发生变化。更合理的写法是先完成必要操作，再单独断言：
-
-```cpp
-++count;
-assert(count == 10);
-```
-
-#### 18.2 编译期断言 `static_assert`
-
-除了运行时的 `assert`，C++ 还提供语言级的 `static_assert`，用于在**编译期**检查常量表达式：
-
-```cpp
-static_assert(sizeof(int) >= 4, "int should be at least 4 bytes");
-```
-
-如果条件为 `false`，程序会直接编译失败。二者可以简单区分为：
-
-| 断言 | 检查时机 | 典型用途 |
-| --- | --- | --- |
-| `assert(...)` | 运行时 | 检查运行过程中本应成立的内部状态 |
-| `static_assert(...)` | 编译期 | 检查类型、模板参数和其他常量表达式 |
-
-> [!NOTE]
->
-> 有些教学框架或测试框架会自定义大写的 `ASSERT(...)`。它不是 C++ 标准库的 `assert`；具体参数形式和失败行为取决于该框架自己的定义，应查看对应头文件或框架文档。
-
-参考：[`assert`](https://en.cppreference.com/w/cpp/error/assert)、[`static_assert`](https://en.cppreference.com/w/cpp/language/static_assert)。'''
-
+              section = base64.b64decode(section_b64).decode('utf-8')
               text = text.replace(marker, '\n\n' + section + '\n\n## 二、C++特性', 1)
               path.write_text(text, encoding='utf-8')
           PY
