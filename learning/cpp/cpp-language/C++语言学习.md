@@ -284,6 +284,165 @@ void input(std::string& op, Numbers numbers)
 
 在 C++ 中，`std::size_t` 是 `<cstddef>` 中定义的无符号整数类型，能够表示实现所支持的任意对象大小，常用于对象大小、容器长度和数组索引。许多标准库头文件也会间接声明它，但需要直接使用时应包含 `<cstddef>`。
 
+
+#### 10.2 枚举类型：`enum` 与 `enum class`
+
+枚举（enumeration）是一种独立类型，用一组有名字的常量表示有限的离散取值。每个枚举都有一个**底层整数类型（underlying type）**。
+
+C++ 中主要有两类枚举：无作用域枚举 `enum`，以及 C++11 引入的有作用域枚举 `enum class`（`enum struct` 与之等价）。
+
+##### 10.2.1 无作用域枚举 `enum`
+
+```cpp
+enum ColorEnum : unsigned char {
+    COLOR_RED = 31,
+    COLOR_GREEN,
+    COLOR_YELLOW,
+    COLOR_BLUE,
+};
+```
+
+`: unsigned char` 显式指定了底层类型。若后续枚举项没有显式赋值，其值为前一个枚举项加 `1`，因此这里依次为 `31、32、33、34`。
+
+无作用域枚举的枚举项会进入外围作用域，可以直接写：
+
+```cpp
+ColorEnum color = COLOR_RED;
+```
+
+因此不同枚举若定义同名枚举项，容易发生名字冲突，这就是常说的“命名空间污染”。无作用域枚举值还可以隐式转换为整数类型：
+
+```cpp
+int value = COLOR_RED;  // value == 31
+```
+
+> [!NOTE]
+>
+> 枚举项不是普通的 `constexpr` 变量。更准确地说，它们是**枚举类型的命名常量**，可以用于要求常量表达式的场景。
+
+##### 10.2.2 有作用域枚举 `enum class`
+
+```cpp
+enum class Color : int {
+    Red = 31,
+    Green,
+    Yellow,
+    Blue,
+};
+```
+
+枚举项位于枚举自身的作用域中，因此使用时要写：
+
+```cpp
+Color color = Color::Red;
+```
+
+`enum class` 的主要优点是**避免名字污染**并提供更强的**类型安全**。它不会隐式转换为整数：
+
+```cpp
+Color color = Color::Green;
+
+// int value = color;               // 错误
+int value = static_cast<int>(color); // 正确
+```
+
+若 `enum class` 没有显式指定底层类型，其底层类型默认为 `int`。
+
+##### 10.2.3 枚举之间的显式转换
+
+不同枚举即使数值相同，也仍然是不同类型。需要明确进行值转换时可以使用 `static_cast`：
+
+```cpp
+Color color = Color::Green;
+ColorEnum old_color = static_cast<ColorEnum>(color);
+```
+
+对具有固定底层类型的目标枚举，`static_cast` 会按照标准规定的枚举转换规则完成转换。
+
+> [!WARNING]
+>
+> `static_cast` 不会验证转换后的数值一定对应某个已经命名的枚举项。接口仍应保证输入值处于约定范围内。
+
+参考：[`enum`](https://en.cppreference.com/w/cpp/language/enum)、[`static_cast`](https://en.cppreference.com/w/cpp/language/static_cast)。
+
+#### 10.3 联合体 `union`
+
+`union`（联合体）是一种特殊的类类型。多个非静态数据成员**共享同一块存储空间**，通常同一时刻只有一个成员处于活动状态（active member）。
+
+```cpp
+union Value {
+    int i;
+    double d;
+};
+
+Value value;
+value.i = 42;   // i 成为活动成员
+int x = value.i;
+
+value.d = 3.14; // d 成为新的活动成员
+```
+
+联合体必须拥有足够的空间容纳最大的成员，但各成员使用的是重叠存储，而不是像 `struct` 那样分别占用独立空间。
+
+##### 10.3.1 活动成员与类型双关
+
+**类型双关（type punning）**是把一种类型的对象表示当成另一种无关类型解释。传统代码有时会写：
+
+```cpp
+union TypePun {
+    int i;
+    float f;
+};
+
+TypePun pun;
+pun.i = 0x3f800000;
+float value = pun.f;
+```
+
+这里先写 `i`，再读取另一个成员 `f`。
+
+> [!WARNING]
+>
+> 在标准 C++ 中，读取非当前活动成员的 `union` 成员通常是**未定义行为（undefined behavior）**。某些编译器把它作为扩展支持，但不能据此把它视为可移植的标准 C++。标准只为少数特殊情况提供例外，例如标准布局类型的共同初始序列。
+
+C 与 C++ 对 `union` 类型双关的规则并不相同，因此不能把 C 中的写法直接当成标准 C++ 技巧。
+
+##### 10.3.2 `union` 不是通用类型转换工具
+
+例如本题中的两个枚举：
+
+```cpp
+enum ColorEnum : unsigned char { COLOR_RED = 31 };
+enum class Color : int { Red = 31 };
+
+union TypePun {
+    ColorEnum e;
+    Color c;
+};
+```
+
+如果写：
+
+```cpp
+TypePun pun;
+pun.c = Color::Red;
+return pun.e;
+```
+
+此时 `c` 是活动成员，而 `e` 不是，因此读取 `pun.e` 在标准 C++ 中通常属于未定义行为。
+
+此外，`ColorEnum` 的底层类型是 `unsigned char`，而 `Color` 的底层类型是 `int`。它们的大小和对象表示通常不同；即使某个平台或编译器扩展下“碰巧能工作”，结果也可能依赖字节序、整数表示和编译器实现。
+
+真正想进行**枚举值转换**时应写：
+
+```cpp
+return static_cast<ColorEnum>(c);
+```
+
+如果真正需要按位复制对象表示，C++20 提供 `std::bit_cast`（`<bit>`），但它要求 `sizeof(To) == sizeof(From)`，且两种类型都必须是 trivially copyable。因此本例中底层类型大小不同的两个枚举不能用 `std::bit_cast` 互转。
+
+参考：[`union`](https://en.cppreference.com/w/cpp/language/union)、[`std::bit_cast`](https://en.cppreference.com/w/cpp/numeric/bit_cast)。
+
 ------
 
 ### 11、内存管理（动态分配）
@@ -3968,6 +4127,52 @@ if (auto* derived = dynamic_cast<Derived*>(base)) {
 `reinterpret_cast` 只允许标准列出的低层转换，例如某些指针类型之间，或指针与足够大的整数类型之间的转换。它并非“任意类型都能转换”，也不能移除 `const`。
 
 即使转换能够编译，转换后若违反对象生命周期、对齐或类型访问规则，读取对象仍可能产生未定义行为。除底层系统接口等明确场景外，应避免使用 `reinterpret_cast`。
+
+
+#### 12.1 枚举转换与类型双关
+
+枚举之间如果只是希望转换**数值语义**，应优先使用 `static_cast`，而不是通过内存表示“猜”出另一个类型的值：
+
+```cpp
+ColorEnum convert(Color color)
+{
+    return static_cast<ColorEnum>(color);
+}
+```
+
+`Color` 与 `ColorEnum` 是不同的枚举类型，但 `static_cast` 可以显式完成枚举到枚举的转换。
+
+本题中这种 `union` 类型双关不要用于实际 C++ 代码：
+
+```cpp
+union TypePun {
+    ColorEnum e;
+    Color c;
+};
+
+TypePun pun;
+pun.c = Color::Red;
+return pun.e;  // 标准 C++：读取非活动 union 成员，通常是未定义行为
+```
+
+这类教学代码真正需要理解的是：
+
+- `union` 成员共享存储；
+- 写入某个成员后，它会成为活动成员；
+- C 与 C++ 对 `union` 类型双关的规则不同；
+- “内存里碰巧是这些字节”不等于“标准保证可以把它当成另一个类型读取”。
+
+`reinterpret_cast` 也不是通用修复方案。它只允许标准规定的一组底层转换，并不会绕过对象生命周期、别名和类型访问规则。
+
+如果目的是“枚举值 A → 枚举值 B”，优先使用：
+
+```cpp
+static_cast<TargetEnum>(source);
+```
+
+如果目的是按位复制同样大小的两个 trivially copyable 类型，C++20 可以考虑 `std::bit_cast`；但它要求源类型和目标类型大小相同。
+
+参考：[`static_cast`](https://en.cppreference.com/w/cpp/language/static_cast)、[`union`](https://en.cppreference.com/w/cpp/language/union)、[`std::bit_cast`](https://en.cppreference.com/w/cpp/numeric/bit_cast)。
 
 ### 13、对象切片（object slicing）
 
