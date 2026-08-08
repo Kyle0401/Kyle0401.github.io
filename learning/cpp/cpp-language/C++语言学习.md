@@ -144,13 +144,212 @@ void calculate(const std::string& op, const double& x, const double& y) {
 }
 ```
 
-非静态成员函数参数列表之后的 `const` 表示在该函数中把 `*this` 视为 const，因此不能修改普通数据成员，也只能调用其他 const 成员函数。它仍然可以修改 `mutable` 成员或外部状态，所以不能简单理解为“函数不会进行任何修改”：
+#### 5.1 `static` 关键字
+
+`static` 在不同上下文中的作用并不相同。下面这个例子中两个 `static` 分别控制函数的链接属性和局部变量的存储期：
 
 ```cpp
-double operator[](std::size_t index) const {
-    return data[index];
+static int func(int param) {
+    static int static_ = param;
+    return static_++;
 }
 ```
+
+##### 5.1.1 修饰命名空间作用域函数：内部链接
+
+函数定义前的 `static`：
+
+```cpp
+static int func(int param)
+```
+
+表示该函数具有 **internal linkage（内部链接）**。也就是说，这个名字只在当前翻译单元中可见，其他 `.cpp` 文件不能通过普通的外部声明链接到这个函数。
+
+> [!NOTE]
+> 这里的 `static` 不会让函数“保存上一次调用的状态”。它影响的是函数名的链接属性。现代 C++ 中，如果只是想让命名空间作用域的实体只在当前翻译单元内部使用，也常使用匿名命名空间。
+
+##### 5.1.2 修饰局部变量：静态存储期
+
+函数内部的局部 `static` 变量：
+
+```cpp
+static int static_ = param;
+```
+
+仍然具有**局部作用域**，只能在所在代码块中访问；但它具有 **static storage duration（静态存储期）**，对象的存储会持续到程序结束。
+
+对于这里依赖运行期参数 `param` 的初始化表达式，初始化会在程序第一次执行到这条声明时发生，并且只发生一次。因此第一次调用 `func(5)` 时 `static_` 被初始化为 `5`；之后再调用 `func(4)`、`func(3)` 时，不会重新用新的 `param` 初始化它。
+
+又因为：
+
+```cpp
+return static_++;
+```
+
+`static_++` 是后置自增：先产生自增前的值作为表达式结果，再把 `static_` 加 `1`。
+
+> [!IMPORTANT]
+> 局部 `static` 的关键点是：**作用域仍然是局部的，但存储期是静态的，并且动态初始化只执行一次。** 从 C++11 起，局部静态变量的初始化本身保证只执行一次；但初始化完成后，如果多个线程同时修改这个变量，仍然需要程序自己进行同步。
+
+参考：[cppreference：Storage duration and linkage](https://en.cppreference.com/w/cpp/language/storage_duration.html)
+
+#### 5.2 成员函数尾部的 `const`
+
+对于**非静态成员函数**，参数列表后面的 `const` 是成员函数的 cv 限定符之一：
+
+```cpp
+struct Fibonacci {
+    int numbers[11];
+
+    int get(int i) const {
+        return numbers[i];
+    }
+};
+```
+
+这里最后的 `const`：
+
+```cpp
+int get(int i) const
+               ^^^^^
+```
+
+**不是修饰返回类型 `int`，也不是修饰参数 `i`**，而是限定这个成员函数所操作的当前对象。
+
+成员函数在调用时会隐式接收当前对象。可以把普通成员函数近似理解为存在一个隐式的 `this` 指针：
+
+```cpp
+Fibonacci* this;
+```
+
+而在 `const` 成员函数中，可以近似理解为：
+
+```cpp
+const Fibonacci* this;
+```
+
+更准确地说，`this` 指向 const 的当前对象，因此函数不能通过 `this` 修改普通数据成员，也不能调用当前类的非 `const` 成员函数：
+
+```cpp
+struct Fibonacci {
+    int numbers[11];
+
+    int get(int i) const {
+        // numbers[i] = 100;  // 错误：不能修改普通成员
+        return numbers[i];    // 正确：只读取
+    }
+
+    void reset() {
+        numbers[0] = 0;
+    }
+
+    void test() const {
+        // reset();           // 错误：const 成员函数不能调用非 const 成员函数
+    }
+};
+```
+
+##### 5.2.1 为什么 `const` 对象只能调用 `const` 成员函数
+
+例如：
+
+```cpp
+constexpr Fibonacci FIB{{0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55}};
+```
+
+`constexpr` 对象本身也是 const 对象。因此下面的成员函数如果没有尾部 `const`：
+
+```cpp
+int get(int i) {
+    return numbers[i];
+}
+```
+
+就不能通过 `FIB` 调用，编译器常会报告类似：
+
+```text
+passing 'const Fibonacci' as 'this' argument discards qualifiers
+```
+
+意思是：调用这个非 `const` 成员函数需要把 const 当前对象当成可修改对象使用，相当于丢弃了 `const` 限定。
+
+正确写法是：
+
+```cpp
+int get(int i) const {
+    return numbers[i];
+}
+```
+
+于是：
+
+```cpp
+FIB.get(10);  // 正确
+```
+
+普通的非 const 对象既可以调用非 const 成员函数，也可以调用 const 成员函数；const 对象则只能调用 const 成员函数：
+
+| 当前对象 | 非 `const` 成员函数 | `const` 成员函数 |
+| --- | --- | --- |
+| 普通对象 | 可以 | 可以 |
+| `const` / `constexpr` 对象 | 不可以 | 可以 |
+
+##### 5.2.2 `const` 成员函数仍可能修改 `mutable` 成员
+
+尾部 `const` 的准确含义不是“这个函数绝对不会产生任何修改”，而是它不能通过当前对象修改普通非静态数据成员。
+
+被声明为 `mutable` 的成员是例外：
+
+```cpp
+struct Cache {
+    mutable int access_count = 0;
+
+    int read() const {
+        ++access_count;  // 允许
+        return access_count;
+    }
+};
+```
+
+此外，函数仍然可能修改全局变量、通过指针或引用修改其他对象，或者执行 I/O。因此不要把尾部 `const` 简单理解为“纯函数”。
+
+##### 5.2.3 const 与非 const 成员函数可以构成重载
+
+常见写法是同时提供两个版本：
+
+```cpp
+struct Buffer {
+    int data[10];
+
+    int& operator[](std::size_t i) {
+        return data[i];
+    }
+
+    const int& operator[](std::size_t i) const {
+        return data[i];
+    }
+};
+```
+
+这样普通对象调用非 const 版本，可以得到可修改引用；const 对象调用 const 版本，只能得到只读引用。
+
+##### 5.2.4 函数中不同位置的 `const`
+
+需要区分 `const` 出现在函数声明中的不同位置：
+
+```cpp
+const int f(const int& x) const;
+^^^^^       ^^^^^         ^^^^^
+返回类型     参数           成员函数尾部
+```
+
+它们分别限定不同的对象。尤其要记住：
+
+> **只有非静态成员函数参数列表后面的 `const`，才是在限定当前对象 `*this`。**
+
+静态成员函数没有 `this` 指针，因此不能写成员函数尾部的 cv 限定符。
+
+参考：[cppreference：Non-static member functions](https://en.cppreference.com/w/cpp/language/member_functions.html)
 
 ### 6、引用
 
