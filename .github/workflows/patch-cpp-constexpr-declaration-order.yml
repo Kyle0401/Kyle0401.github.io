@@ -1,87 +1,18 @@
-name: Patch C++ constexpr declaration order
-
-on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/patch-cpp-constexpr-declaration-order.yml'
-
+name: Patch constexpr note
+on: [push]
 permissions:
   contents: write
-
 jobs:
-  patch-notes:
+  patch:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Patch constexpr notes
+      - name: Apply patch
         run: |
-          python3 - <<'PY'
-          from pathlib import Path
-
-          path = Path('learning/cpp/cpp-language/C++语言学习.md')
-          text = path.read_text(encoding='utf-8')
-
-          old = '''`constexpr` 变量必须初始化：
-
-```cpp
-constexpr int x = 10;  // 正确
-// constexpr int y;    // 错误：constexpr 变量必须初始化
-```
-
-##### 19.1.1 `const` 与 `constexpr` 的区别
-'''
-
-          new = '''`constexpr` 变量必须初始化：
-
-```cpp
-constexpr int x = 10;  // 正确
-// constexpr int y;    // 错误：constexpr 变量必须初始化
-```
-
-##### 19.1.1 `constexpr` 在声明中的书写位置
-
-在变量声明中，`constexpr` 属于**声明说明符（declaration specifier）**，而 `Fibonacci` 这样的类型名属于类型说明符；它们共同组成声明中的说明符序列。因此在这种简单声明里，下面两种写法是等价的：
-
-```cpp
-constexpr Fibonacci FIB{{0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55}};
-Fibonacci constexpr FIB{{0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55}};
-```
-
-也就是说：
-
-```cpp
-Fibonacci constexpr FIB;
-```
-
-并不是把 `constexpr` “修饰在 `Fibonacci` 后面”产生了不同语义；它仍然是在声明变量 `FIB` 为 `constexpr` 对象。
-
-这和下面两种 `const` 写法类似：
-
-```cpp
-const int a = 10;
-int const b = 10;
-```
-
-二者都表示顶层 `const` 的 `int` 对象。
-
-> [!NOTE]
->
-> 虽然 `Fibonacci constexpr FIB` 合法，但实际 C++ 代码中更常见、也更符合大多数代码风格的是把 `constexpr` 写在类型前：`constexpr Fibonacci FIB`。阅读代码时不要把关键字的位置机械地理解成“只修饰它左边或右边紧挨着的词”，而应结合整个声明语法判断。
-
-##### 19.1.2 `const` 与 `constexpr` 的区别
-'''
-
-          if old not in text:
-              raise SystemExit('target text not found; refusing to modify file')
-
-          text = text.replace(old, new, 1)
-          path.write_text(text, encoding='utf-8')
-          PY
-
+          echo 'CmZyb20gcGF0aGxpYiBpbXBvcnQgUGF0aAoKcGF0aCA9IFBhdGgoImxlYXJuaW5nL2NwcC9jcHAtbGFuZ3VhZ2UvQysr6K+t6KiA5a2m5LmgLm1kIikKdGV4dCA9IHBhdGgucmVhZF90ZXh0KGVuY29kaW5nPSJ1dGYtOCIpCgpvbGQgPSAiIiJgY29uc3RleHByYCDlj5jph4/lv4XpobvliJ3lp4vljJbvvJoKCmBgYGNwcApjb25zdGV4cHIgaW50IHggPSAxMDsgIC8vIOato+ehrgovLyBjb25zdGV4cHIgaW50IHk7ICAgIC8vIOmUmeivr++8mmNvbnN0ZXhwciDlj5jph4/lv4XpobvliJ3lp4vljJYKYGBgCgojIyMjIyAxOS4xLjEgYGNvbnN0YCDkuI4gYGNvbnN0ZXhwcmAg55qE5Yy65YirCiIiIgoKbmV3ID0gIiIiYGNvbnN0ZXhwcmAg5Y+Y6YeP5b+F6aG75Yid5aeL5YyW77yaCgpgYGBjcHAKY29uc3RleHByIGludCB4ID0gMTA7ICAvLyDmraPnoa4KLy8gY29uc3RleHByIGludCB5OyAgICAvLyDplJnor6/vvJpjb25zdGV4cHIg5Y+Y6YeP5b+F6aG75Yid5aeL5YyWCmBgYAoKIyMjIyMgMTkuMS4xIGBjb25zdGV4cHJgIOWcqOWjsOaYjuS4reeahOS5puWGmeS9jee9rgoK5Zyo5Y+Y6YeP5aOw5piO5Lit77yMYGNvbnN0ZXhwcmAg5bGe5LqOKirlo7DmmI7or7TmmI7nrKbvvIhkZWNsYXJhdGlvbiBzcGVjaWZpZXLvvIkqKu+8jOiAjCBgRmlib25hY2NpYCDov5nmoLfnmoTnsbvlnovlkI3lsZ7kuo7nsbvlnovor7TmmI7nrKbvvJvlroPku6zlhbHlkIznu4TmiJDlo7DmmI7kuK3nmoTor7TmmI7nrKbluo/liJfjgILlm6DmraTlnKjov5nnp43nroDljZXlo7DmmI7ph4zvvIzkuIvpnaLkuKTnp43lhpnms5XmmK/nrYnku7fnmoTvvJoKCmBgYGNwcApjb25zdGV4cHIgRmlib25hY2NpIEZJQnt7MCwgMSwgMSwgMiwgMywgNSwgOCwgMTMsIDIxLCAzNCwgNTV9fTsKRmlib25hY2NpIGNvbnN0ZXhwciBGSUJ7ezAsIDEsIDEsIDIsIDMsIDUsIDgsIDEzLCAyMSwgMzQsIDU1fX07CmBgYAoK5Lmf5bCx5piv6K+077yaCgpgYGBjcHAKRmlib25hY2NpIGNvbnN0ZXhwciBGSUI7CmBgYAoK5bm25LiN5piv5oqKIGBjb25zdGV4cHJgIOKAnOS/rumlsOWcqCBgRmlib25hY2NpYCDlkI7pnaLigJ3kuqfnlJ/kuobkuI3lkIzor63kuYnvvJvlroPku43nhLbmmK/lnKjlo7DmmI7lj5jph48gYEZJQmAg5Li6IGBjb25zdGV4cHJgIOWvueixoeOAggoK6L+Z5ZKM5LiL6Z2i5Lik56eNIGBjb25zdGAg5YaZ5rOV57G75Ly877yaCgpgYGBjcHAKY29uc3QgaW50IGEgPSAxMDsKaW50IGNvbnN0IGIgPSAxMDsKYGBgCgrkuozogIXpg73ooajnpLrpobblsYIgYGNvbnN0YCDnmoQgYGludGAg5a+56LGh44CCCgo+IFshTk9URV0KPgo+IOiZveeEtiBgRmlib25hY2NpIGNvbnN0ZXhwciBGSUJgIOWQiOazle+8jOS9huWunumZhSBDKysg5Luj56CB5Lit5pu05bi46KeB44CB5Lmf5pu056ym5ZCI5aSn5aSa5pWw5Luj56CB6aOO5qC855qE5piv5oqKIGBjb25zdGV4cHJgIOWGmeWcqOexu+Wei+WJje+8mmBjb25zdGV4cHIgRmlib25hY2NpIEZJQmDjgILpmIXor7vku6PnoIHml7bkuI3opoHmiorlhbPplK7lrZfnmoTkvY3nva7mnLrmorDlnLDnkIbop6PmiJDigJzlj6rkv67ppbDlroPlt6bovrnmiJblj7PovrnntKfmjKjnnYDnmoTor43igJ3vvIzogIzlupTnu5PlkIjmlbTkuKrlo7DmmI7or63ms5XliKTmlq3jgIIKCiMjIyMjIDE5LjEuMiBgY29uc3RgIOS4jiBgY29uc3RleHByYCDnmoTljLrliKsKIiIiCgppZiBvbGQgbm90IGluIHRleHQ6CiAgICByYWlzZSBTeXN0ZW1FeGl0KCJ0YXJnZXQgdGV4dCBub3QgZm91bmQ7IHJlZnVzaW5nIHRvIG1vZGlmeSBmaWxlIikKCnBhdGgud3JpdGVfdGV4dCh0ZXh0LnJlcGxhY2Uob2xkLCBuZXcsIDEpLCBlbmNvZGluZz0idXRmLTgiKQo=' | base64 -d > /tmp/patch.py
+          python3 /tmp/patch.py
           rm .github/workflows/patch-cpp-constexpr-declaration-order.yml
-
-      - name: Commit patch
+      - name: Commit
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
