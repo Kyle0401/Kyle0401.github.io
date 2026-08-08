@@ -110,5 +110,53 @@
     <script src="../../ai-infra/01-ai-infra-foundations/vendor/markdown-it/markdown-it.min.js"></script>
     <script src="../../ai-infra/01-ai-infra-foundations/vendor/highlight.js/highlight.min.js"></script>
     <script src="./cpp-language-page.js?v=20260808a"></script>
+    <script>
+        (function () {
+            var root = document.getElementById('article-content');
+            if (!root || !window.MutationObserver || !window.NodeFilter) return;
+
+            function repairTextNode(node) {
+                var parent = node.parentElement;
+                if (!parent || parent.closest('pre, code, kbd, samp, script, style')) return;
+
+                var text = node.nodeValue || '';
+                var pattern = /\*\*([^*\n]+?)\*\*/g;
+                if (!pattern.test(text)) return;
+                pattern.lastIndex = 0;
+
+                var fragment = document.createDocumentFragment();
+                var lastIndex = 0;
+                var match;
+
+                while ((match = pattern.exec(text)) !== null) {
+                    if (match.index > lastIndex) {
+                        fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+                    }
+
+                    var strong = document.createElement('strong');
+                    strong.textContent = match[1].trim();
+                    fragment.appendChild(strong);
+                    lastIndex = pattern.lastIndex;
+                }
+
+                if (lastIndex < text.length) {
+                    fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+                }
+
+                node.parentNode.replaceChild(fragment, node);
+            }
+
+            function repairLiteralBoldMarkers() {
+                var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+                var nodes = [];
+                while (walker.nextNode()) nodes.push(walker.currentNode);
+                nodes.forEach(repairTextNode);
+            }
+
+            var observer = new MutationObserver(repairLiteralBoldMarkers);
+            observer.observe(root, { childList: true, subtree: true });
+            repairLiteralBoldMarkers();
+        })();
+    </script>
 </body>
 </html>
