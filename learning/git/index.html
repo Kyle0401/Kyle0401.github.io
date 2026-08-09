@@ -3,49 +3,108 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Kyle 的 Git 学习记录：基础概念、常用命令、分支管理与协作工作流">
-    <title>Git学习 · 学习记录 · Kyle</title>
+    <meta name="description" content="Kyle 的 Git 基础学习笔记：仓库初始化、暂存、提交、历史、分支与 stash">
+    <title>Git 使用学习 · 学习记录 · Kyle</title>
+    <script>
+        (function () {
+            var theme = 'light';
+            try {
+                var saved = window.localStorage.getItem('git-note-theme');
+                theme = saved === 'dark' || saved === 'light'
+                    ? saved
+                    : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            } catch (error) {
+                theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            }
+            document.documentElement.setAttribute('data-theme', theme);
+            document.documentElement.style.colorScheme = theme;
+        })();
+    </script>
     <link rel="icon" type="image/svg+xml" href="../../static/img/logo-jy.svg">
-    <link rel="stylesheet" href="../../static/css/learning.css">
+    <link rel="stylesheet" href="../../static/css/java-note.css">
+    <link rel="stylesheet" href="../docker/docker-page.css?v=20260718a">
+    <link rel="stylesheet" href="../ai-infra/01-ai-infra-foundations/vendor/highlight.js/github-dark.min.css">
+    <link rel="stylesheet" href="./git-page.css?v=20260810a">
 </head>
 <body>
-    <div class="learning-shell">
-        <header class="topbar">
-            <a class="brand" href="../../" aria-label="返回 Kyle 主页">
-                <span class="brand-mark">K</span>
-                <span>Kyle · Learning Records</span>
-            </a>
-            <a class="back-link" href="../">← 返回学习记录</a>
-        </header>
+    <a class="skip-link" href="#article-content">跳到正文</a>
 
-        <section class="hero">
-            <p class="eyebrow">Git Learning</p>
-            <h1>Git学习</h1>
-            <p>记录 Git 基础概念、常用命令、分支管理、远程仓库与协作工作流。</p>
-            <div class="hero-meta">
-                <span class="pill">工程工具</span>
-                <span class="pill">持续完善</span>
+    <header class="note-topbar">
+        <a class="note-brand" href="../../" aria-label="返回 Kyle 主页">
+            <span class="note-brand-mark">K</span>
+            <span>Kyle · Learning Records</span>
+        </a>
+        <div class="topbar-actions">
+            <button class="mobile-nav-toggle" id="mobile-nav-toggle" type="button" aria-expanded="false" aria-controls="docs-sidebar">
+                <span aria-hidden="true">☰</span><span>目录</span>
+            </button>
+            <button class="theme-toggle" id="theme-toggle" type="button" aria-label="切换到夜览模式" aria-pressed="false">
+                <svg class="theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.2 15.3A8.5 8.5 0 0 1 8.7 3.8 8.5 8.5 0 1 0 20.2 15.3Z"></path></svg>
+                <svg class="theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.5"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
+                <span class="theme-label theme-label-night">夜览</span>
+                <span class="theme-label theme-label-day">日间</span>
+            </button>
+            <a class="source-link" href="./Git使用学习.md">Markdown</a>
+            <a class="note-back" href="../">← 返回学习记录</a>
+        </div>
+    </header>
+
+    <div class="docs-layout" id="docs-layout">
+        <aside class="docs-sidebar" id="docs-sidebar" aria-label="Git 使用学习章节目录">
+            <div class="docs-sidebar-heading">
+                <span class="docs-sidebar-kicker">GIT · WORKFLOW NOTES</span>
+                <strong id="docs-title">Git 使用学习</strong>
+                <span class="docs-sidebar-release" id="chapter-count">按章节分页</span>
             </div>
-        </section>
+            <nav class="page-nav" id="page-nav" aria-label="章节导航">
+                <p class="nav-loading">正在加载目录…</p>
+            </nav>
+        </aside>
 
-        <section class="section">
-            <div class="section-heading">
-                <div>
-                    <h2>学习内容</h2>
-                    <p>Git 学习笔记正在持续整理中。</p>
+        <main class="note-main" id="main-content">
+            <nav class="breadcrumb" aria-label="面包屑导航">
+                <a href="../../">主页</a><span>/</span>
+                <a href="../">学习记录</a><span>/</span>
+                <span>Git 使用学习</span>
+            </nav>
+
+            <article class="article">
+                <div id="article-content" tabindex="-1" aria-live="polite">
+                    <p class="nav-loading">正在加载笔记…</p>
                 </div>
-            </div>
 
-            <div class="record-grid">
-                <div class="record-card empty">
-                    <span class="status">持续补充</span>
-                    <h2>Git 学习笔记</h2>
-                    <p>后续将补充仓库、提交、分支、合并、远程协作等内容。</p>
-                </div>
-            </div>
-        </section>
+                <nav class="page-pagination" id="page-pagination" aria-label="上一章和下一章"></nav>
 
-        <footer class="page-footer">Kyle Learning Records · 学习不止于记录</footer>
+                <footer class="article-footer">
+                    <span>学习记录 · Git 基础笔记</span>
+                    <a href="../">返回学习记录 →</a>
+                </footer>
+            </article>
+        </main>
+
+        <aside class="page-outline" id="page-outline" aria-label="当前章内容目录">
+            <p class="page-outline-title">本章内容</p>
+            <nav id="outline-links"><p class="outline-empty">正在加载…</p></nav>
+        </aside>
     </div>
+
+    <button class="docs-overlay" id="docs-overlay" type="button" aria-label="关闭目录"></button>
+
+    <button class="reading-progress" id="reading-progress" type="button" aria-label="返回页面顶部" title="返回顶部">
+        <svg viewBox="0 0 52 52" aria-hidden="true">
+            <circle class="reading-progress-track" cx="26" cy="26" r="21"></circle>
+            <circle class="reading-progress-value" id="reading-progress-value" cx="26" cy="26" r="21"></circle>
+        </svg>
+        <span class="reading-progress-label" id="reading-progress-label">0%</span>
+        <span class="reading-progress-arrow" aria-hidden="true">↑</span>
+    </button>
+
+    <noscript>
+        <p class="noscript-message">此页面需要 JavaScript 渲染。你也可以直接查看 <a href="./Git使用学习.md">Markdown 原文</a>。</p>
+    </noscript>
+
+    <script src="../ai-infra/01-ai-infra-foundations/vendor/markdown-it/markdown-it.min.js"></script>
+    <script src="../ai-infra/01-ai-infra-foundations/vendor/highlight.js/highlight.min.js"></script>
+    <script src="./git-page.js?v=20260810a"></script>
 </body>
 </html>
