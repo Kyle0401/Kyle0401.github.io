@@ -439,7 +439,7 @@ if (std::getline(std::cin, line)) {
 #### 9.2 字符串流 `std::stringstream`
 
 ```cpp
-#include <sstream>
+#include <stringstream>
 ```
 
 ```cpp
