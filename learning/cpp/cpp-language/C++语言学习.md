@@ -490,7 +490,7 @@ void input(std::string& op, Numbers numbers)
 
 C++ 中主要有两类枚举：无作用域枚举 `enum`，以及 C++11 引入的有作用域枚举 `enum class`（`enum struct` 与之等价）。
 
-当枚举项没有显式指定值时，自动取值规则对 `enum` 和 `enum class` 都一样：**第一个未显式赋值的枚举项值为 `0`；后续未显式赋值的枚举项值为前一个枚举项的值加 `1`**。
+枚举项的自动取值规则对 `enum` 和 `enum class` 都一样：**如果第一个枚举项没有显式指定值，则其值为 `0`；此后任何没有显式指定值的枚举项，其值为前一个枚举项的值加 `1`**。
 
 例如：
 
@@ -2612,7 +2612,7 @@ catch (...)
 
 表示捕获任何类型的异常。
 
-一般把它放在最后：
+`catch (...)` 如果存在，必须是对应 `try` 的最后一个处理器：
 
 ```cpp
 try {
@@ -2629,7 +2629,7 @@ catch (...) {
 }
 ```
 
-因为它什么都能捕获，如果放在前面，后面的处理器就失去意义。
+这是语言规则要求，不只是代码风格：因为 `catch (...)` 能匹配任意异常，标准要求它必须位于该处理器序列的最后。
 
 不过 `catch (...)` 不能直接取得异常对象，因此不能写：
 
@@ -3233,13 +3233,7 @@ constexpr Fibonacci FIB{{0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55}};
 Fibonacci constexpr FIB{{0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55}};
 ```
 
-也就是说：
-
-```cpp
-Fibonacci constexpr FIB;
-```
-
-并不是把 `constexpr` “修饰在 `Fibonacci` 后面”产生了不同语义；它仍然是在声明变量 `FIB` 为 `constexpr` 对象。
+这里两种写法之所以等价，是因为 `constexpr` 和类型说明符都属于声明说明符序列的一部分。需要注意：**不能为了只演示关键字位置而省略初始化器**，因为 `constexpr` 变量必须初始化。
 
 这和下面两种 `const` 写法类似：
 
@@ -3252,7 +3246,7 @@ int const b = 10;
 
 > [!NOTE]
 >
-> 虽然 `Fibonacci constexpr FIB` 合法，但实际 C++ 代码中更常见、也更符合大多数代码风格的是把 `constexpr` 写在类型前：`constexpr Fibonacci FIB`。阅读代码时不要把关键字的位置机械地理解成“只修饰它左边或右边紧挨着的词”，而应结合整个声明语法判断。
+> 虽然把 `constexpr` 写在类型名后面是合法的，例如 `Fibonacci constexpr FIB{{0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55}};`，但实际 C++ 代码中更常见、也更符合大多数代码风格的是把 `constexpr` 写在类型前。阅读代码时不要把关键字的位置机械地理解成“只修饰它左边或右边紧挨着的词”，而应结合整个声明语法判断。
 
 ##### 19.1.2 `const` 与 `constexpr` 的区别
 
@@ -4937,13 +4931,20 @@ animals.push_back(std::make_unique<Dog>("旺财", 3));
 
 #### 13.3 抽象基类不能按值存储
 
-**错误示例：**若 `Object` 含纯虚函数，下面不是“发生切片”，而是直接非法：
+抽象类不能直接实例化，因此不能真正构造 `Object` 类型的元素。需要注意，下面这行本身只是默认构造一个空的 `std::vector`，并没有构造任何 `Object` 对象：
 
 ```cpp
-// std::vector<Object> objects; // 错误：Object 是抽象类
+std::vector<Object> objects; // 空容器声明本身并不是“实例化 Object”
 ```
 
-**修正版：**多态容器保存智能指针：
+真正的问题出现在需要构造元素时：
+
+```cpp
+// Object object;          // 错误：Object 是抽象类，不能实例化
+// objects.emplace_back(); // 错误：尝试构造 Object 元素
+```
+
+在多态场景下，应保存基类智能指针，而不是按值保存抽象基类对象：
 
 ```cpp
 std::vector<std::unique_ptr<Object>> objects;
