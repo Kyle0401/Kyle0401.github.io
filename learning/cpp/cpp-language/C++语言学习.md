@@ -4314,11 +4314,151 @@ A::~A() → A::num_a: 1 → 0
 
 更完整地说，一个最派生对象构造时，会先构造基类子对象，再构造非静态数据成员，最后执行当前类构造函数体；析构则总体按照相反方向进行。存在多继承、虚继承时还有更具体的顺序规则，但“基类必须先准备好，派生类才能完成构造”仍然是理解这套机制的核心。
 
-> [!NOTE]
->
-> 如果通过 `A*` 删除一个实际类型为 `B` 的对象，例如 `A* p = new B; delete p;`，那么为了保证完整执行派生类析构过程，基类 `A` 的析构函数必须是虚析构函数。这个问题与“构造/析构顺序”相关，但属于多态删除的额外要求。
-
 参考：[cppreference：派生类](https://zh.cppreference.com/w/cpp/language/derived_class)、[cppreference：析构函数](https://zh.cppreference.com/w/cpp/language/destructor)。
+
+##### 9.1.2 通过基类指针删除派生类对象：虚析构函数
+
+如果一个派生类对象可能通过基类指针被 `delete`，那么基类析构函数必须是虚析构函数。
+
+例如：
+
+```cpp
+struct A {
+    virtual ~A() = default;
+};
+
+struct B : A {
+    ~B() override = default;
+};
+
+A* p = new B;
+delete p;
+```
+
+这里 `p` 的静态类型是 `A*`，但它实际指向的对象动态类型是 `B`。因为 `A::~A()` 是虚析构函数，所以 `delete p` 能够正确启动完整的多态析构过程：
+
+```text
+p 的静态类型：A*
+p 指向对象的动态类型：B
+        ↓
+delete p
+        ↓
+B::~B()
+        ↓
+A::~A()
+        ↓
+完整 B 对象被销毁
+```
+
+这与普通虚函数的动态分派思想相似：通过基类接口操作实际的派生类对象时，需要让析构过程能够到达真正的最派生类型。
+
+如果基类析构函数不是虚函数：
+
+```cpp
+struct A {
+    ~A() = default;  // 非虚析构函数
+};
+
+struct B : A {
+    ~B() = default;
+};
+
+A* p = new B;
+delete p;  // 未定义行为
+```
+
+通过 `A*` 删除实际的 `B` 对象会产生**未定义行为（undefined behavior）**。不能把它简单理解成“一定只调用 `A::~A()`”；既然已经进入未定义行为，程序的实际表现就不能依赖。
+
+在带有静态计数器的例子中：
+
+```cpp
+struct A {
+    inline static int num_a = 0;
+
+    A() {
+        ++num_a;
+    }
+
+    virtual ~A() {
+        --num_a;
+    }
+};
+
+struct B final : A {
+    inline static int num_b = 0;
+
+    B() {
+        ++num_b;
+    }
+
+    ~B() override {
+        --num_b;
+    }
+};
+```
+
+执行：
+
+```cpp
+A* ab = new B;
+```
+
+构造完成后：
+
+```cpp
+A::num_a == 1;
+B::num_b == 1;
+```
+
+随后：
+
+```cpp
+delete ab;
+```
+
+因为 `A::~A()` 是虚函数，所以析构顺序为：
+
+```text
+B::~B() → B::num_b: 1 → 0
+A::~A() → A::num_a: 1 → 0
+```
+
+最终：
+
+```cpp
+A::num_a == 0;
+B::num_b == 0;
+```
+
+还要注意：**类中存在其他虚函数，并不会自动让析构函数变成虚函数。**例如：
+
+```cpp
+struct A {
+    virtual char name() const {
+        return 'A';
+    }
+
+    ~A() = default;  // 仍然不是虚析构函数
+};
+```
+
+即使 `name()` 是虚函数，`A::~A()` 仍然必须单独声明为 `virtual`：
+
+```cpp
+virtual ~A() = default;
+```
+
+基类析构函数一旦是虚函数，派生类析构函数也会保持虚函数性质，因此派生类中可以写：
+
+```cpp
+~B() override = default;
+```
+
+> [!IMPORTANT]
+>
+> **只要对象可能经 `Base*`（或拥有该基类指针的多态智能指针）被销毁，基类通常就应该提供虚析构函数。**
+
+参考：[cppreference：析构函数](https://zh.cppreference.com/w/cpp/language/destructor)、[cppreference：虚函数](https://zh.cppreference.com/w/cpp/language/virtual)。
 
 #### 9.2 `dynamic_cast`
 
