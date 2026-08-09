@@ -177,6 +177,83 @@
                 ''
             ].join('\n');
 
+            var staticDataMemberSection = [
+                '##### 5.1.3 类的静态数据成员：类内声明与类外定义',
+                '',
+                '类中的 `static` 数据成员不属于某一个具体对象，而是由整个类共享。即使创建了多个对象，程序中通常也只有这一份静态数据成员；它具有静态存储期，其生命周期独立于某个具体对象。',
+                '',
+                '例如：',
+                '',
+                '```cpp',
+                'struct A {',
+                '    static int num_a;',
+                '};',
+                '',
+                'int A::num_a = 0;',
+                '```',
+                '',
+                '对于普通的、非 `inline` 静态数据成员，类体中的：',
+                '',
+                '```cpp',
+                'static int num_a;',
+                '```',
+                '',
+                '只是**声明**，通常还需要在类外提供一次**定义**：',
+                '',
+                '```cpp',
+                'int A::num_a = 0;',
+                '```',
+                '',
+                '类外定义时不要再写 `static`。这里的 `A::` 表示正在定义类 `A` 作用域中的静态数据成员 `num_a`。',
+                '',
+                '因此下面这种普通非 `const`、非 `inline` 静态数据成员的写法是不正确的：',
+                '',
+                '```cpp',
+                'struct A {',
+                '    static int num_a = 0;  // 错误',
+                '};',
+                '```',
+                '',
+                '编译器可能报告类似：',
+                '',
+                '```text',
+                "ISO C++ forbids in-class initialization of non-const static member 'A::num_a'",
+                '```',
+                '',
+                '传统写法应改为：',
+                '',
+                '```cpp',
+                'struct A {',
+                '    static int num_a;',
+                '};',
+                '',
+                'int A::num_a = 0;',
+                '```',
+                '',
+                '从 **C++17** 起，如果把静态数据成员声明为 `inline`，就可以直接在类内完成定义和初始化，并且不再需要类外定义：',
+                '',
+                '```cpp',
+                'struct A {',
+                '    inline static int num_a = 0;',
+                '};',
+                '```',
+                '',
+                '本笔记以 C++20 为基线，因此这种 `inline static` 写法完全可用。两种写法可以这样对照：',
+                '',
+                '| 写法 | 是否需要类外定义 |',
+                '| --- | --- |',
+                '| `static int num_a;` | 是，通常再写 `int A::num_a = 0;` |',
+                '| `inline static int num_a = 0;` | 否（C++17 起） |',
+                '',
+                '> [!IMPORTANT]',
+                '> 静态数据成员不属于某个具体对象。对象的析构函数可以修改它，例如执行 `--num_a` 来维护“当前存活对象数量”，但这只是修改静态成员的值，并不会销毁 `num_a` 本身。静态数据成员自己的生命周期不会随着某个 `A` 对象的析构而结束。',
+                '',
+                '还要注意，某些 `const` / `constexpr` 静态成员存在额外的类内初始化规则；不能把这些特殊规则泛化到普通的 `static int`。C++17 起，`constexpr` 静态数据成员也隐式具有 `inline` 性质。',
+                '',
+                '参考：[cppreference：Static members](https://en.cppreference.com/w/cpp/language/static)、[cppreference：Definitions and ODR](https://en.cppreference.com/w/cpp/language/definition)。',
+                ''
+            ].join('\n');
+
             window.fetch = function () {
                 var args = arguments;
                 var input = args[0];
@@ -192,6 +269,13 @@
                     return response.text().then(function (markdown) {
                         if (markdown.indexOf('#### 5.1 `static` 关键字') === -1) {
                             markdown = markdown.replace('\n### 6、引用', '\n\n' + section + '\n### 6、引用');
+                        }
+
+                        if (markdown.indexOf('##### 5.1.3 类的静态数据成员：类内声明与类外定义') === -1) {
+                            markdown = markdown.replace(
+                                '\n#### 5.2 成员函数尾部的 `const`',
+                                '\n\n' + staticDataMemberSection + '\n#### 5.2 成员函数尾部的 `const`'
+                            );
                         }
 
                         var headers = new Headers(response.headers);
