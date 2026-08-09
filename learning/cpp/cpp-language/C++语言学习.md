@@ -4353,7 +4353,84 @@ struct C final : B {
 
 参考：[`final` 说明符](https://zh.cppreference.com/w/cpp/language/final)。
 
-通过基类指针或引用调用虚函数时，程序根据对象的动态类型选择该虚函数的最终重写函数（final overrider）。这不是运行时从基类开始逐层向下搜索成员函数。
+#### 10.2 静态类型、动态类型与成员函数调用
+
+判断继承体系中的成员函数调用时，需要先区分**静态类型（static type）**和**动态类型（dynamic type）**：
+
+- **静态类型**：表达式在编译期确定的类型。例如 `A& ref = b;` 中，表达式 `ref` 的静态类型是 `A`（更完整地说，变量 `ref` 的声明类型是 `A&`）。
+- **动态类型**：引用或指针实际所指对象的最派生类型。若 `b` 是 `B` 对象，那么 `ref` 所引用对象的动态类型就是 `B`。
+
+对于通过引用或指针进行的成员函数调用，可以先记住两条实用规则：
+
+> **虚函数：看实际对象的动态类型。**
+>
+> **非虚成员函数：按照调用表达式的静态类型进行普通的名字查找和重载决议。**
+
+例如：
+
+```cpp
+struct A {
+    virtual char virtual_name() const {
+        return 'A';
+    }
+
+    char direct_name() const {
+        return 'A';
+    }
+};
+
+struct B : A {
+    char virtual_name() const override {
+        return 'B';
+    }
+
+    char direct_name() const {
+        return 'B';
+    }
+};
+
+B b;
+A& ref = b;
+```
+
+此时：
+
+```text
+ref 的静态类型：A
+ref 所引用对象的动态类型：B
+```
+
+因此：
+
+```cpp
+ref.virtual_name();  // 'B'：虚函数，根据动态类型 B 选择 B::virtual_name()
+ref.direct_name();   // 'A'：非虚函数，根据静态类型 A 选择 A::direct_name()
+```
+
+可以把这类题简化成下面的判断流程：
+
+```text
+调用成员函数
+    ↓
+这个函数是 virtual 吗？
+    ├─ 是  → 看动态类型 → 选择最终重写函数（final overrider）
+    └─ 否  → 看静态类型 → 普通名字查找 / 重载决议
+```
+
+例如：
+
+```cpp
+B b;
+A& ref = b;
+```
+
+虽然 `ref` 的静态类型是 `A`，但它引用的实际对象是 `B`，所以虚函数可以表现出运行时多态；而同名的非虚函数不会因为实际对象是 `B` 就自动调用 `B` 的版本。
+
+> [!NOTE]
+>
+> “虚函数看动态类型”是针对正常的虚函数调用。若显式使用限定名，例如 `ref.A::virtual_name()`，会抑制虚分派并明确调用 `A::virtual_name()`。
+
+参考：[`virtual` 函数](https://zh.cppreference.com/w/cpp/language/virtual)。
 
 | 特征 | 普通虚函数 | 纯虚函数 |
 |---|---|---|
