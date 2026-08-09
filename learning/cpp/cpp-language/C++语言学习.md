@@ -439,7 +439,7 @@ if (std::getline(std::cin, line)) {
 #### 9.2 字符串流 `std::stringstream`
 
 ```cpp
-#include <stringstream>
+#include <sstream>
 ```
 
 ```cpp
@@ -489,6 +489,19 @@ void input(std::string& op, Numbers numbers)
 枚举（enumeration）是一种独立类型，用一组有名字的常量表示有限的离散取值。每个枚举都有一个**底层整数类型（underlying type）**。
 
 C++ 中主要有两类枚举：无作用域枚举 `enum`，以及 C++11 引入的有作用域枚举 `enum class`（`enum struct` 与之等价）。
+
+当枚举项没有显式指定值时，自动取值规则对 `enum` 和 `enum class` 都一样：**第一个未显式赋值的枚举项值为 `0`；后续未显式赋值的枚举项值为前一个枚举项的值加 `1`**。
+
+例如：
+
+```cpp
+enum class DataType {
+    Float,   // 0
+    Double,  // 1
+};
+```
+
+因此 `DataType::Float` 的底层值是 `0`，`DataType::Double` 的底层值是 `1`。对于 `enum class`，枚举值本身仍然是枚举类型，不会隐式转换成整数；需要观察其整数值时可以显式转换，例如 `static_cast<int>(DataType::Float)`。
 
 ##### 10.2.1 无作用域枚举 `enum`
 
@@ -2419,7 +2432,8 @@ double divide(double a, double b)
 
 int main()
 {
-    try {
+    try
+    {
         double result = divide(10.0, 0.0);
         std::cout << result << '\n';
     }
@@ -2475,7 +2489,8 @@ void g()
 
 int main()
 {
-    try {
+    try
+    {
         g();
     }
     catch (const std::runtime_error& error) {
@@ -2716,7 +2731,8 @@ void test()
 
 int main()
 {
-    try {
+    try
+    {
         test();
     }
     catch (const std::exception& e) {
@@ -2803,7 +2819,8 @@ void process()
 
 int main()
 {
-    try {
+    try
+    {
         process();
     }
     catch (const std::exception& error) {
@@ -2992,14 +3009,14 @@ double divide(double a, double b)
 
 int main()
 {
-    try {
+    try
+    {
         double a;
         double b;
 
         std::cin >> a >> b;
 
         double result = divide(a, b);
-
         std::cout << "结果：" << result << '\n';
     }
     catch (const std::invalid_argument& e) {
