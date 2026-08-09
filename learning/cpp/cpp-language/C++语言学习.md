@@ -439,7 +439,7 @@ if (std::getline(std::cin, line)) {
 #### 9.2 字符串流 `std::stringstream`
 
 ```cpp
-#include <stringstream>
+#include <sstream>
 ```
 
 ```cpp
@@ -4276,6 +4276,82 @@ private:
 ```
 
 `override` 是 C++11 引入的说明符，用于要求该函数确实重写某个基类虚函数。若参数类型、尾置 `const`、引用限定或异常说明不匹配，编译器会报错，而不会静默创建一个新的重载。
+
+#### 10.1 `final` 说明符
+
+`final` 是 C++11 引入的说明符。在**虚成员函数**的声明末尾使用时，表示该虚函数到当前类为止，后续派生类不能再重写它。
+
+例如：
+
+```cpp
+struct A {
+    virtual char virtual_name() const {
+        return 'A';
+    }
+};
+
+struct B : A {
+    char virtual_name() const override {
+        return 'B';
+    }
+};
+
+struct C : B {
+    char virtual_name() const final {
+        return 'C';
+    }
+};
+
+struct D : C {
+    // char virtual_name() const {  // 编译错误：C 中已经 final
+    //     return 'D';
+    // }
+};
+```
+
+这里：
+
+```cpp
+char virtual_name() const final
+```
+
+表示 `C::virtual_name()` 是这条虚函数重写链中的最终实现。`D` **仍然可以继承并调用**这个函数，只是不能再次重写它：
+
+```cpp
+D d;
+d.virtual_name();  // 调用 C::virtual_name()，返回 'C'
+```
+
+因此，`final` 并不是“这个函数不能再使用”，而是“这个虚函数不能在更深的派生类中继续被 override”。
+
+`final` 也可以和 `override` 同时使用：
+
+```cpp
+char virtual_name() const override final;
+```
+
+两者的侧重点不同：
+
+- `override`：要求当前函数确实重写了基类虚函数；
+- `final`：禁止后续派生类继续重写这个虚函数。
+
+此外，`final` 还可以直接修饰类：
+
+```cpp
+struct C final : B {
+};
+
+// struct D : C {};  // 编译错误：C 不允许再被继承
+```
+
+可以简单区分为：
+
+| 写法 | 含义 |
+|---|---|
+| `void f() final` | `f()` 后续不能再被重写 |
+| `class C final` | `C` 后续不能再被继承 |
+
+参考：[`final` 说明符](https://zh.cppreference.com/w/cpp/language/final)。
 
 通过基类指针或引用调用虚函数时，程序根据对象的动态类型选择该虚函数的最终重写函数（final overrider）。这不是运行时从基类开始逐层向下搜索成员函数。
 
