@@ -683,6 +683,111 @@
         );
     }
 
+    function addMemcmpSection(markdown) {
+        if (markdown.indexOf('##### 16.2.1 `std::memcmp()`') !== -1) return markdown;
+
+        var memcmpSection = [
+            '#### 16.2 `<cstring>`',
+            '',
+            '`<cstring>` 提供一组处理 C 风格字符串和原始字节序列的函数。`std::memcmp` 用于比较两块内存的对象表示。',
+            '',
+            '##### 16.2.1 `std::memcmp()`',
+            '',
+            '`std::memcmp` 的函数接口可以写成：',
+            '',
+            '```cpp',
+            'int std::memcmp(const void* s1, const void* s2, std::size_t n);',
+            '```',
+            '',
+            '三个参数的含义是：',
+            '',
+            '| 参数 | 含义 |',
+            '| --- | --- |',
+            '| `s1` | 第一块内存的起始地址 |',
+            '| `s2` | 第二块内存的起始地址 |',
+            '| `n` | 要比较的**字节数** |',
+            '',
+            '返回值用于表示按字节比较的结果：',
+            '',
+            '| 返回值 | 含义 |',
+            '| --- | --- |',
+            '| `< 0` | 第一块内存在第一个不同字节处小于第二块 |',
+            '| `== 0` | 指定的 `n` 个字节完全相同 |',
+            '| `> 0` | 第一块内存在第一个不同字节处大于第二块 |',
+            '',
+            '例如：',
+            '',
+            '```cpp',
+            '#include <array>',
+            '#include <cstring>',
+            '',
+            'std::array<int, 5> arr{{1, 2, 3, 4, 5}};',
+            'int ans[]{1, 2, 3, 4, 5};',
+            '',
+            'std::memcmp(arr.data(), ans, 5 * sizeof(int));',
+            '```',
+            '',
+            '这里最容易出错的是第三个参数：',
+            '',
+            '```cpp',
+            '5 * sizeof(int)',
+            '```',
+            '',
+            '`n` 表示的是**比较多少个字节（byte）**，而不是“比较多少个元素”。如果有 `5` 个 `int`，需要比较的总字节数就是：',
+            '',
+            '```text',
+            '元素个数 × 每个元素的字节数',
+            '    5    ×    sizeof(int)',
+            '```',
+            '',
+            '因此不能简单写成：',
+            '',
+            '```cpp',
+            'std::memcmp(arr.data(), ans, 5);  // 只比较前 5 个字节',
+            '```',
+            '',
+            '假设某个平台上 `sizeof(int) == 4`，那么 5 个 `int` 一共占：',
+            '',
+            '```text',
+            '5 × 4 = 20 字节',
+            '```',
+            '',
+            '所以应写：',
+            '',
+            '```cpp',
+            'std::memcmp(arr.data(), ans, 5 * sizeof(int))',
+            '```',
+            '',
+            '如果要判断指定范围的字节是否完全相同，则判断返回值是否为 `0`：',
+            '',
+            '```cpp',
+            'if (std::memcmp(arr.data(), ans, 5 * sizeof(int)) == 0) {',
+            '    // 两块内存的这 5 * sizeof(int) 个字节完全相同',
+            '}',
+            '```',
+            '',
+            '> [!WARNING]',
+            '> `std::memcmp` 比较的是**对象表示，也就是原始字节序列**，并不是通用的 C++ “值相等”操作。对于具有填充字节、不同但等价的对象表示，或者带有更复杂语义的类型，不应把 `memcmp == 0` 当作普遍的相等判断。普通 C++ 对象和标准容器通常应优先使用它们自己的 `operator==` 或标准算法。',
+            '',
+            '可以把它简单记成：',
+            '',
+            '```text',
+            'memcmp = memory compare',
+            '         内存比较',
+            '',
+            '第三个参数 = 比较的字节数',
+            '```',
+            '',
+            '参考：[cppreference：`std::memcmp`](https://en.cppreference.com/w/cpp/string/byte/memcmp)。',
+            ''
+        ].join('\n');
+
+        return markdown.replace(
+            '\n### 17、异常处理机制',
+            '\n\n' + memcmpSection + '\n### 17、异常处理机制'
+        );
+    }
+
     fetch('./C++语言学习.md?v=20260808a')
         .then(function (response) {
             if (!response.ok) throw new Error('HTTP ' + response.status);
@@ -690,6 +795,7 @@
         })
         .then(function (markdown) {
             markdown = addArraySection(markdown);
+            markdown = addMemcmpSection(markdown);
             preparePages(markdown);
             routeFromHash();
         })
