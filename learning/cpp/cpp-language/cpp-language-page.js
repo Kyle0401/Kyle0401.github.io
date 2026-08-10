@@ -582,6 +582,94 @@
     window.addEventListener('resize', updateReadingProgress);
     window.addEventListener('hashchange', routeFromHash);
 
+    function addBlockScopeSection(markdown) {
+        if (markdown.indexOf('#### 4.1 块（compound statement）与块作用域（block scope）') !== -1) return markdown;
+
+        var blockScopeSection = [
+            '#### 4.1 块（compound statement）与块作用域（block scope）',
+            '',
+            '在 C++ 中，一对花括号 `{ ... }` 可以组成一个 **compound statement（复合语句，也常简称 block，块）**。块不仅可以用于 `if`、`for`、`while`、函数体等结构，也可以单独出现。',
+            '',
+            '```cpp',
+            '{',
+            '    int x = 10;',
+            '}',
+            '```',
+            '',
+            '这种单独的 `{ ... }` 并不只是为了视觉上的代码分组，它还会建立一个新的 **block scope（块作用域）**。在块中声明的普通局部变量，其名字通常只能在该块以及它内部更深的嵌套块中使用。',
+            '',
+            '例如：',
+            '',
+            '```cpp',
+            '{',
+            '    int x = 10;',
+            '    std::cout << x;   // 正确：x 仍在作用域内',
+            '}',
+            '',
+            '// std::cout << x;    // 错误：x 已经离开作用域',
+            '```',
+            '',
+            '可以把嵌套作用域理解为“里面能看到外面，外面看不到里面”：',
+            '',
+            '```cpp',
+            '{',
+            '    int a = 1;',
+            '',
+            '    {',
+            '        int b = 2;',
+            '        std::cout << a << b;  // a、b 都可以访问',
+            '    }',
+            '',
+            '    std::cout << a;           // 可以访问 a',
+            '    // std::cout << b;        // 错误：b 已离开作用域',
+            '}',
+            '```',
+            '',
+            '块作用域还会影响自动存储期对象的生命周期。对于在块内创建的普通局部对象，当程序正常执行离开这个块时，对象会被析构。',
+            '',
+            '```cpp',
+            '{',
+            '    std::vector<int> vec{1, 2, 3, 4, 5};',
+            '    // 使用 vec',
+            '} // vec 的生命周期在这里结束，析构函数被调用',
+            '```',
+            '',
+            '因此练习题中经常会看到下面这样的结构：',
+            '',
+            '```cpp',
+            '{',
+            '    std::vector vec{1, 2, 3, 4, 5};',
+            '',
+            '    {',
+            '        // 测试初始状态',
+            '    }',
+            '',
+            '    {',
+            '        vec.push_back(6);',
+            '        // 测试 push_back / pop_back',
+            '    }',
+            '',
+            '    {',
+            '        // 继续测试同一个 vec',
+            '    }',
+            '}',
+            '```',
+            '',
+            '这里内层的 `{ ... }` 主要用于**组织不同测试逻辑，并限制其中临时变量的作用域**；它们不会销毁定义在外层作用域中的 `vec`。只有执行到最外层对应的 `}` 时，这个 `vec` 的生命周期才结束。',
+            '',
+            '> [!IMPORTANT]',
+            '> `{ ... }` 既可以起到代码分组的作用，也具有真正的 C++ 语义：它形成块作用域，并影响局部名字的可见范围以及自动存储期对象的生命周期。',
+            '',
+            '参考：[cppreference：Statements - Compound statements](https://en.cppreference.com/w/cpp/language/statements)、[cppreference：Scope - Block scope](https://en.cppreference.com/w/cpp/language/scope)。',
+            ''
+        ].join('\n');
+
+        return markdown.replace(
+            '\n### 5、函数',
+            '\n\n' + blockScopeSection + '\n### 5、函数'
+        );
+    }
+
     function addArraySection(markdown) {
         if (markdown.indexOf('#### 13.1 `std::array`：固定大小连续容器') !== -1) return markdown;
 
@@ -869,6 +957,7 @@
             return response.text();
         })
         .then(function (markdown) {
+            markdown = addBlockScopeSection(markdown);
             markdown = addArraySection(markdown);
             markdown = addVectorDataSection(markdown);
             markdown = addMemcmpSection(markdown);
