@@ -219,7 +219,7 @@
                     var row = document.createElement('div');
                     var childBox = document.createElement('div');
 
-                    group.className = 'outline-group';
+                    group.className = 'outline-group is-collapsed';
                     row.className = 'outline-parent-row';
                     childBox.className = 'outline-group-children';
 
@@ -263,8 +263,8 @@
 
                 button.type = 'button';
                 button.className = 'outline-group-toggle';
-                button.setAttribute('aria-expanded', 'true');
-                button.setAttribute('aria-label', '折叠“' + label + '”的子目录');
+                button.setAttribute('aria-expanded', 'false');
+                button.setAttribute('aria-label', '展开“' + label + '”的子目录');
 
                 indicator.className = 'outline-group-toggle-indicator';
                 indicator.setAttribute('aria-hidden', 'true');
