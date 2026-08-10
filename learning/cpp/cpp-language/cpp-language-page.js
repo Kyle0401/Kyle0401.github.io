@@ -683,6 +683,81 @@
         );
     }
 
+    function addVectorDataSection(markdown) {
+        if (markdown.indexOf('#### 13.2 `std::vector::data()`：取得底层连续存储的首地址') !== -1) return markdown;
+
+        var vectorDataSection = [
+            '#### 13.2 `std::vector::data()`：取得底层连续存储的首地址',
+            '',
+            '`std::vector` 会把元素连续存储在一块动态分配的内存中。`data()` 用于取得这块连续元素存储区域的起始地址，也就是指向第一个元素的指针。',
+            '',
+            '例如：',
+            '',
+            '```cpp',
+            '#include <vector>',
+            '',
+            'std::vector vec{1, 2, 3, 4, 5};',
+            '```',
+            '',
+            '这里通过类模板实参推导得到的类型是：',
+            '',
+            '```cpp',
+            'std::vector<int>',
+            '```',
+            '',
+            '因此：',
+            '',
+            '```cpp',
+            'vec.data()',
+            '```',
+            '',
+            '对于这个非 `const std::vector<int>`，返回类型是：',
+            '',
+            '```cpp',
+            'int*',
+            '```',
+            '',
+            '它指向 `vec` 的第一个元素。当 `vec` 非空时，可以把它理解为：',
+            '',
+            '```cpp',
+            'vec.data() == &vec[0]',
+            '```',
+            '',
+            '因此可以把 `vector` 底层的连续元素交给需要原始指针的接口。例如：',
+            '',
+            '```cpp',
+            'std::vector vec{1, 2, 3, 4, 5};',
+            'int ans[]{1, 2, 3, 4, 5};',
+            '',
+            'ASSERT(',
+            '    std::memcmp(vec.data(), ans, sizeof(ans)) == 0,',
+            '    "The object representations should match."',
+            ');',
+            '```',
+            '',
+            '这里：',
+            '',
+            '```text',
+            'vec.data()  → vector 底层连续元素的首地址',
+            'ans         → 内置数组在函数调用中退化为指向首元素的指针',
+            'sizeof(ans) → 整个 ans 数组占用的字节数',
+            '```',
+            '',
+            '> [!IMPORTANT]',
+            '> `vec.data()` 指向的是 **vector 管理的元素存储区域**，并不是 `std::vector` 管理对象本身的地址。因此 `sizeof(vec)` 与 `vec.data()` 所指向的动态元素区域大小是两个不同概念。',
+            '',
+            '还要注意，可能导致 `vector` 重新分配存储空间的操作（例如容量不足时的 `push_back`、某些 `insert`、`reserve` 等）会使之前取得的 `data()` 指针失效，因此不要在重新分配后继续使用旧指针。',
+            '',
+            '参考：[cppreference：`std::vector::data`](https://en.cppreference.com/w/cpp/container/vector/data)。',
+            ''
+        ].join('\n');
+
+        return markdown.replace(
+            '\n### 14、类型别名声明（using别名）',
+            '\n\n' + vectorDataSection + '\n### 14、类型别名声明（using别名）'
+        );
+    }
+
     function addMemcmpSection(markdown) {
         if (markdown.indexOf('##### 16.2.1 `std::memcmp()`') !== -1) return markdown;
 
@@ -795,6 +870,7 @@
         })
         .then(function (markdown) {
             markdown = addArraySection(markdown);
+            markdown = addVectorDataSection(markdown);
             markdown = addMemcmpSection(markdown);
             preparePages(markdown);
             routeFromHash();
