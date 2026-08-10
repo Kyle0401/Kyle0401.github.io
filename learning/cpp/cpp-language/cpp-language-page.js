@@ -94,44 +94,6 @@
             '.page-outline::-webkit-scrollbar-thumb:hover {',
             '    background: rgba(20, 109, 160, .55);',
             '}',
-            '.page-outline-toggle {',
-            '    width: 100%;',
-            '    display: flex;',
-            '    align-items: center;',
-            '    justify-content: space-between;',
-            '    gap: 10px;',
-            '    margin: 0;',
-            '    padding: 0;',
-            '    border: 0;',
-            '    color: inherit;',
-            '    background: transparent;',
-            '    font: inherit;',
-            '    text-align: left;',
-            '    cursor: pointer;',
-            '    user-select: none;',
-            '}',
-            '.page-outline-toggle:focus-visible {',
-            '    outline: 2px solid var(--note-accent);',
-            '    outline-offset: 4px;',
-            '    border-radius: 6px;',
-            '}',
-            '.page-outline-toggle-indicator {',
-            '    display: inline-flex;',
-            '    flex: 0 0 auto;',
-            '    align-items: center;',
-            '    justify-content: center;',
-            '    width: 18px;',
-            '    height: 18px;',
-            '    font-size: 16px;',
-            '    line-height: 1;',
-            '    transition: transform .18s ease;',
-            '}',
-            '.page-outline.is-collapsed .page-outline-toggle-indicator {',
-            '    transform: rotate(-90deg);',
-            '}',
-            '.page-outline.is-collapsed #outline-links {',
-            '    display: none !important;',
-            '}',
             '#outline-links {',
             '    min-width: 0;',
             '    max-width: 100%;',
@@ -145,6 +107,62 @@
             '    overflow-wrap: anywhere;',
             '    word-break: break-word;',
             '}',
+            '.outline-group {',
+            '    min-width: 0;',
+            '    max-width: 100%;',
+            '}',
+            '.outline-parent-row {',
+            '    display: grid;',
+            '    grid-template-columns: minmax(0, 1fr);',
+            '    align-items: start;',
+            '    min-width: 0;',
+            '}',
+            '.outline-parent-row.has-children {',
+            '    grid-template-columns: minmax(0, 1fr) 24px;',
+            '}',
+            '.outline-parent-row > .outline-level-4 {',
+            '    min-width: 0;',
+            '}',
+            '.outline-group-toggle {',
+            '    display: inline-flex;',
+            '    align-items: center;',
+            '    justify-content: center;',
+            '    width: 24px;',
+            '    height: 28px;',
+            '    margin: 0;',
+            '    padding: 0;',
+            '    border: 0;',
+            '    border-radius: 6px;',
+            '    color: var(--docker-muted);',
+            '    background: transparent;',
+            '    cursor: pointer;',
+            '}',
+            '.outline-group-toggle:hover {',
+            '    color: var(--docker-deep);',
+            '    background: rgba(20, 109, 160, .08);',
+            '}',
+            '.outline-group-toggle:focus-visible {',
+            '    outline: 2px solid var(--note-accent);',
+            '    outline-offset: 1px;',
+            '}',
+            '.outline-group-toggle-indicator {',
+            '    display: inline-flex;',
+            '    align-items: center;',
+            '    justify-content: center;',
+            '    font-size: 15px;',
+            '    line-height: 1;',
+            '    transition: transform .18s ease;',
+            '}',
+            '.outline-group.is-collapsed .outline-group-toggle-indicator {',
+            '    transform: rotate(-90deg);',
+            '}',
+            '.outline-group.is-collapsed .outline-group-children {',
+            '    display: none;',
+            '}',
+            '.outline-group-children {',
+            '    min-width: 0;',
+            '    max-width: 100%;',
+            '}',
             'html[data-theme="dark"] .page-outline {',
             '    scrollbar-color: rgba(88, 166, 255, .45) transparent;',
             '}',
@@ -153,63 +171,138 @@
             '}',
             'html[data-theme="dark"] .page-outline::-webkit-scrollbar-thumb:hover {',
             '    background: rgba(88, 166, 255, .55);',
+            '}',
+            'html[data-theme="dark"] .outline-group-toggle:hover {',
+            '    color: #79c0ff;',
+            '    background: rgba(88, 166, 255, .10);',
             '}'
         ].join('\n');
         document.head.appendChild(style);
     }
 
-    function setupOutlineToggle() {
+    function setupGroupedOutline() {
         var outline = document.getElementById('page-outline');
         var links = document.getElementById('outline-links');
-        if (!outline || !links) return;
+        if (!outline || !links || !window.MutationObserver) return;
 
-        var existingButton = document.getElementById('page-outline-toggle');
-        if (existingButton) return;
+        outline.classList.remove('is-collapsed');
 
-        var title = outline.querySelector('.page-outline-title');
-        if (!title) return;
-
-        var button = document.createElement('button');
-        button.id = 'page-outline-toggle';
-        button.type = 'button';
-        button.className = 'page-outline-title page-outline-toggle';
-        button.setAttribute('aria-controls', 'outline-links');
-        button.setAttribute('aria-expanded', 'true');
-
-        var label = document.createElement('span');
-        label.className = 'page-outline-toggle-label';
-        label.textContent = '本章内容';
-
-        var indicator = document.createElement('span');
-        indicator.className = 'page-outline-toggle-indicator';
-        indicator.setAttribute('aria-hidden', 'true');
-        indicator.textContent = '⌄';
-
-        button.appendChild(label);
-        button.appendChild(indicator);
-        title.replaceWith(button);
-
-        function setCollapsed(collapsed) {
-            outline.classList.toggle('is-collapsed', collapsed);
-            button.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
-            button.setAttribute('aria-label', collapsed ? '展开本章内容' : '折叠本章内容');
+        var oldGlobalToggle = document.getElementById('page-outline-toggle');
+        if (oldGlobalToggle) {
+            var title = document.createElement('p');
+            title.className = 'page-outline-title';
+            title.textContent = '本章内容';
+            oldGlobalToggle.replaceWith(title);
         }
 
-        button.addEventListener('click', function () {
-            setCollapsed(!outline.classList.contains('is-collapsed'));
+        var enhancing = false;
+
+        function enhanceGroups() {
+            if (enhancing) return;
+
+            var children = Array.prototype.slice.call(links.children);
+            var hasDirectLevel4 = children.some(function (node) {
+                return node.matches && node.matches('a.outline-level-4');
+            });
+
+            if (!hasDirectLevel4) return;
+
+            enhancing = true;
+
+            var fragment = document.createDocumentFragment();
+            var currentGroup = null;
+            var currentChildren = null;
+
+            children.forEach(function (node) {
+                if (node.matches && node.matches('a.outline-level-4')) {
+                    var group = document.createElement('div');
+                    var row = document.createElement('div');
+                    var childBox = document.createElement('div');
+
+                    group.className = 'outline-group';
+                    row.className = 'outline-parent-row';
+                    childBox.className = 'outline-group-children';
+
+                    row.appendChild(node);
+                    group.appendChild(row);
+                    group.appendChild(childBox);
+                    fragment.appendChild(group);
+
+                    currentGroup = group;
+                    currentChildren = childBox;
+                    return;
+                }
+
+                if (
+                    currentGroup &&
+                    node.matches &&
+                    node.matches('a.outline-level-5, a.outline-level-6')
+                ) {
+                    currentChildren.appendChild(node);
+                    return;
+                }
+
+                fragment.appendChild(node);
+                currentGroup = null;
+                currentChildren = null;
+            });
+
+            links.replaceChildren(fragment);
+
+            Array.prototype.forEach.call(links.querySelectorAll('.outline-group'), function (group) {
+                var row = group.querySelector('.outline-parent-row');
+                var parentLink = row && row.querySelector('a.outline-level-4');
+                var childBox = group.querySelector('.outline-group-children');
+                if (!row || !parentLink || !childBox || !childBox.children.length) return;
+
+                row.classList.add('has-children');
+
+                var button = document.createElement('button');
+                var indicator = document.createElement('span');
+                var label = (parentLink.textContent || '').trim();
+
+                button.type = 'button';
+                button.className = 'outline-group-toggle';
+                button.setAttribute('aria-expanded', 'true');
+                button.setAttribute('aria-label', '折叠“' + label + '”的子目录');
+
+                indicator.className = 'outline-group-toggle-indicator';
+                indicator.setAttribute('aria-hidden', 'true');
+                indicator.textContent = '⌄';
+
+                button.appendChild(indicator);
+                row.appendChild(button);
+
+                button.addEventListener('click', function () {
+                    var collapsed = group.classList.toggle('is-collapsed');
+                    button.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+                    button.setAttribute(
+                        'aria-label',
+                        (collapsed ? '展开“' : '折叠“') + label + '”的子目录'
+                    );
+                });
+            });
+
+            enhancing = false;
+        }
+
+        var observer = new MutationObserver(function () {
+            if (enhancing) return;
+            enhanceGroups();
         });
 
-        setCollapsed(false);
+        observer.observe(links, { childList: true });
+        enhanceGroups();
     }
 
     installOutlineStyles();
-    setupOutlineToggle();
+    setupGroupedOutline();
 
     var baseScript = document.createElement('script');
     baseScript.src = './cpp-language-page-base.js?v=20260811b';
     baseScript.async = false;
     baseScript.addEventListener('load', function () {
-        setupOutlineToggle();
+        setupGroupedOutline();
     });
     document.head.appendChild(baseScript);
 })();
