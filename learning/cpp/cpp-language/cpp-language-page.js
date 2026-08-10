@@ -582,12 +582,114 @@
     window.addEventListener('resize', updateReadingProgress);
     window.addEventListener('hashchange', routeFromHash);
 
+    function addArraySection(markdown) {
+        if (markdown.indexOf('#### 13.1 `std::array`：固定大小连续容器') !== -1) return markdown;
+
+        var arraySection = [
+            '#### 13.1 `std::array`：固定大小连续容器',
+            '',
+            '`std::array<T, N>` 是 C++11 提供的固定大小容器，定义在 `<array>` 中。它保存恰好 `N` 个 `T` 类型元素，元素在内存中连续存储，并提供和其他标准容器相似的接口。',
+            '',
+            '```cpp',
+            '#include <array>',
+            '',
+            'std::array<int, 5> arr{{1, 2, 3, 4, 5}};',
+            '```',
+            '',
+            '这里 `int` 是元素类型，`5` 是数组长度，同时也是模板参数的一部分，因此 `std::array<int, 5>` 与 `std::array<int, 6>` 是不同类型。',
+            '',
+            '##### 13.1.1 `size()`：取得元素个数',
+            '',
+            '`size()` 返回容器中保存的**元素个数**：',
+            '',
+            '```cpp',
+            'std::array<int, 5> arr{{1, 2, 3, 4, 5}};',
+            '',
+            'arr.size();  // 5',
+            '```',
+            '',
+            '因此：',
+            '',
+            '```cpp',
+            'ASSERT(arr.size() == 5, "size should be 5");',
+            '```',
+            '',
+            '需要特别区分 `arr.size()` 与 `sizeof(arr)`：',
+            '',
+            '| 表达式 | 含义 | 本例结果 |',
+            '| --- | --- | --- |',
+            '| `arr.size()` | 元素数量 | `5` |',
+            '| `sizeof(arr)` | 整个 `std::array` 对象占用的字节数 | `5 * sizeof(int)` |',
+            '',
+            '`size()` 的单位是“元素”，而 `sizeof` 的单位是“字节”。不要因为本例恰好满足 `sizeof(arr) == arr.size() * sizeof(int)`，就把二者理解成同一个概念。',
+            '',
+            '##### 13.1.2 `data()`：取得连续元素的首地址',
+            '',
+            '`std::array` 本身是一个容器对象，不会像内置数组那样在普通表达式中自动退化成元素指针。需要把底层连续元素交给只接受指针的接口时，可以调用：',
+            '',
+            '```cpp',
+            'arr.data()',
+            '```',
+            '',
+            '对于非 `const std::array<int, 5>`，返回类型是 `int*`，指向第一个元素；对于 `const` 对象则返回 `const int*`。当数组非空时，可以把它近似理解为：',
+            '',
+            '```cpp',
+            'arr.data() == &arr[0]',
+            '```',
+            '',
+            '例如：',
+            '',
+            '```cpp',
+            'std::array<int, 5> arr{{1, 2, 3, 4, 5}};',
+            'int ans[]{1, 2, 3, 4, 5};',
+            '',
+            'ASSERT(',
+            '    std::memcmp(arr.data(), ans, 5 * sizeof(int)) == 0,',
+            '    "The object representations should match."',
+            ');',
+            '```',
+            '',
+            '这里三个参数分别表示：',
+            '',
+            '```text',
+            'arr.data()       → 第一块内存的起始地址',
+            'ans              → 第二块内存的起始地址；内置数组在这里退化为指向首元素的指针',
+            '5 * sizeof(int)  → 比较的字节数',
+            '```',
+            '',
+            '`std::memcmp` 的第三个参数单位是**字节**，不是元素个数。两个 `int[5]` 所占的元素存储共有 `5 * sizeof(int)` 字节，因此这里必须传入对应的字节数。',
+            '',
+            '`std::memcmp(...) == 0` 表示指定范围内的**对象表示（字节序列）完全相同**。',
+            '',
+            '> [!WARNING]',
+            '> `memcmp` 比较的是字节表示，不是 C++ 意义上的通用“元素值相等”操作。对于含填充字节、指针、浮点特殊表示或具有非平凡语义的类型，字节相同与值相等不能简单等同。比较普通标准容器的元素值时通常优先使用 `operator==`；这里使用 `memcmp` 是为了理解连续存储、`data()` 和字节数参数。',
+            '',
+            '因此这道题中的核心关系可以记成：',
+            '',
+            '```text',
+            'size()  → 有多少个元素',
+            'data()  → 元素从哪里开始存',
+            'sizeof  → 占多少个字节',
+            'memcmp  → 从两个地址开始逐字节比较指定长度',
+            '```',
+            '',
+            '参考：[cppreference：`std::array`](https://en.cppreference.com/w/cpp/container/array)、[cppreference：`std::array::size`](https://en.cppreference.com/w/cpp/container/array/size)、[cppreference：`std::array::data`](https://en.cppreference.com/w/cpp/container/array/data)、[cppreference：`std::memcmp`](https://en.cppreference.com/w/cpp/string/byte/memcmp)。',
+            ''
+        ].join('\n');
+
+        return markdown.replace(
+            '\n### 14、类型别名声明（using别名）',
+            '\n\n' + arraySection + '\n### 14、类型别名声明（using别名）'
+        );
+    }
+
     fetch('./C++语言学习.md?v=20260808a')
         .then(function (response) {
             if (!response.ok) throw new Error('HTTP ' + response.status);
             return response.text();
         })
         .then(function (markdown) {
+            markdown = addArraySection(markdown);
             preparePages(markdown);
             routeFromHash();
         })
