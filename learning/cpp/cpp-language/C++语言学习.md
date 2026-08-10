@@ -3479,6 +3479,95 @@ private:
 Vector<double> numbers;
 ```
 
+#### 2.1 模板参数：类型参数与非类型（常量）参数
+
+模板参数并不一定代表“类型”。模板参数通常可以分为**类型模板参数**、**非类型模板参数**（C++26 起标准术语改称**常量模板参数，constant template parameter**）和**模板模板参数**。下面这个 `Tensor` 例子涉及前两类。
+
+例如：
+
+```cpp
+template<unsigned int N, class T>
+struct Tensor {
+    unsigned int shape[N];
+    T* data;
+};
+```
+
+这里两个模板参数的性质不同：
+
+| 模板参数 | 类别 | 模板实参提供什么 |
+| --- | --- | --- |
+| `class T` | 类型模板参数（type template parameter） | 一个类型，例如 `int`、`float` |
+| `unsigned int N` | 非类型模板参数；C++26 起称常量模板参数 | 一个编译期值，例如 `3`、`4` |
+
+`class T` 中的 `T` 代表一种**类型**。在模板参数列表中，这里的 `class` 与 `typename` 都可以用来声明类型模板参数，因此下面两个类模板中的 `T` 性质相同：
+
+```cpp
+template<class T>
+struct A {};
+
+template<typename T>
+struct B {};
+```
+
+而：
+
+```cpp
+unsigned int N
+```
+
+表示 `N` 本身是一个 `unsigned int` 类型的模板参数值，而不是一种类型。对于这里的整数非类型模板参数，实例化时提供的实参必须满足编译期常量表达式的要求，因此它可以用于固定大小数组的数组界限。
+
+例如：
+
+```cpp
+Tensor<4, int> tensor;
+```
+
+可以理解为模板实例化时进行：
+
+```text
+N = 4
+T = int
+```
+
+因而模板中的：
+
+```cpp
+unsigned int shape[N];
+T* data;
+```
+
+在这个特化中分别相当于：
+
+```cpp
+unsigned int shape[4];
+int* data;
+```
+
+模板实参也是模板特化身份的一部分，因此：
+
+```cpp
+Tensor<3, int>
+Tensor<4, int>
+Tensor<4, float>
+```
+
+是三个不同的类型。`N` 不只是对象运行时保存的一个普通成员变量，而是在模板实例化时就已经确定的参数。
+
+标准库中的 `std::array` 也是非常典型的例子：
+
+```cpp
+std::array<int, 10>
+```
+
+其中 `int` 是类型模板实参，`10` 是非类型（常量）模板实参。
+
+> [!NOTE]
+> 本笔记以 C++20 为基线。C++20 及更早标准中的术语是 **non-type template parameter（非类型模板参数）**；C++26 将标准术语改为 **constant template parameter（常量模板参数）**，含义并未因此改变。因此在不同版本的资料中会看到两种名称。
+
+参考：[cppreference：Template parameters](https://en.cppreference.com/w/cpp/language/template_parameters.html)、[C++ working draft：[temp.param]](https://eel.is/c++draft/temp.param)。
+
 类模板及其成员函数的定义通常必须在实例化点可见，因此最常见的做法是把声明和定义一起放在头文件中。也可以把定义放入 `.tpp` 或 `.ipp` 文件，再由头文件包含。
 
 若只支持一组固定模板实参，也可以在 `.cpp` 中定义并显式实例化；不能简单理解为模板实现永远不能拆分。
