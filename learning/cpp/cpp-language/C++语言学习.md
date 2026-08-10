@@ -3481,7 +3481,7 @@ Vector<double> numbers;
 
 #### 2.1 模板参数：类型参数与非类型（常量）参数
 
-模板参数并不一定代表“类型”。C++ 模板参数中常见的两类是**类型模板参数**和**非类型模板参数**；从 C++26 起，后者在标准术语中改称**常量模板参数（constant template parameter）**。
+模板参数并不一定代表“类型”。模板参数通常可以分为**类型模板参数**、**非类型模板参数**（C++26 起标准术语改称**常量模板参数，constant template parameter**）和**模板模板参数**。下面这个 `Tensor` 例子涉及前两类。
 
 例如：
 
@@ -3500,11 +3500,14 @@ struct Tensor {
 | `class T` | 类型模板参数（type template parameter） | 一个类型，例如 `int`、`float` |
 | `unsigned int N` | 非类型模板参数；C++26 起称常量模板参数 | 一个编译期值，例如 `3`、`4` |
 
-`class T` 中的 `T` 代表一种**类型**。在模板参数列表中，这里的 `class` 与 `typename` 用来声明类型模板参数，因此下面两种写法在这个场景中等价：
+`class T` 中的 `T` 代表一种**类型**。在模板参数列表中，这里的 `class` 与 `typename` 都可以用来声明类型模板参数，因此下面两个类模板中的 `T` 性质相同：
 
 ```cpp
 template<class T>
+struct A {};
+
 template<typename T>
+struct B {};
 ```
 
 而：
