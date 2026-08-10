@@ -68,56 +68,49 @@
         });
     };
 
-    function enableCollapsibleOutline() {
-        var outline = document.getElementById('page-outline');
-        var title = outline && outline.querySelector('.page-outline-title');
-        var links = document.getElementById('outline-links');
-
-        if (!outline || !title || !links || title.classList.contains('is-collapsible')) {
-            return;
-        }
-
-        var indicator = document.createElement('span');
-        indicator.className = 'page-outline-toggle-indicator';
-        indicator.setAttribute('aria-hidden', 'true');
-        indicator.textContent = '⌄';
-        title.appendChild(indicator);
-
-        title.classList.add('is-collapsible');
-        title.setAttribute('role', 'button');
-        title.setAttribute('tabindex', '0');
-        title.setAttribute('aria-controls', 'outline-links');
-        title.setAttribute('aria-expanded', 'true');
-
-        function setCollapsed(collapsed) {
-            outline.classList.toggle('is-collapsed', collapsed);
-            links.hidden = collapsed;
-            title.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
-        }
-
-        function toggleOutline() {
-            setCollapsed(!outline.classList.contains('is-collapsed'));
-        }
-
-        title.addEventListener('click', toggleOutline);
-        title.addEventListener('keydown', function (event) {
-            if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault();
-                toggleOutline();
-            }
-        });
+    function installOutlineStyles() {
+        if (document.getElementById('cpp-outline-fix-styles')) return;
 
         var style = document.createElement('style');
+        style.id = 'cpp-outline-fix-styles';
         style.textContent = [
-            '.page-outline-title.is-collapsible {',
+            '.page-outline {',
+            '    overflow-x: hidden !important;',
+            '    overflow-y: auto !important;',
+            '    scrollbar-width: thin;',
+            '    scrollbar-color: rgba(20, 109, 160, .45) transparent;',
+            '}',
+            '.page-outline::-webkit-scrollbar {',
+            '    width: 6px;',
+            '    height: 0;',
+            '}',
+            '.page-outline::-webkit-scrollbar-track {',
+            '    background: transparent;',
+            '}',
+            '.page-outline::-webkit-scrollbar-thumb {',
+            '    background: rgba(20, 109, 160, .35);',
+            '    border-radius: 999px;',
+            '}',
+            '.page-outline::-webkit-scrollbar-thumb:hover {',
+            '    background: rgba(20, 109, 160, .55);',
+            '}',
+            '.page-outline-toggle {',
+            '    width: 100%;',
             '    display: flex;',
             '    align-items: center;',
             '    justify-content: space-between;',
             '    gap: 10px;',
+            '    margin: 0;',
+            '    padding: 0;',
+            '    border: 0;',
+            '    color: inherit;',
+            '    background: transparent;',
+            '    font: inherit;',
+            '    text-align: left;',
             '    cursor: pointer;',
             '    user-select: none;',
             '}',
-            '.page-outline-title.is-collapsible:focus-visible {',
+            '.page-outline-toggle:focus-visible {',
             '    outline: 2px solid var(--note-accent);',
             '    outline-offset: 4px;',
             '    border-radius: 6px;',
@@ -125,21 +118,98 @@
             '.page-outline-toggle-indicator {',
             '    display: inline-flex;',
             '    flex: 0 0 auto;',
+            '    align-items: center;',
+            '    justify-content: center;',
+            '    width: 18px;',
+            '    height: 18px;',
             '    font-size: 16px;',
             '    line-height: 1;',
             '    transition: transform .18s ease;',
             '}',
             '.page-outline.is-collapsed .page-outline-toggle-indicator {',
             '    transform: rotate(-90deg);',
+            '}',
+            '.page-outline.is-collapsed #outline-links {',
+            '    display: none !important;',
+            '}',
+            '#outline-links {',
+            '    min-width: 0;',
+            '    max-width: 100%;',
+            '    overflow-x: hidden !important;',
+            '}',
+            '#outline-links .outline-link {',
+            '    box-sizing: border-box;',
+            '    min-width: 0;',
+            '    max-width: 100%;',
+            '    white-space: normal;',
+            '    overflow-wrap: anywhere;',
+            '    word-break: break-word;',
+            '}',
+            'html[data-theme="dark"] .page-outline {',
+            '    scrollbar-color: rgba(88, 166, 255, .45) transparent;',
+            '}',
+            'html[data-theme="dark"] .page-outline::-webkit-scrollbar-thumb {',
+            '    background: rgba(88, 166, 255, .35);',
+            '}',
+            'html[data-theme="dark"] .page-outline::-webkit-scrollbar-thumb:hover {',
+            '    background: rgba(88, 166, 255, .55);',
             '}'
         ].join('\n');
         document.head.appendChild(style);
     }
 
-    enableCollapsibleOutline();
+    function setupOutlineToggle() {
+        var outline = document.getElementById('page-outline');
+        var links = document.getElementById('outline-links');
+        if (!outline || !links) return;
+
+        var existingButton = document.getElementById('page-outline-toggle');
+        if (existingButton) return;
+
+        var title = outline.querySelector('.page-outline-title');
+        if (!title) return;
+
+        var button = document.createElement('button');
+        button.id = 'page-outline-toggle';
+        button.type = 'button';
+        button.className = 'page-outline-title page-outline-toggle';
+        button.setAttribute('aria-controls', 'outline-links');
+        button.setAttribute('aria-expanded', 'true');
+
+        var label = document.createElement('span');
+        label.className = 'page-outline-toggle-label';
+        label.textContent = '本章内容';
+
+        var indicator = document.createElement('span');
+        indicator.className = 'page-outline-toggle-indicator';
+        indicator.setAttribute('aria-hidden', 'true');
+        indicator.textContent = '⌄';
+
+        button.appendChild(label);
+        button.appendChild(indicator);
+        title.replaceWith(button);
+
+        function setCollapsed(collapsed) {
+            outline.classList.toggle('is-collapsed', collapsed);
+            button.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+            button.setAttribute('aria-label', collapsed ? '展开本章内容' : '折叠本章内容');
+        }
+
+        button.addEventListener('click', function () {
+            setCollapsed(!outline.classList.contains('is-collapsed'));
+        });
+
+        setCollapsed(false);
+    }
+
+    installOutlineStyles();
+    setupOutlineToggle();
 
     var baseScript = document.createElement('script');
-    baseScript.src = './cpp-language-page-base.js?v=20260811a';
+    baseScript.src = './cpp-language-page-base.js?v=20260811b';
     baseScript.async = false;
+    baseScript.addEventListener('load', function () {
+        setupOutlineToggle();
+    });
     document.head.appendChild(baseScript);
 })();
