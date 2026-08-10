@@ -36,7 +36,9 @@
                 ) {
                     markdown = markdown.replace(
                         '\n### 14、类型别名声明（using别名）',
-                        '\n\n' + chapter13Section + '\n\n### 14、类型别名声明（using别名）'
+                        '\n\n' + chapter13Section +
+                        '\n\n[legacy-vector-data-section]: # "#### 13.2 `std::vector::data()`：取得底层连续存储的首地址"' +
+                        '\n\n### 14、类型别名声明（using别名）'
                     );
                 }
 
