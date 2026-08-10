@@ -3,16 +3,31 @@
 
     var previousFetch = window.fetch;
 
-    var chapter13SectionPromise = previousFetch('./chapter13-stl.md?v=20260811b')
-        .then(function (response) {
-            if (!response.ok) {
-                throw new Error('Failed to load chapter 13 STL notes.');
-            }
-            return response.text();
-        })
-        .catch(function () {
-            return '';
+    function loadNote(path, errorMessage) {
+        return previousFetch(path)
+            .then(function (response) {
+                if (!response.ok) {
+                    throw new Error(errorMessage);
+                }
+                return response.text();
+            })
+            .catch(function () {
+                return '';
+            });
+    }
+
+    function normalizeReferenceLabels(markdown) {
+        return markdown.replace(/^参考：(.*)$/gm, function (line) {
+            return line.replace(/`([^`]+)`/g, '$1');
         });
+    }
+
+    var chapter13SectionPromise = Promise.all([
+        loadNote('./chapter13-stl.md?v=20260811c', 'Failed to load chapter 13 STL notes.'),
+        loadNote('./chapter13-vector-bool.md?v=20260811a', 'Failed to load vector<bool> notes.')
+    ]).then(function (sections) {
+        return normalizeReferenceLabels(sections.filter(Boolean).join('\n\n'));
+    });
 
     window.fetch = function () {
         var args = arguments;
