@@ -19,6 +19,11 @@
         });
     }
 
+    var chapter5SectionPromise = loadNote(
+        './chapter5-return-values.md?v=20260812a',
+        'Failed to load chapter 5 return value notes.'
+    ).then(normalizeReferenceLabels);
+
     var chapter9SectionPromise = loadNote(
         './chapter9-string-literals.md?v=20260812a',
         'Failed to load chapter 9 string literal notes.'
@@ -50,14 +55,26 @@
 
             return Promise.all([
                 response.text(),
+                chapter5SectionPromise,
                 chapter9SectionPromise,
                 chapter10SectionPromise,
                 chapter13SectionPromise
             ]).then(function (results) {
                 var markdown = results[0];
-                var chapter9Section = results[1];
-                var chapter10Section = results[2];
-                var chapter13Section = results[3];
+                var chapter5Section = results[1];
+                var chapter9Section = results[2];
+                var chapter10Section = results[3];
+                var chapter13Section = results[4];
+
+                if (
+                    chapter5Section &&
+                    markdown.indexOf('#### 5.3 函数返回值是如何产生的') === -1
+                ) {
+                    markdown = markdown.replace(
+                        '\n### 6、引用',
+                        '\n\n' + chapter5Section + '\n\n### 6、引用'
+                    );
+                }
 
                 if (
                     chapter9Section &&
