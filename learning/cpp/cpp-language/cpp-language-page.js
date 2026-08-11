@@ -23,6 +23,11 @@
         });
     }
 
+    var chapter9SectionPromise = loadNote(
+        './chapter9-string-literals.md?v=20260812a',
+        'Failed to load chapter 9 string literal notes.'
+    ).then(normalizeReferenceLabels);
+
     var chapter13SectionPromise = Promise.all([
         loadNote('./chapter13-stl.md?v=20260811c', 'Failed to load chapter 13 STL notes.'),
         loadNote('./chapter13-vector-bool.md?v=20260811b', 'Failed to load vector<bool> notes.')
@@ -42,9 +47,29 @@
 
             if (decodedUrl.indexOf('C++语言学习.md') === -1) return response;
 
-            return Promise.all([response.text(), chapter13SectionPromise]).then(function (results) {
+            return Promise.all([
+                response.text(),
+                chapter9SectionPromise,
+                chapter13SectionPromise
+            ]).then(function (results) {
                 var markdown = results[0];
-                var chapter13Section = results[1];
+                var chapter9Section = results[1];
+                var chapter13Section = results[2];
+
+                if (
+                    chapter9Section &&
+                    markdown.indexOf('#### 9.1 字符串字面量、`std::string_literals` 与 `operator""s`') === -1
+                ) {
+                    markdown = markdown.replace(
+                        '\n#### 9.2 字符串流 `std::stringstream`',
+                        '\n#### 9.3 字符串流 `std::stringstream`'
+                    );
+                    markdown = markdown.replace(
+                        '\n#### 9.1 行读取 `std::getline()` 函数',
+                        '\n\n' + chapter9Section +
+                        '\n\n#### 9.2 行读取 `std::getline()` 函数'
+                    );
+                }
 
                 if (
                     chapter13Section &&
