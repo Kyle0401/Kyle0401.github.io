@@ -1,3 +1,93 @@
+##### 13.2.8 `rbegin()` / `rend()`：逆向迭代器与 `++` 的方向
+
+标准容器通常同时提供正向迭代器和逆向迭代器。对于 `std::vector`：
+
+```cpp
+std::vector<int> vec{10, 20, 30, 40};
+
+auto first = vec.rbegin();
+```
+
+`rbegin()` 返回指向**逆向遍历第一个元素**的逆向迭代器。对于非空 `vector`，这个元素就是容器的最后一个元素，因此：
+
+```cpp
+*vec.rbegin() == 40;  // true
+```
+
+`rend()` 返回逆向遍历的**尾后位置**。它不指向任何有效元素，可以把它概念上理解为“位于第一个元素之前”的位置，因此和普通的 `end()` 一样，**不能对 `rend()` 解引用**。
+
+可以这样对照理解：
+
+```text
+容器：       [10] [20] [30] [40]
+              ↑              ↑
+           begin()         rbegin()
+
+正向遍历：   10 → 20 → 30 → 40 → end()
+逆向遍历：   40 → 30 → 20 → 10 → rend()
+```
+
+因此逆向遍历通常写成：
+
+```cpp
+for (auto it = vec.rbegin(); it != vec.rend(); ++it) {
+    std::cout << *it << ' ';
+}
+```
+
+输出：
+
+```text
+40 30 20 10
+```
+
+这里最容易产生疑问的是：**明明是从右往左遍历，为什么仍然写 `++it`？**
+
+原因是，对迭代器来说，`++` 更准确的含义不是“数组下标加 1”或“内存地址向右移动”，而是：
+
+> **沿着当前迭代器定义的遍历方向，前进到下一个元素。**
+
+所以普通迭代器和逆向迭代器的 `++` 实际方向正好相反：
+
+| 迭代器 | 初始位置 | `++it` 的逻辑含义 | 在原容器中的实际方向 |
+| --- | --- | --- | --- |
+| `begin()` 得到的正向迭代器 | 第一个元素 | 前进到下一个元素 | 左 → 右 |
+| `rbegin()` 得到的逆向迭代器 | 最后一个元素 | 前进到逆向序列的下一个元素 | 右 → 左 |
+
+例如：
+
+```cpp
+std::vector<int> vec{10, 20, 30, 40};
+auto it = vec.rbegin();
+
+*it;    // 40
+++it;
+*it;    // 30
+++it;
+*it;    // 20
+```
+
+因此对于逆向迭代器：
+
+```text
+++it  ：在原容器中向左移动
+--it  ：在原容器中向右移动
+```
+
+从 `std::reverse_iterator` 与底层正向迭代器的关系来看，也可以写成：
+
+```cpp
+vec.rbegin().base() == vec.end();    // true
+vec.rend().base()   == vec.begin();  // true
+```
+
+逆向迭代器保存的底层迭代器位置与它实际解引用得到的元素之间相差一个位置，所以 `rbegin()` 的底层 `base()` 是 `end()`，但 `*rbegin()` 得到的却是最后一个元素。相应地，**递增逆向迭代器会使其底层迭代器递减**，从而实现从右向左遍历。
+
+> [!IMPORTANT]
+> 不要把迭代器的 `++` 固定理解成“向右”。应理解成“沿该迭代器的遍历方向前进一步”。对正向迭代器，`++` 是向右；对逆向迭代器，`++` 是向左。
+
+参考：[cppreference：`std::vector::rbegin`](https://en.cppreference.com/w/cpp/container/vector/rbegin)、[cppreference：`std::vector::rend`](https://en.cppreference.com/w/cpp/container/vector/rend)、[cppreference：`std::reverse_iterator`](https://en.cppreference.com/w/cpp/iterator/reverse_iterator)。
+
 #### 13.3 `std::vector<bool>`：针对布尔值的特殊化
 
 `std::vector<bool>` 不是把普通 `std::vector<T>` 简单地把 `T` 换成 `bool`。标准库为 `bool` 提供了专门的特化版本，用来更紧凑地保存布尔值。
