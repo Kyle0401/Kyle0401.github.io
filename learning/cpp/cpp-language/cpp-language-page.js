@@ -7,14 +7,10 @@
     function loadNote(path, errorMessage) {
         return previousFetch(path)
             .then(function (response) {
-                if (!response.ok) {
-                    throw new Error(errorMessage);
-                }
+                if (!response.ok) throw new Error(errorMessage);
                 return response.text();
             })
-            .catch(function () {
-                return '';
-            });
+            .catch(function () { return ''; });
     }
 
     function normalizeReferenceLabels(markdown) {
@@ -26,6 +22,11 @@
     var chapter9SectionPromise = loadNote(
         './chapter9-string-literals.md?v=20260812a',
         'Failed to load chapter 9 string literal notes.'
+    ).then(normalizeReferenceLabels);
+
+    var chapter10SectionPromise = loadNote(
+        './chapter10-type-metaprogramming.md?v=20260812a',
+        'Failed to load chapter 10 type metaprogramming notes.'
     ).then(normalizeReferenceLabels);
 
     var chapter13SectionPromise = Promise.all([
@@ -50,11 +51,13 @@
             return Promise.all([
                 response.text(),
                 chapter9SectionPromise,
+                chapter10SectionPromise,
                 chapter13SectionPromise
             ]).then(function (results) {
                 var markdown = results[0];
                 var chapter9Section = results[1];
-                var chapter13Section = results[2];
+                var chapter10Section = results[2];
+                var chapter13Section = results[3];
 
                 if (
                     chapter9Section &&
@@ -68,6 +71,17 @@
                         '\n#### 9.1 行读取 `std::getline()` 函数',
                         '\n\n' + chapter9Section +
                         '\n\n#### 9.2 行读取 `std::getline()` 函数'
+                    );
+                }
+
+                if (
+                    chapter10Section &&
+                    markdown.indexOf('#### 10.4 编译期类型信息：cv、`decltype` 与类型元编程') === -1
+                ) {
+                    markdown = markdown.replace(
+                        '\n------\n\n### 11、内存管理（动态分配）',
+                        '\n\n' + chapter10Section +
+                        '\n\n------\n\n### 11、内存管理（动态分配）'
                     );
                 }
 
@@ -239,7 +253,6 @@
             });
 
             if (!hasDirectLevel4) return;
-
             enhancing = true;
 
             var fragment = document.createDocumentFragment();
@@ -302,15 +315,11 @@
                 button.type = 'button';
                 button.className = 'outline-group-toggle';
                 button.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
-                button.setAttribute(
-                    'aria-label',
-                    (collapsed ? '展开“' : '折叠“') + label + '”的子目录'
-                );
+                button.setAttribute('aria-label', (collapsed ? '展开“' : '折叠“') + label + '”的子目录');
 
                 indicator.className = 'outline-group-toggle-indicator';
                 indicator.setAttribute('aria-hidden', 'true');
                 indicator.textContent = '⌄';
-
                 button.appendChild(indicator);
                 row.appendChild(button);
 
@@ -318,10 +327,7 @@
                     var nextCollapsed = group.classList.toggle('is-collapsed');
                     outlineGroupState[groupKey] = nextCollapsed;
                     button.setAttribute('aria-expanded', nextCollapsed ? 'false' : 'true');
-                    button.setAttribute(
-                        'aria-label',
-                        (nextCollapsed ? '展开“' : '折叠“') + label + '”的子目录'
-                    );
+                    button.setAttribute('aria-label', (nextCollapsed ? '展开“' : '折叠“') + label + '”的子目录');
                 });
             });
 
@@ -337,6 +343,15 @@
         enhanceGroups();
     }
 
+    function loadSearchScript() {
+        if (document.getElementById('cpp-language-search-script')) return;
+        var searchScript = document.createElement('script');
+        searchScript.id = 'cpp-language-search-script';
+        searchScript.src = './cpp-language-search.js?v=20260812a';
+        searchScript.async = false;
+        document.head.appendChild(searchScript);
+    }
+
     installOutlineStyles();
     setupGroupedOutline();
 
@@ -345,6 +360,7 @@
     baseScript.async = false;
     baseScript.addEventListener('load', function () {
         setupGroupedOutline();
+        loadSearchScript();
     });
     document.head.appendChild(baseScript);
 })();
