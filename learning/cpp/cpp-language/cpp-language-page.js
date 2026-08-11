@@ -2,6 +2,7 @@
     'use strict';
 
     var previousFetch = window.fetch;
+    var outlineGroupState = Object.create(null);
 
     function loadNote(path, errorMessage) {
         return previousFetch(path)
@@ -195,7 +196,14 @@
             oldGlobalToggle.replaceWith(title);
         }
 
+        if (links.getAttribute('data-grouped-outline-observer') === 'true') return;
+        links.setAttribute('data-grouped-outline-observer', 'true');
+
         var enhancing = false;
+
+        function hasOwnState(key) {
+            return Object.prototype.hasOwnProperty.call(outlineGroupState, key);
+        }
 
         function enhanceGroups() {
             if (enhancing) return;
@@ -218,8 +226,11 @@
                     var group = document.createElement('div');
                     var row = document.createElement('div');
                     var childBox = document.createElement('div');
+                    var groupKey = node.getAttribute('href') || (node.textContent || '').trim();
+                    var collapsed = hasOwnState(groupKey) ? outlineGroupState[groupKey] : true;
 
-                    group.className = 'outline-group is-collapsed';
+                    group.className = collapsed ? 'outline-group is-collapsed' : 'outline-group';
+                    group.setAttribute('data-outline-group-key', groupKey);
                     row.className = 'outline-parent-row';
                     childBox.className = 'outline-group-children';
 
@@ -260,11 +271,16 @@
                 var button = document.createElement('button');
                 var indicator = document.createElement('span');
                 var label = (parentLink.textContent || '').trim();
+                var groupKey = group.getAttribute('data-outline-group-key') || parentLink.getAttribute('href') || label;
+                var collapsed = group.classList.contains('is-collapsed');
 
                 button.type = 'button';
                 button.className = 'outline-group-toggle';
-                button.setAttribute('aria-expanded', 'false');
-                button.setAttribute('aria-label', '展开“' + label + '”的子目录');
+                button.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+                button.setAttribute(
+                    'aria-label',
+                    (collapsed ? '展开“' : '折叠“') + label + '”的子目录'
+                );
 
                 indicator.className = 'outline-group-toggle-indicator';
                 indicator.setAttribute('aria-hidden', 'true');
@@ -274,11 +290,12 @@
                 row.appendChild(button);
 
                 button.addEventListener('click', function () {
-                    var collapsed = group.classList.toggle('is-collapsed');
-                    button.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+                    var nextCollapsed = group.classList.toggle('is-collapsed');
+                    outlineGroupState[groupKey] = nextCollapsed;
+                    button.setAttribute('aria-expanded', nextCollapsed ? 'false' : 'true');
                     button.setAttribute(
                         'aria-label',
-                        (collapsed ? '展开“' : '折叠“') + label + '”的子目录'
+                        (nextCollapsed ? '展开“' : '折叠“') + label + '”的子目录'
                     );
                 });
             });
