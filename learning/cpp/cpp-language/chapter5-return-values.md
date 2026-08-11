@@ -1,53 +1,224 @@
-#### 5.3 函数返回值是如何产生的
+#### 5.3 函数返回值：类型与生成机制
 
-函数写成“按值返回”时，并不意味着运行时一定会先创建一个局部对象，再调用一次移动构造函数把它搬到调用者那里。对于类类型返回值，实际过程可能是：
+看到：
 
-- 直接构造最终的返回结果对象；
-- 通过 NRVO 省略局部对象到返回结果对象之间的复制/移动；
-- 如果不能或没有进行复制消除，再通过移动构造或复制构造产生返回结果。
+```cpp
+return expression;
+```
 
-因此，分析 `return` 时不能只问“是不是按值返回”，还要继续看：**`return` 后面的表达式是什么、它的值类别是什么、是否满足复制消除条件，以及未消除时重载决议会选择复制还是移动。**
+时，不应该立刻判断“这是复制”“这是移动”或者“这是 NRVO”。**这些机制并不是对所有返回类型都适用。**
 
-标准从语义上把带操作数的 `return` 描述为：用 `return` 的操作数去初始化函数调用的返回结果。对于类类型，这个初始化过程可能涉及复制构造或移动构造，也可能被复制消除规则省略。
+分析函数返回值时，最清晰的顺序是：
+
+```text
+先看返回类型
+    ↓
+标量类型 / 类类型 / 引用类型
+    ↓
+如果是类类型，再分析返回表达式
+    ↓
+直接构造 / NRVO / 隐式移动 / 复制
+```
 
 > [!IMPORTANT]
-> **“按值返回”描述的是函数接口，不等于“必然调用移动构造”。**
+> **“按值返回”只说明函数返回的是一个值，不等于“必然复制一次”或“必然移动一次”。**
 
-##### 5.3.1 先区分：返回类型、返回表达式和返回结果对象
+标准从语义上规定，带操作数的 `return` 会用返回表达式初始化函数调用的返回结果。对于类类型，这个初始化过程可能涉及复制构造、移动构造，也可能被复制消除规则省略。
+
+------
+
+##### 5.3.1 先看返回类型
+
+学习返回值时，首先把常见返回类型分成三类：
+
+| 返回类型 | 示例 | 是否讨论复制/移动构造 | 是否可能 NRVO |
+| --- | --- | --- | --- |
+| 标量类型 | `int`、`double`、`T*` | 否 | 否 |
+| 类类型 | `std::string`、`std::vector<T>`、`std::unique_ptr<T>`、用户自定义类 | 是 | 满足条件时可能 |
+| 引用类型 | `T&`、`const T&` | 不产生新的 `T` 返回对象 | 否 |
+
+这里尤其要区分 **“变量”** 和 **“类对象”**。
+
+“局部变量”是一个很宽泛的概念：
+
+```cpp
+int n;                       // 局部变量，标量类型
+Resource* p;                 // 局部变量，指针类型，也是标量类型
+std::string s;               // 局部变量，同时也是局部类对象
+std::unique_ptr<int> ptr;    // 局部变量，同时也是局部类对象
+```
+
+所以不能看到：
+
+```cpp
+return 某个局部变量;
+```
+
+就直接想到 NRVO。
+
+> **NRVO 讨论的是满足条件的“具名局部类对象”，而不是所有局部变量。**
 
 例如：
 
 ```cpp
-std::string make_name()
+A f()
 {
-    return std::string{"Kyle"};
+    A a;
+    return a;       // 可能 NRVO
 }
 ```
 
-这里有三个不同概念：
-
-```text
-std::string                 → 函数的返回类型
-std::string{"Kyle"}          → return 的操作数（返回表达式）
-调用 make_name() 得到的结果 → 返回结果对象
-```
-
-对于类类型，真正需要分析的是：**返回表达式如何初始化最终的返回结果对象。**
-
-如果返回类型是 `int`、`double`、指针等非类类型，则本来就不存在“调用复制构造函数还是移动构造函数”的问题。例如：
+与：
 
 ```cpp
-int add(int a, int b)
+A* f()
 {
-    return a + b;
+    A* p = ...;
+    return p;       // 不是 NRVO
 }
 ```
 
-`a + b` 产生一个 `int` 值，用它产生函数结果即可；`int` 没有复制构造函数和移动构造函数。
+虽然形式上都是 `return 某个变量;`，但返回类型不同，适用的机制也完全不同。
 
 ------
 
-##### 5.3.2 `return T{};`：C++17 起直接构造返回结果
+##### 5.3.2 标量返回
+
+`int`、`double`、枚举、裸指针等属于标量类型。
+
+它们不是类类型，因此不存在：
+
+```text
+复制构造函数
+移动构造函数
+NRVO
+```
+
+这些类对象相关机制。
+
+###### 返回普通数值
+
+```cpp
+int f()
+{
+    int n = 10;
+    return n;
+}
+```
+
+`n` 是局部变量，但它是 `int` 类型。
+
+这里可以直接理解为：
+
+```text
+读取 n 的值 10
+    ↓
+用 10 产生函数结果
+```
+
+不需要讨论复制构造或移动构造，因为 `int` 根本没有构造函数。
+
+###### 返回裸指针
+
+```cpp
+Resource* forward(Resource* ptr)
+{
+    return ptr;
+}
+```
+
+`ptr` 是指针类型，也是标量类型。
+
+假设：
+
+```text
+ptr 保存的地址值 = 0x1234
+```
+
+那么：
+
+```cpp
+return ptr;
+```
+
+可以理解成：
+
+```text
+ptr 中保存 0x1234
+        ↓
+用地址值 0x1234 产生函数结果
+```
+
+函数返回后，可能有多个裸指针保存同一个地址：
+
+```text
+原指针 ──┐
+         ├──→ Resource
+返回指针 ─┘
+```
+
+这里复制的是**指针值（地址值）**，并没有复制 `Resource` 对象，也没有发生资源所有权转移。
+
+###### 裸指针与 `std::move`
+
+即使写：
+
+```cpp
+Resource* p2 = std::move(p1);
+```
+
+也不会自动得到：
+
+```text
+p1 → nullptr
+p2 → Resource
+```
+
+`std::move` 本身不会搬运任何资源，它只是改变表达式的值类别。
+
+裸指针没有移动构造函数，所以初始化后通常仍然是：
+
+```text
+p1 ──┐
+     ├──→ Resource
+p2 ──┘
+```
+
+这和 `std::unique_ptr` 的移动行为不同。
+
+> [!IMPORTANT]
+> `T* p; return p;` 是**返回指针值**，不是 NRVO，也不是调用“裸指针的移动构造”。
+
+------
+
+##### 5.3.3 类类型总览
+
+如果函数按值返回的是类类型，例如：
+
+```cpp
+std::string f();
+std::vector<int> g();
+std::unique_ptr<Resource> h();
+A make_a();
+```
+
+才需要进一步分析返回对象是如何形成的。
+
+常见情况可以先记成这张表：
+
+| 写法 | 典型机制 |
+| --- | --- |
+| `return T{...};` | C++17 起同类型 prvalue 直接构造返回结果 |
+| `return local;`，`local` 是满足条件的具名局部类对象 | 优先可能 NRVO；未实施时通常可以隐式移动 |
+| `return param;`，`param` 是按值类类型形参 | 不能 NRVO，但满足条件时可以隐式移动 |
+| `return std::move(local);` | 通常移动构造，但会破坏 NRVO 条件 |
+| `return global;` / `return static_obj;` | 不属于普通隐式移动返回场景，通常按原本的 lvalue 语义处理 |
+
+后面的几节分别解释这些情况。
+
+------
+
+##### 5.3.4 直接构造：prvalue
 
 例如：
 
@@ -66,25 +237,25 @@ A make_a()
 
 `A{}` 是一个与函数返回类型相同的 **prvalue（纯右值）**。
 
-从 C++17 起，这种同类型 prvalue 不需要先物化成一个独立的临时 `A`，再复制或移动到返回结果对象中；它可以直接初始化最终的返回结果对象。
+从 C++17 起，这种情况不需要先创建一个独立的临时 `A`，再把临时对象复制或移动到返回结果中。
 
-可以把旧式的直观模型：
+旧式直觉容易想成：
 
 ```text
-先构造临时 A
-      ↓
+临时 A
+  ↓
 复制 / 移动
-      ↓
+  ↓
 返回结果 A
 ```
 
-改成：
+C++17 以后更合适的理解是：
 
 ```text
-直接构造返回结果 A
+直接在最终返回结果的位置构造 A
 ```
 
-所以在 C++17 及以后：
+所以：
 
 ```cpp
 A make_a()
@@ -93,14 +264,12 @@ A make_a()
 }
 ```
 
-这一返回过程本身不需要调用：
+这一返回过程本身不需要额外调用：
 
 ```cpp
-A(const A&);  // 复制构造
-A(A&&);       // 移动构造
+A(const A&);   // 复制构造
+A(A&&);        // 移动构造
 ```
-
-这类情况常被口语化地称为“保证的复制消除（guaranteed copy elision）”；更准确地理解是：C++17 的 prvalue 语义允许对象直接在最终目标位置构造，不必先创建一个独立源对象再把它消除掉。
 
 同理：
 
@@ -111,16 +280,15 @@ std::unique_ptr<int> make_ptr()
 }
 ```
 
-`std::make_unique<int>(42)` 返回的是 `std::unique_ptr<int>` 类型的 prvalue，与函数返回类型一致，因此 C++17 起可以直接形成 `make_ptr()` 的返回结果，不需要再额外调用一次 `unique_ptr` 的移动构造函数。
+`std::make_unique<int>(42)` 产生同类型 prvalue，C++17 起可以直接形成函数的返回结果，不需要再额外移动一次 `unique_ptr`。
 
-> [!NOTE]
-> 这也是为什么不能简单地说“函数按值返回对象时都会移动一次”。`return T{};`、`return make_unique<T>();` 这类同类型 prvalue 返回，在 C++17 以后通常根本没有那一步移动。
+这类行为常被口语化称为 **guaranteed copy elision（保证的复制消除）**。从 C++17 的对象模型理解，更准确地说是：同类型 prvalue 可以直接初始化最终目标对象，不必先产生一个独立源对象再复制或移动。
 
 ------
 
-##### 5.3.3 `return local;`：普通局部变量优先考虑 NRVO
+##### 5.3.5 NRVO：具名局部类对象
 
-例如：
+NRVO（Named Return Value Optimization，具名返回值优化）的典型形式是：
 
 ```cpp
 A make_a()
@@ -130,130 +298,110 @@ A make_a()
 }
 ```
 
-这里 `local` 是：
+这里 `local` 不只是“局部变量”，而是一个**具名局部类对象**。
 
-- 有名字的局部对象；
-- 自动存储期；
-- 非 `volatile`；
-- 类型与函数返回类型匹配；
-- 不是函数形参。
+标准允许 NRVO 的典型条件包括：
 
-这种情况满足 **NRVO（Named Return Value Optimization，具名返回值优化）** 的典型条件。
+- 函数按值返回类类型；
+- `return` 表达式直接命名一个对象；
+- 该对象是非 `volatile`；
+- 该对象具有自动存储期；
+- 该对象不是函数形参，也不是异常处理器的异常声明变量。
 
-如果编译器实施 NRVO，可以把 `local` 直接构造在最终返回结果的位置：
+如果实施 NRVO：
 
 ```text
-表面代码：
+源代码：
 
 A local;
 return local;
 
-可能的实际对象模型：
+对象模型可以理解成：
 
 最终返回结果 A
       ↑
-local 从一开始就在这里构造
+local 从一开始就在这个位置构造
 ```
 
-于是不存在：
+因此：
 
 ```text
 local
-  ↓ move/copy
+  ↓ copy / move
 返回结果
 ```
 
-这一步额外的复制或移动。
+这一步可以完全不存在。
 
-需要注意：**NRVO 是允许进行的复制消除，但并不是所有情况下都由语言强制保证。** 因此代码不能依赖“移动构造函数一定不会执行”这种假设。
+> [!NOTE]
+> NRVO 是标准允许的复制消除，并不像 C++17 同类型 prvalue 返回那样在相应条件下由语言语义保证。因此代码仍然应当保证没有 NRVO 时也能正确工作。
 
-如果没有进行 NRVO，在本笔记采用的 C++20 语义下，满足隐式移动条件的局部对象在 `return local;` 中会优先尝试按右值语义进行重载决议，因此通常会选择移动构造函数：
+如果编译器没有实施 NRVO，`return local;` 还可能继续走下一节介绍的**隐式移动**。
 
-```cpp
-A(A&&);
-```
-
-可以把常见路径概括为：
-
-```text
-return local;
-     ↓
-能做 NRVO？
- ├─ 是 → 直接让 local 成为返回结果对象
- └─ 否 → 通常尝试移动构造
-          ↓
-        若移动不可用且复制可用，按相应语言规则可能使用复制
-```
-
-所以：
+所以一般应该写：
 
 ```cpp
 return local;
 ```
 
-通常已经是正确写法，不需要为了“让它移动”而手动加 `std::move`。
+而不是为了“优化”机械地写：
+
+```cpp
+return std::move(local);
+```
 
 ------
 
-##### 5.3.4 `return std::move(local);`：通常反而会阻止 NRVO
+##### 5.3.6 隐式移动
 
-考虑：
+除了 NRVO，C++ 对某些自动存储期对象的 `return` 还提供了隐式移动机制。
+
+最常见的两类是：
+
+```text
+普通局部类对象
+函数按值形参对象
+```
+
+###### 普通局部类对象：NRVO 未发生时
 
 ```cpp
 A make_a()
 {
     A local;
-    return std::move(local);
+    return local;
 }
 ```
 
-`std::move(local)` 会把表达式转换成 xvalue（将亡值），因此移动构造函数通常可以参与重载决议。
+分析顺序应该是：
 
-但是 NRVO 的典型条件要求 `return` 的操作数直接是那个具名局部对象：
+```text
+return local;
+     ↓
+满足 NRVO 条件？
+     ↓
+编译器实施 NRVO？
+ ├─ 是 → 直接成为返回结果
+ └─ 否 → 再考虑隐式移动
+```
+
+如果没有 NRVO，并且移动构造可用，通常会使用：
+
+```cpp
+A(A&&);
+```
+
+因此不要把：
 
 ```cpp
 return local;
 ```
 
-而：
+简单记成“NRVO”。更准确的是：
 
-```cpp
-return std::move(local);
-```
+> **它首先给编译器 NRVO 的机会；如果没有实施 NRVO，还可能隐式移动。**
 
-操作数已经变成了一个 `std::move(...)` 表达式，不再是直接返回局部变量名字本身，所以通常不能进行 NRVO。
-
-于是原本可能是：
-
-```text
-return local;
-     ↓
-NRVO
-     ↓
-0 次复制 + 0 次移动
-```
-
-手动加上 `std::move` 后可能变成：
-
-```text
-return std::move(local);
-          ↓
-       移动构造
-          ↓
-1 次移动
-```
-
-因此一般规则是：
-
-> **返回一个与返回类型相同的普通局部变量时，优先写 `return local;`，不要习惯性写 `return std::move(local);`。**
-
-`std::move` 并不是“性能优化开关”；它本质上只是改变表达式的值类别，让移动相关重载有机会被选择。
-
-------
-
-##### 5.3.5 `return ptr;`：按值形参不能做 NRVO，但可以隐式移动
-
-这一点对于 `std::unique_ptr` 特别重要。
+###### 函数形参：不能 NRVO，但可以隐式移动
 
 例如：
 
@@ -266,34 +414,38 @@ Unique forward(Unique ptr)
 }
 ```
 
-`ptr` 是**函数形参**。
+这里的 `ptr` 是**函数形参对象**。
 
-NRVO 明确不适用于函数形参，所以这里不能把形参 `ptr` 和调用表达式的返回结果对象直接视为同一个对象。
+函数形参明确不属于 NRVO 的允许对象，因此：
 
-但是 `ptr` 是自动存储期的非 `volatile` 对象，并且它直接出现在 `return ptr;` 中，属于可以进行**隐式移动（implicit move）**的典型返回场景。
+```cpp
+return ptr;
+```
 
-因此在 C++20 中可以把它近似理解成：
+不能做 NRVO。
+
+但是 `ptr` 属于可进行返回时隐式移动的典型对象，所以对于 `std::unique_ptr` 可以把效果近似理解成：
 
 ```cpp
 return std::move(ptr);
 ```
 
-对于 `std::unique_ptr`：
+所有权变化为：
 
 ```text
-进入 forward：
+return 前：
 
 ptr ─────────→ Resource
 
-return ptr：
+return 后：
 
 ptr      ────→ nullptr
 返回结果 ────→ Resource
 ```
 
-然后形参 `ptr` 自己的生命周期结束并执行 `unique_ptr` 析构函数，但此时它已经是空的，因此不会删除 `Resource`。
+随后形参 `ptr` 自己会析构，但它已经为空，因此不会删除 `Resource`。
 
-这也是下面代码能够编译的原因：
+这就是：
 
 ```cpp
 Unique forward(Unique ptr)
@@ -302,222 +454,68 @@ Unique forward(Unique ptr)
 }
 ```
 
-虽然 `std::unique_ptr` 的复制构造函数被删除，但返回形参时可以走隐式移动。
+能够工作的原因：`unique_ptr` 不可复制，但可以移动。
 
 > [!NOTE]
-> C++23 对“move-eligible expression”的语言规则进一步统一：满足条件的返回表达式会按 xvalue 处理。本笔记以 C++20 为基线，因此主要按 C++20 的“返回时隐式移动”规则理解即可。
+> C++20 及更早版本通常用“返回时隐式移动”的规则解释这一过程；C++23 对 move-eligible expression 的规则进一步统一。学习所有权时，可以先抓住实际效果：**满足条件的局部类对象或形参在 `return name;` 时可以被当作移动源使用。**
 
 ------
 
-##### 5.3.6 为什么 `drop()` 返回 `nullptr` 时参数里的资源会被释放
+##### 5.3.7 显式 `std::move` 与复制
 
-继续看：
+###### `return std::move(local);`
+
+例如：
 
 ```cpp
-Unique drop(Unique ptr)
+A make_a()
 {
-    if (ptr) ptr->record('d');
-    return nullptr;
+    A local;
+    return std::move(local);
 }
 ```
 
-这里返回的是：
+`std::move(local)` 把表达式转换成 xvalue，因此移动构造通常可以参与重载决议。
+
+但它还有一个副作用：
 
 ```cpp
-nullptr
+return local;
 ```
 
-而不是：
+直接命名局部对象，可能满足 NRVO 条件；而：
 
 ```cpp
-ptr
+return std::move(local);
 ```
 
-因此 `ptr` 所拥有的资源**没有被转移到返回结果中**。
+返回表达式已经不再只是对象名字 `local`，因此通常不满足 NRVO 条件。
 
-过程可以画成：
+结果可能从：
 
 ```text
-进入 drop：
-
-ptr ─────────→ Resource
-
-return nullptr：
-
-返回结果 ────→ nullptr
-ptr      ────→ Resource
+return local;
+     ↓
+NRVO
+     ↓
+0 次复制 + 0 次移动
 ```
 
-随后 `ptr` 生命周期结束：
+变成：
 
 ```text
-~unique_ptr()
-      ↓
-发现 ptr 仍然持有 Resource
-      ↓
-调用删除器
-      ↓
-Resource 析构
+return std::move(local);
+          ↓
+       移动构造
+          ↓
+1 次移动
 ```
 
-这里要把两件事分开：
+所以通常：
 
-```text
-return nullptr
-```
+> **返回与函数返回类型相同的具名局部类对象时，优先写 `return local;`，不要习惯性加 `std::move`。**
 
-决定的是：**返回结果是什么**。
-
-而：
-
-```text
-函数形参 ptr 生命周期结束
-```
-
-决定的是：**ptr 对象自己需要析构**。
-
-所以“函数返回了 `nullptr`”并不会阻止形参 `ptr` 的析构。
-
-------
-
-##### 5.3.7 `reset()`：返回一个新 prvalue，旧参数不会被转移出去
-
-题目中的函数：
-
-```cpp
-Unique reset(Unique ptr)
-{
-    if (ptr) ptr->record('r');
-    return std::make_unique<Resource>();
-}
-```
-
-这里有两条彼此独立的所有权链：
-
-```text
-旧资源：由形参 ptr 持有
-新资源：由 std::make_unique<Resource>() 创建
-```
-
-执行：
-
-```cpp
-return std::make_unique<Resource>();
-```
-
-时，返回的是**新的 `unique_ptr`**，不是 `ptr`。
-
-在 C++17 以后，这个同类型 prvalue 可以直接形成函数返回结果：
-
-```text
-ptr ─────────→ 旧 Resource
-
-返回结果 ────→ 新 Resource
-```
-
-因此旧的 `ptr` 没有被移动出去。等 `ptr` 析构时，它仍持有旧资源，于是旧资源被释放。
-
-所以这三个函数的返回行为可以直接对照：
-
-| 函数 | `return` 操作数 | 形参 `ptr` 的资源是否转移到返回结果 | `ptr` 析构时是否还拥有旧资源 |
-| --- | --- | --- | --- |
-| `forward(ptr)` | `ptr` | 是，隐式移动 | 否 |
-| `drop(ptr)` | `nullptr` | 否 | 是 |
-| `reset(ptr)` | 新的 `make_unique` 结果 | 否 | 是 |
-
-------
-
-##### 5.3.8 函数形参对象的析构时机：函数退出还是 full-expression 结束
-
-前面为了理解 `drop()` 和 `reset()`，把“函数结束后形参会析构”作为直观模型来使用。这个模型足够帮助理解所有权，但如果代码依赖**析构发生的精确先后顺序**，还必须知道一条更细的标准规则：
-
-> **函数参数对象是在被调用函数退出时销毁，还是推迟到包含该函数调用的外围 full-expression（完整表达式）结束时销毁，是 implementation-defined（实现定义）的。**
-
-也就是说，标准允许不同实现选择不同的参数析构时机。无论实现选择哪一种，参数对象之间都按照**构造顺序的逆序**销毁。
-
-这里的 **full-expression** 可以先理解为“一次完整求值单位”。对于普通表达式语句，最常见的情况就是从表达式开始一直到末尾分号。例如：
-
-```cpp
-forward(drop(reset(forward(forward(reset(nullptr))))));
-```
-
-对于这条表达式语句，外围的整个嵌套调用：
-
-```text
-forward(drop(reset(forward(forward(reset(nullptr))))))
-```
-
-共同属于这个 full-expression，而不是每个内层函数调用各自成为一个独立的 full-expression。
-
-这会直接影响“析构函数具有可观察副作用”时记录出现的顺序。以这道 `unique_ptr` 练习为例，资源本身经历的操作是确定的：
-
-```text
-Resource A：forward → forward → reset
-            得到 "ffr"
-
-Resource B：drop
-            得到 "d"
-```
-
-所以两个资源最终保存的记录一定分别是：
-
-```text
-"ffr"
-"d"
-```
-
-但它们**谁先析构、谁先被 `Resource::~Resource()` 写入全局 `RECORDS`**，可能取决于实现。
-
-一种允许的实现策略是：参数在相应函数退出时销毁。可以近似理解为：
-
-```text
-reset(A) 返回
-    ↓
-reset 的参数 ptr 销毁
-    ↓
-A 析构，记录 "ffr"
-    ↓
-之后 drop(B) 的参数销毁
-    ↓
-B 析构，记录 "d"
-```
-
-那么可能得到：
-
-```cpp
-{"ffr", "d"}
-```
-
-另一种同样符合标准的实现策略是：把相关参数的销毁推迟到外围 full-expression 结束。此时后构造的相关参数会先销毁，因此可能先销毁持有 B 的参数，再销毁持有 A 的参数：
-
-```text
-整个 full-expression 结束
-        ↓
-后构造的参数先析构
-        ↓
-B 析构 → 记录 "d"
-        ↓
-A 析构 → 记录 "ffr"
-```
-
-于是可能得到：
-
-```cpp
-{"d", "ffr"}
-```
-
-> [!IMPORTANT]
-> **函数的执行顺序和函数参数对象的析构顺序不是同一个问题。** 不能看到 `reset()` 已经返回，就在所有实现上都断言它的参数一定已经析构。
-
-这也是为什么某些依赖析构副作用的测试会注明“结果可能与平台/实现有关”。更准确地说，变化来源不是 `std::unique_ptr` 的所有权规则不同，而是 C++ 标准在**函数参数对象的销毁时机**上给实现保留了选择。
-
-在正常工程代码中，不应该让程序正确性依赖这种 implementation-defined 的析构先后顺序。如果必须控制可观察副作用的顺序，应通过更明确的语句、作用域或显式操作建立顺序，而不是依赖嵌套函数调用中参数何时析构。
-
-参考：[C++ 标准草案：Function call](https://eel.is/c++draft/expr.call)、[C++ 标准草案：Full-expressions](https://eel.is/c++draft/intro.execution#def:full-expression)。
-
-------
-
-##### 5.3.9 返回 `const` 局部变量为什么可能阻止移动
+###### `const` 局部类对象
 
 例如：
 
@@ -529,57 +527,25 @@ A make_a()
 }
 ```
 
-典型的移动构造函数是：
+如果实施 NRVO，仍然可以省略相关复制/移动。
+
+但如果没有 NRVO，常见移动构造函数：
 
 ```cpp
-A(A&& other);
+A(A&&);
 ```
 
-它需要绑定到：
-
-```cpp
-A&&
-```
-
-但一个 `const A` 即使被当作右值使用，其类型仍然带有 `const`，相应引用形态是：
-
-```cpp
-const A&&
-```
-
-`const A&&` 不能绑定到要求可修改源对象的普通 `A&&` 参数，因此常见的 `A(A&&)` 无法使用。
-
-如果类同时有：
+不能直接接收 `const A` 作为可修改的移动源，因此通常会退回到：
 
 ```cpp
 A(const A&);
 ```
 
-那么通常只能复制。
+也就是复制。
 
-所以对于准备按值返回、并希望允许移动的普通局部对象，一般不要无意义地把它声明成 `const`：
+因此如果一个局部类对象准备按值返回并希望允许移动，一般不要无意义地给它加 `const`。
 
-```cpp
-A local;       // 通常更适合返回
-return local;
-```
-
-而不是：
-
-```cpp
-const A local;
-return local;
-```
-
-当然，如果实施了 NRVO，复制/移动本身仍可能被省略；这里讨论的是**没有发生 NRVO 时构造函数重载如何选择**。
-
-------
-
-##### 5.3.10 全局变量、静态局部变量不会因为 `return name;` 自动移动
-
-隐式移动规则主要针对满足条件的自动存储期对象。
-
-例如：
+###### 全局对象和静态局部对象
 
 ```cpp
 A global;
@@ -590,15 +556,7 @@ A get_global()
 }
 ```
 
-`global` 不是自动存储期局部对象，因此普通的：
-
-```cpp
-return global;
-```
-
-不会因为它出现在 `return` 中就自动把全局对象“掏空”。它仍然是一个普通 lvalue，通常按复制语义初始化返回结果。
-
-静态局部变量同理：
+以及：
 
 ```cpp
 A get_static()
@@ -608,102 +566,275 @@ A get_static()
 }
 ```
 
-这里 `value` 具有静态存储期，也不属于普通的隐式移动返回场景。
-
-如果显式写：
-
-```cpp
-return std::move(global);
-```
-
-那是在明确要求把全局对象当作将亡值使用，可能把全局对象留在 moved-from 状态；除非设计上非常确定需要这么做，否则通常不是合理接口。
+这些对象具有静态存储期，不属于普通自动存储期的隐式移动返回场景，所以 `return name;` 不会仅仅因为处在 `return` 中就自动把它们“掏空”。
 
 ------
 
-##### 5.3.11 返回引用：根本不是“产生一个新的返回值对象”
+##### 5.3.8 `unique_ptr` 所有权实例
+
+下面用练习中的三个函数把前面的返回机制串起来：
+
+```cpp
+using Unique = std::unique_ptr<Resource>;
+
+Unique reset(Unique ptr)
+{
+    if (ptr) ptr->record('r');
+    return std::make_unique<Resource>();
+}
+
+Unique drop(Unique ptr)
+{
+    if (ptr) ptr->record('d');
+    return nullptr;
+}
+
+Unique forward(Unique ptr)
+{
+    if (ptr) ptr->record('f');
+    return ptr;
+}
+```
+
+###### 按值传入 `unique_ptr`
+
+这里：
+
+```cpp
+Unique func(Unique ptr);
+```
+
+意味着函数需要构造自己的形参对象 `ptr`。
+
+如果调用者有：
+
+```cpp
+Unique p = std::make_unique<Resource>();
+```
+
+直接写：
+
+```cpp
+func(p);              // 错误：需要复制 unique_ptr
+```
+
+因为 `unique_ptr` 禁止复制。
+
+应当显式转移所有权：
+
+```cpp
+func(std::move(p));   // 可以移动
+```
+
+之后：
+
+```text
+调用前：
+
+p ─────────→ Resource
+
+形参初始化后：
+
+p   ───────→ nullptr
+ptr ───────→ Resource
+```
+
+如果传入的本来就是一个临时/prvalue `unique_ptr`，则不需要手动再套一层 `std::move`。
+
+###### `forward`：把旧资源继续返回
+
+```cpp
+Unique forward(Unique ptr)
+{
+    if (ptr) ptr->record('f');
+    return ptr;
+}
+```
+
+这里返回的是形参 `ptr` 本身。
+
+形参不能 NRVO，但可以隐式移动：
+
+```text
+ptr ─────────→ Resource
+       return ptr
+           ↓
+ptr      → nullptr
+返回结果 → Resource
+```
+
+所以资源继续存活。
+
+###### `drop`：不返回旧资源
+
+```cpp
+Unique drop(Unique ptr)
+{
+    if (ptr) ptr->record('d');
+    return nullptr;
+}
+```
+
+这里返回的是一个空 `unique_ptr`，不是 `ptr`：
+
+```text
+返回结果 ────→ nullptr
+ptr      ────→ Resource
+```
+
+因此旧资源没有被移动出去。
+
+当 `ptr` 最终析构时，它仍拥有 `Resource`，于是 `unique_ptr` 会删除资源。
+
+###### `reset`：返回一个新资源
+
+```cpp
+Unique reset(Unique ptr)
+{
+    if (ptr) ptr->record('r');
+    return std::make_unique<Resource>();
+}
+```
+
+这里同时存在两条所有权链：
+
+```text
+ptr ─────────→ 旧 Resource
+
+返回结果 ────→ 新 Resource
+```
+
+`std::make_unique<Resource>()` 产生新的 `unique_ptr` prvalue；C++17 起它可以直接形成函数返回结果。
+
+因此 `ptr` 中的旧资源没有被转移出去。当 `ptr` 最终析构时，旧资源也随之销毁。
+
+三个函数可以总结成：
+
+| 函数 | 返回表达式 | 旧资源是否进入返回结果 | `ptr` 最终析构时是否还拥有旧资源 |
+| --- | --- | --- | --- |
+| `forward` | `ptr` | 是，隐式移动 | 否 |
+| `drop` | `nullptr` | 否 | 是 |
+| `reset` | 新的 `make_unique` 结果 | 否 | 是 |
+
+> [!IMPORTANT]
+> 分析智能指针时始终区分两个对象：
+>
+> ```text
+> unique_ptr 对象本身
+>        ↓ 管理
+> Resource 资源对象
+> ```
+>
+> `unique_ptr` 对象析构并不等于 `Resource` 一定析构；只有该 `unique_ptr` 在析构时仍拥有资源，才会删除资源。
+
+------
+
+##### 5.3.9 参数析构时机
+
+前面为了理解所有权，可以暂时把“函数结束后形参会析构”当作直观模型。
+
+但如果程序依赖**析构的精确先后顺序**，还需要知道一个更细的规则：
+
+> 函数参数对象是在被调用函数退出时销毁，还是推迟到包含该函数调用的外围 full-expression（完整表达式）结束时销毁，是 implementation-defined（实现定义）的。
 
 例如：
 
 ```cpp
-A& get(A& value)
+forward(drop(reset(forward(forward(reset(nullptr))))));
+```
+
+这一整条表达式直到最后的：
+
+```cpp
+;
+```
+
+才结束外围 full-expression。
+
+因此不能仅仅看到某个内层函数已经返回，就在所有实现上都断言它的形参对象已经析构。
+
+这会影响下面这种代码：
+
+```cpp
+~Resource()
 {
-    return value;
+    RECORDS.push_back(_records);
 }
 ```
 
-函数返回类型是：
+因为析构本身具有可观察副作用。
 
-```cpp
-A&
-```
-
-因此调用结果只是引用原来的对象，并不会产生一个新的 `A` 对象，也就不存在复制构造或移动构造。
-
-但绝不能返回对普通局部对象的引用：
-
-```cpp
-A& bad()
-{
-    A local;
-    return local;  // 错误设计：函数结束后 local 生命周期结束
-}
-```
-
-函数结束后 `local` 已被销毁，返回的引用会悬空。
-
-因此需要区分：
+资源经历的操作可能确定为：
 
 ```text
-T  f()   → 按值返回，产生 T 类型的函数结果
-T& f()   → 返回引用，调用结果引用某个已有对象
+Resource A → "ffr"
+Resource B → "d"
 ```
+
+但谁先析构、谁先写入 `RECORDS`，可能因实现选择不同而不同，例如可能出现：
+
+```cpp
+{"ffr", "d"}
+```
+
+也可能出现：
+
+```cpp
+{"d", "ffr"}
+```
+
+所以正常工程代码不应该让正确性依赖这种 implementation-defined 的参数析构时机。
 
 ------
 
-##### 5.3.12 常见返回写法对照表
+##### 5.3.10 判断流程
 
-| 写法 | 典型行为 |
-| --- | --- |
-| `return ptr;`，`ptr` 是按值形参 | 不能 NRVO；满足条件时进行**隐式移动** |
-| `return local;`，`local` 是普通局部变量 | 优先可能进行 **NRVO**；若未消除，通常尝试移动 |
-| `return std::move(local);` | 把表达式变成 xvalue，通常使用移动构造，但通常也会**阻止 NRVO** |
-| `return T{};` | C++17 起同类型 prvalue **直接构造返回结果**，不需要复制/移动 |
-| `return std::make_unique<T>();` | C++17 起同类型 prvalue 可直接形成返回结果，不需要额外移动 |
-| `return const_local;` | 若未 NRVO，普通 `T(T&&)` 往往不能接收 `const T`，通常退回复制 |
-| `return global;` / `return static_local;` | 不属于普通隐式移动返回场景，通常按 lvalue 复制 |
-| `return 1;` | 返回标量值，不涉及类的复制/移动构造 |
-| 返回类型是 `T&`，`return obj;` | 返回已有对象的引用，不产生新的 `T` 返回对象 |
-
-可以把类类型按值返回的判断过程概括为：
+以后看到一个 `return`，可以按下面顺序分析：
 
 ```text
 看到 return expression;
         ↓
-返回的是引用类型吗？
- ├─ 是 → 返回已有对象的引用，不讨论复制/移动构造
- └─ 否
+① 返回类型是什么？
         ↓
-expression 是与返回类型相同的 prvalue 吗？
- ├─ 是 → C++17 起直接构造最终返回结果
- └─ 否
-        ↓
-expression 是满足 NRVO 条件的具名普通局部变量吗？
- ├─ 是 → 编译器可以实施 NRVO
- │        └─ 若未实施，再考虑隐式移动 / 复制
- └─ 否
-        ↓
-expression 是满足隐式移动条件的自动存储期对象或形参吗？
- ├─ 是 → 返回时优先按移动语义处理
- └─ 否 → 按表达式原本的值类别进行初始化
+ ┌──────┼─────────────┐
+ │      │             │
+标量   引用          类类型
+ │      │             │
+ │      └→ 引用已有对象│
+ │                    ↓
+ └→ 返回标量值    ② expression 是同类型 prvalue？
+                      │
+                 ┌────┴────┐
+                 是        否
+                 │          │
+         C++17 起直接构造    ↓
+                        ③ 是满足 NRVO 条件的
+                          具名局部类对象？
+                              │
+                         ┌────┴────┐
+                         是        否
+                         │          │
+                    可以 NRVO       ↓
+                    未实施则移动  ④ 是满足隐式移动条件
+                                  的局部对象/形参？
+                                      │
+                                 ┌────┴────┐
+                                 是        否
+                                 │          │
+                              隐式移动   按表达式原本
+                                         的值类别初始化
 ```
 
-> [!IMPORTANT]
-> 对实际编程最有用的规则是：
->
-> 1. 返回新对象时，直接写 `return T{...};` 或返回工厂函数产生的 prvalue；
-> 2. 返回普通局部变量时，优先写 `return local;`，让编译器有机会做 NRVO；
-> 3. 返回按值形参时，`return param;` 已能利用隐式移动，不要机械地加 `std::move`；
-> 4. 不要把“按值返回”简单记成“必然移动一次”；
-> 5. 分析 `unique_ptr` 时，要分别追踪“智能指针对象本身”和“它所拥有的资源对象”。
+最重要的几条结论是：
 
-参考：[C++ 标准草案：return statement](https://eel.is/c++draft/stmt.return)、[C++ 标准草案：copy/move elision](https://eel.is/c++draft/class.copy.elision)、[C++ 标准草案：move-eligible expressions](https://eel.is/c++draft/expr.prim.id)、[cppreference：return statement](https://en.cppreference.com/w/cpp/language/return)、[cppreference：copy elision](https://en.cppreference.com/w/cpp/language/copy_elision)、[cppreference：value categories](https://en.cppreference.com/w/cpp/language/value_category)。
+1. **先看返回类型，再讨论机制。**
+2. `int`、`double`、裸指针等标量类型不讨论复制/移动构造，也不适用 NRVO。
+3. NRVO 针对的是满足条件的**具名局部类对象**，不是所有“局部变量”。
+4. `return T{...};` 这类同类型 prvalue 在 C++17 起可以直接构造最终返回结果。
+5. `return local;` 对具名局部类对象应优先保留 NRVO 机会；未实施 NRVO 时还可能隐式移动。
+6. 函数按值形参不能 NRVO，但满足条件时可以在返回时隐式移动。
+7. `return std::move(local);` 通常会破坏 NRVO 条件，不应机械添加。
+8. `std::move` 本身不移动资源；真正的移动效果由目标类型的移动语义决定。
+9. 对 `unique_ptr` 要分别追踪智能指针对象与它所拥有的资源对象。
+
+参考：[C++ 标准草案：return statement](https://eel.is/c++draft/stmt.return)、[C++ 标准草案：copy/move elision](https://eel.is/c++draft/class.copy.elision)、[C++ 标准草案：move-eligible expressions](https://eel.is/c++draft/expr.prim.id)、[C++ 标准草案：function call](https://eel.is/c++draft/expr.call)、[cppreference：copy elision](https://en.cppreference.com/w/cpp/language/copy_elision)、[cppreference：return statement](https://en.cppreference.com/w/cpp/language/return)。
