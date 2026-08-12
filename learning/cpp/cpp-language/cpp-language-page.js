@@ -41,6 +41,11 @@
         return normalizeReferenceLabels(sections.filter(Boolean).join('\n\n'));
     });
 
+    var chapter14SharedPtrSectionPromise = loadNote(
+        './chapter14-shared-ptr.md?v=20260813a',
+        'Failed to load chapter 14 shared_ptr notes.'
+    ).then(normalizeReferenceLabels);
+
     window.fetch = function () {
         var args = arguments;
         var input = args[0];
@@ -58,13 +63,15 @@
                 chapter5SectionPromise,
                 chapter9SectionPromise,
                 chapter10SectionPromise,
-                chapter13SectionPromise
+                chapter13SectionPromise,
+                chapter14SharedPtrSectionPromise
             ]).then(function (results) {
                 var markdown = results[0];
                 var chapter5Section = results[1];
                 var chapter9Section = results[2];
                 var chapter10Section = results[3];
                 var chapter13Section = results[4];
+                var chapter14SharedPtrSection = results[5];
 
                 if (
                     chapter5Section &&
@@ -111,6 +118,16 @@
                         '\n\n' + chapter13Section +
                         '\n\n[legacy-vector-data-section]: # "#### 13.2 `std::vector::data()`：取得底层连续存储的首地址"' +
                         '\n\n### 14、类型别名声明（using别名）'
+                    );
+                }
+
+                if (
+                    chapter14SharedPtrSection &&
+                    markdown.indexOf('##### 14.2.1 `std::make_shared<T>(args...)`：参数用于构造被管理对象') === -1
+                ) {
+                    markdown = markdown.replace(
+                        '\n#### 14.3 `std::weak_ptr`',
+                        '\n\n' + chapter14SharedPtrSection + '\n\n#### 14.3 `std::weak_ptr`'
                     );
                 }
 
