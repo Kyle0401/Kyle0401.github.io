@@ -378,3 +378,159 @@ shared ─→ nullptr
 > 对 `shared_ptr` 使用 `std::move` 时，**移动的是 `shared_ptr` 的所有权状态，不是底层对象。移动后源 `shared_ptr` 为空；这次所有权转移本身不会增加同一控制块的强引用计数。**
 
 参考：[cppreference：`std::shared_ptr::operator=`](https://en.cppreference.com/w/cpp/memory/shared_ptr/operator%3D)、[cppreference：`std::shared_ptr`](https://en.cppreference.com/w/cpp/memory/shared_ptr)、[cppreference：`std::move`](https://en.cppreference.com/w/cpp/utility/move)。
+
+##### 14.2.4 `std::ignore` 与 `std::move`：写了 `std::move` 不等于已经发生移动
+
+`std::ignore` 是标准库提供的一个特殊对象，可以把它理解成一个**“接收后直接忽略”的占位对象**。它定义在 `<tuple>` 中，最常见的用途是配合 `std::tie()` 忽略不需要的结果。
+
+例如：
+
+```cpp
+#include <tuple>
+
+int i;
+std::string s;
+
+std::tie(i, std::ignore, s) = std::make_tuple(42, 3.14, "C++");
+```
+
+这里中间的 `3.14` 被交给 `std::ignore`，程序不会保存它。
+
+从理解语义的角度，可以把 `std::ignore` 想象成一个赋值运算符可以接收各种类型、但收到后什么都不做的对象：
+
+```cpp
+std::ignore = value;  // value 被忽略
+```
+
+###### 为什么 `std::ignore = std::move(ptrs[0]);` 不会把 `ptrs[0]` 移空
+
+考虑：
+
+```cpp
+std::ignore = std::move(ptrs[0]);
+```
+
+最容易误解成：
+
+```text
+对 ptrs[0] 调用了 std::move
+        ↓
+ptrs[0] 一定被移动走
+        ↓
+ptrs[0] 变成 nullptr
+```
+
+这个推理是错误的。
+
+`std::move` **本身并不执行资源转移**。它的作用是把表达式转换为可以作为右值使用的形式，使后续操作有机会选择移动构造函数或移动赋值运算符。
+
+因此：
+
+```cpp
+std::move(ptrs[0])
+```
+
+只表示“把 `ptrs[0]` 当作可移动的右值来使用”，真正是否发生移动，要看**接下来拿这个表达式做什么**。
+
+在：
+
+```cpp
+std::shared_ptr<int> p2 = std::move(p1);
+```
+
+中，右边的结果用于构造另一个 `shared_ptr`，于是会调用 `shared_ptr` 的移动构造，所有权真的从 `p1` 转移到 `p2`：
+
+```text
+移动前：
+
+p1 ──→ int(10)
+
+移动后：
+
+p1 ──→ nullptr
+p2 ──→ int(10)
+```
+
+但在：
+
+```cpp
+std::ignore = std::move(ptrs[0]);
+```
+
+中，右侧表达式只是交给 `std::ignore` 的赋值操作，而 `std::ignore` 会直接忽略这个值，并不会用它去移动构造或移动赋值另一个 `shared_ptr`。
+
+因此这里**没有调用 `std::shared_ptr` 的移动构造函数或移动赋值运算符**，`ptrs[0]` 仍然保持原来的所有权状态。
+
+例如：
+
+```cpp
+auto p = std::make_shared<int>(10);
+
+std::ignore = std::move(p);
+```
+
+执行后仍然有：
+
+```cpp
+p != nullptr;       // true
+p.use_count() == 1; // true
+```
+
+可以把整个过程理解为：
+
+```text
+ptrs[0]
+   │
+   │ std::move
+   ▼
+得到一个右值表达式
+   │
+   ▼
+交给 std::ignore
+   │
+   ▼
+直接忽略，不构造新的 shared_ptr
+   │
+   ▼
+ptrs[0] 保持不变
+```
+
+因此如果原来：
+
+```text
+ptrs[0] ─┐
+ptrs[1] ─┼──→ int(10)
+ptrs[2] ─┘
+
+use_count = 3
+```
+
+执行：
+
+```cpp
+std::ignore = std::move(ptrs[0]);
+```
+
+之后仍然是：
+
+```text
+ptrs[0] ─┐
+ptrs[1] ─┼──→ int(10)
+ptrs[2] ─┘
+
+use_count = 3
+```
+
+强引用计数不会因为这一句发生变化。
+
+> [!IMPORTANT]
+> **`std::move(x)` 不等于“移动了 `x`”。** `std::move` 只改变表达式的值类别；只有后续操作实际调用移动构造、移动赋值或其他会消耗该右值的操作时，资源或所有权才可能真正发生转移。
+
+这也解释了下面两句为什么不同：
+
+```cpp
+std::shared_ptr<int> p2 = std::move(p1);  // 真正发生 shared_ptr 的移动构造
+std::ignore = std::move(p1);              // 只是把右值表达式交给 ignore，p1 不会因此被移空
+```
+
+参考：[cppreference：`std::ignore`](https://en.cppreference.com/w/cpp/utility/tuple/ignore)、[cppreference：`std::move`](https://en.cppreference.com/w/cpp/utility/move)、[cppreference：`std::shared_ptr`](https://en.cppreference.com/w/cpp/memory/shared_ptr)。
