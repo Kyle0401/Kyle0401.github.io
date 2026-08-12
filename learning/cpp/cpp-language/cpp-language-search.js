@@ -20,13 +20,24 @@
             .replace(/'/g, '&#39;');
     }
 
+    function unescapeMarkdown(value) {
+        return String(value || '').replace(/\\([\\`*_{}\[\]()#+\-.!<>|~])/g, '$1');
+    }
+
     function normalizeText(value) {
-        return String(value || '')
+        return unescapeMarkdown(String(value || '')
             .replace(/`([^`]+)`/g, '$1')
             .replace(/!\[([^\]]*)\]\([^)]*\)/g, '$1')
             .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
-            .replace(/<[^>]+>/g, ' ')
-            .replace(/[>*_~#|]/g, ' ')
+            // 只移除常见 HTML 标签，不要用 /<[^>]+>/，否则 C++ 的 <int>、<T> 等模板参数也会被删掉。
+            .replace(/<\/?(?:br|div|span|p|a|strong|em|code|pre|details|summary|table|thead|tbody|tr|th|td|ul|ol|li|blockquote|kbd|sup|sub|hr)\b[^>]*>/gi, ' '))
+            // 保留 C++ 标识符和语法中的特殊符号，例如 _、*、::、< >、[]、|、~、#。
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
+
+    function normalizeQuery(value) {
+        return unescapeMarkdown(value)
             .replace(/\s+/g, ' ')
             .trim();
     }
@@ -101,7 +112,7 @@
 
     function loadRecords() {
         if (recordsPromise) return recordsPromise;
-        recordsPromise = window.fetch('./C++语言学习.md?v=20260812-search')
+        recordsPromise = window.fetch('./C++语言学习.md?v=20260813-symbol-search')
             .then(function (response) {
                 if (!response.ok) throw new Error('search source unavailable');
                 return response.text();
@@ -212,7 +223,7 @@
     root.innerHTML =
         '<div class="cpp-global-search-box">' +
             '<span class="cpp-global-search-icon" aria-hidden="true">⌕</span>' +
-            '<input class="cpp-global-search-input" id="cpp-global-search-input" type="search" autocomplete="off" spellcheck="false" aria-label="全文搜索 C++ 笔记" aria-controls="cpp-global-search-results" aria-expanded="false" placeholder="搜索全文关键词或术语…">' +
+            '<input class="cpp-global-search-input" id="cpp-global-search-input" type="search" autocomplete="off" spellcheck="false" aria-label="全文搜索 C++ 笔记" aria-controls="cpp-global-search-results" aria-expanded="false" placeholder="搜索全文关键词、术语或 C++ 符号…">' +
             '<span class="cpp-global-search-shortcut" aria-hidden="true">Ctrl K</span>' +
         '</div>' +
         '<div class="cpp-global-search-results" id="cpp-global-search-results" role="listbox" aria-label="搜索结果"></div>';
@@ -270,7 +281,8 @@
     }
 
     function runSearch() {
-        var query = input.value.trim();
+        var rawQuery = input.value.trim();
+        var query = normalizeQuery(rawQuery);
         if (!query) {
             renderResults([], '');
             return;
@@ -280,7 +292,7 @@
         setOpen(true);
 
         loadRecords().then(function (records) {
-            if (input.value.trim() !== query) return;
+            if (input.value.trim() !== rawQuery) return;
             var ranked = records
                 .map(function (record) {
                     return { record: record, score: scoreRecord(record, query) };
