@@ -280,3 +280,304 @@ auto ref = static_cast<bool>(vec[30]);
 > 这里并不是说“`auto` 总是引用、`bool` 总是拷贝”。关键在于：**`auto` 会保留 `vec[i]` 返回的代理对象类型，而显式写 `bool` 会要求发生到普通布尔值的转换，从而得到独立值。**
 
 参考：[cppreference：`auto` 占位类型说明符](https://en.cppreference.com/w/cpp/language/auto)。
+
+#### 13.4 `std::map`：按键有序存储的关联容器
+
+`std::map<Key, T>` 是标准库中的**有序关联容器**，定义在 `<map>` 中。每个元素由一个唯一的键（key）和与之关联的值（mapped value）组成，元素按照键的比较规则保持有序。
+
+例如：
+
+```cpp
+#include <map>
+#include <string>
+
+std::map<std::string, std::string> secrets;
+secrets["hello"] = "world";
+secrets["foo"] = "bar";
+```
+
+可以把其中的元素概念上理解为：
+
+```text
+key       mapped value
+"foo"   → "bar"
+"hello" → "world"
+```
+
+`std::map` 的模板参数中，`Key` 表示键类型，`T` 表示映射值类型。一个 `map` 中不能同时存在两个等价的 key；再次给同一个 key 赋值时，通常是在修改这个 key 已关联的 value，而不是再创建一个相同 key。
+
+参考：[cppreference：`std::map`](https://en.cppreference.com/w/cpp/container/map)。
+
+##### 13.4.1 `operator[]`：访问 value，不只是“查找 key”
+
+对非 `const std::map`，可以使用 `operator[]` 按 key 访问对应的 mapped value：
+
+```cpp
+std::map<std::string, std::string> secrets;
+secrets["hello"] = "world";
+
+std::string value = secrets["hello"];
+```
+
+对于：
+
+```cpp
+std::map<K, V> map;
+```
+
+表达式：
+
+```cpp
+map[key]
+```
+
+得到的是这个 key 对应的 **`V` 对象的引用**，也就是 `mapped_type&`。因此它既可以读取 value，也可以直接修改 value：
+
+```cpp
+map[key] = value;
+```
+
+但 `operator[]` 有一个非常重要的行为：**如果 key 不存在，它会向 `map` 中插入这个 key，并为 mapped value 进行值初始化，然后返回新 value 的引用。**
+
+例如：
+
+```cpp
+std::map<std::string, std::string> secrets;
+
+secrets["foo"];
+```
+
+调用前：
+
+```text
+secrets = {}
+```
+
+调用后会出现一个新元素：
+
+```text
+"foo" → ""
+```
+
+因为这里的 mapped type 是 `std::string`，值初始化得到空字符串。
+
+因此不要把：
+
+```cpp
+map[key]
+```
+
+简单理解为“只查一下 key”。它更准确的语义是：
+
+> **取得这个 key 对应的 value；如果 key 不存在，则创建这个元素后再取得 value。**
+
+参考：[cppreference：`std::map::operator[]`](https://en.cppreference.com/w/cpp/container/map/operator_at)。
+
+##### 13.4.2 为什么 `const std::map` 不能使用 `operator[]`
+
+假设函数参数写成：
+
+```cpp
+std::map<K, V> const& map
+```
+
+这里的 `map` 是对 `const std::map<K, V>` 的引用，函数通过这个引用不能执行会修改该 `map` 的操作。
+
+如果写：
+
+```cpp
+map[key]
+```
+
+就可能出现矛盾：当 `key` 不存在时，`operator[]` 必须向容器中插入一个新元素，这会修改 `map`。
+
+因此 `std::map::operator[]` **没有 `const` 成员函数版本**，不能通过 `const std::map` 调用：
+
+```cpp
+void f(std::map<std::string, std::string> const& map) {
+    map["hello"];  // 错误：const map 不能调用 operator[]
+}
+```
+
+这里需要特别注意：问题并不是“`[]` 天生不能读取 `const` 对象”，而是 **`std::map` 的这个 `operator[]` 具有可能插入元素的语义，因此不能设计成只读的 `const` 操作。**
+
+如果只是想在 `const map` 中查找一个 key，可以使用 `find()`；如果确定 key 已存在并希望读取对应 value，也可以使用 `at()`，因为 `at()` 提供 `const` 重载，并且 key 不存在时会抛出 `std::out_of_range`。
+
+> [!IMPORTANT]
+> `std::map::operator[]` 不是纯查询操作。它可能插入元素，所以只能用于非 `const map`。只查询是否存在时应优先使用 `find()`（C++20 起也可以使用 `contains()`）。
+
+参考：[cppreference：`std::map::operator[]`](https://en.cppreference.com/w/cpp/container/map/operator_at)、[cppreference：`std::map::at`](https://en.cppreference.com/w/cpp/container/map/at)。
+
+##### 13.4.3 `find()`：按 key 查找元素
+
+`find(key)` 用于在 `map` 中查找指定 key，并且**不会因为没找到而插入新元素**。
+
+```cpp
+std::map<std::string, std::string> secrets{
+    {"hello", "world"},
+    {"foo", "bar"}
+};
+
+auto it = secrets.find("hello");
+```
+
+如果找到了，`find()` 返回一个指向对应元素的迭代器；如果没有找到，则返回该容器的 `end()`：
+
+```cpp
+secrets.find("hello") != secrets.end();  // true
+secrets.find("abc")   == secrets.end();  // true
+```
+
+`std::map` 的一个元素实际是类似下面的键值对：
+
+```cpp
+std::pair<const Key, T>
+```
+
+因此找到元素后可以通过迭代器访问：
+
+```cpp
+auto it = secrets.find("hello");
+
+if (it != secrets.end()) {
+    it->first;   // key："hello"
+    it->second;  // mapped value："world"
+}
+```
+
+其中：
+
+```text
+it->first   → key
+it->second  → mapped value
+```
+
+对于非 `const map`，`find()` 返回 `iterator`；对于 `const map`，返回 `const_iterator`，因此下面这种只读查询完全合法：
+
+```cpp
+bool key_exists(
+    std::map<std::string, std::string> const& map,
+    std::string const& key
+) {
+    return map.find(key) != map.end();
+}
+```
+
+对 `std::map` 来说，`find()` 的查找复杂度是对数级 `O(log n)`。
+
+参考：[cppreference：`std::map::find`](https://en.cppreference.com/w/cpp/container/map/find)。
+
+##### 13.4.4 `end()`：尾后迭代器，不指向任何元素
+
+`map.end()` 返回一个**尾后（past-the-end）迭代器**。它表示“已经越过最后一个元素的位置”，本身不指向任何有效元素，因此不能解引用：
+
+```cpp
+auto it = map.end();
+
+*it;        // 错误：不能解引用 end()
+it->first;  // 错误
+```
+
+可以把它概念上理解成：
+
+```text
+map 中的有序元素：
+
+[key1] → [key2] → [key3] → end()
+  ↑                         ↑
+begin()                  尾后位置
+```
+
+`end()` 最常见的用途不是“取得最后一个元素”，而是作为**遍历结束或查找失败的哨兵位置**：
+
+```cpp
+for (auto it = map.begin(); it != map.end(); ++it) {
+    // 访问 *it
+}
+```
+
+以及：
+
+```cpp
+auto it = map.find(key);
+
+if (it == map.end()) {
+    // 没找到 key
+} else {
+    // 找到了 key，可以使用 it->first / it->second
+}
+```
+
+对于空 `map`：
+
+```cpp
+map.begin() == map.end();
+```
+
+这正好表示没有任何可以遍历的元素。
+
+> [!IMPORTANT]
+> `end()` 不是“最后一个元素”，而是“最后一个元素之后的位置”。所以它可以用于比较，但不能解引用。
+
+参考：[cppreference：`std::map::end`](https://en.cppreference.com/w/cpp/container/map/end)。
+
+##### 13.4.5 用 `find()` + `end()` 判断 key 是否存在
+
+有了前面的定义，下面这行代码就可以完整理解了：
+
+```cpp
+return map.find(key) != map.end();
+```
+
+执行过程是：
+
+```text
+map.find(key)
+     │
+     ├── 找到 key ──→ 返回指向该元素的迭代器
+     │                    │
+     │                    └── != map.end() → true
+     │
+     └── 没找到 key ─→ 返回 map.end()
+                          │
+                          └── != map.end() → false
+```
+
+因此练习中的函数可以写成：
+
+```cpp
+template<class K, class V>
+bool key_exists(std::map<K, V> const& map, K const& key) {
+    return map.find(key) != map.end();
+}
+```
+
+而设置键值对可以写成：
+
+```cpp
+template<class K, class V>
+void set(std::map<K, V>& map, K key, V value) {
+    map[key] = value;
+}
+```
+
+这里两种操作的语义应明确区分：
+
+| 写法 | 主要目的 | key 不存在时是否插入 | 可否用于 `const map` |
+| --- | --- | --- | --- |
+| `map[key]` | 取得/修改 mapped value | **会** | 否 |
+| `map.find(key)` | 查找 key | 不会 | 是 |
+| `map.at(key)` | 取得已存在 key 的 value | 不会；不存在则抛异常 | 是（有 `const` 重载） |
+
+C++20 起，如果只需要判断 key 是否存在，还可以直接写：
+
+```cpp
+return map.contains(key);
+```
+
+但理解 `find()` 与 `end()` 仍然非常重要，因为这种“查找返回迭代器，失败返回 `end()`”的接口模式在标准库容器中非常常见。
+
+> [!IMPORTANT]
+> 判断是否存在时，不要写 `return map[key];`。这不仅会在 key 不存在时修改 `map`，而且 `map[key]` 返回的是 mapped value，并不是“key 是否存在”的布尔结果。
+
+参考：[cppreference：`std::map::find`](https://en.cppreference.com/w/cpp/container/map/find)、[cppreference：`std::map::end`](https://en.cppreference.com/w/cpp/container/map/end)、[cppreference：`std::map::contains`](https://en.cppreference.com/w/cpp/container/map/contains)。
