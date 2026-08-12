@@ -1055,3 +1055,259 @@ output[i] = op(input1[i], input2[i]);
 > `std::transform` 的核心不是“乘以 2”或“转字符串”，而是：**把输入范围中的元素交给 `op`，再把 `op` 的返回值写到输出范围。** `op` 决定“怎么变”，`transform` 负责“逐元素应用这个变换”。
 
 参考：[cppreference：`std::transform`](https://en.cppreference.com/w/cpp/algorithm/transform)。
+
+#### 13.6 `<numeric>`：数值算法
+
+`<numeric>` 是 C++ 标准库中提供一组**数值相关泛型算法**的头文件。它和 `<algorithm>` 一样，很多设施都通过迭代器描述输入范围，因此从学习结构上适合和 STL 的“容器—迭代器—算法”体系放在一起。
+
+```cpp
+#include <numeric>
+```
+
+标准把 `<numeric>` 中的这组设施归在 **Algorithms library** 下的 **Generalized numeric operations（广义数值运算）**。其中包括 `std::accumulate`、`std::reduce`、`std::inner_product`、`std::partial_sum` 等。
+
+> [!IMPORTANT]
+> `<numeric>` 是头文件，不是类或命名空间。`std::accumulate` 位于 `std` 命名空间中；`#include <numeric>` 负责提供它的声明。
+
+参考：[C++ 标准草案：`<numeric>` synopsis](https://eel.is/c++draft/numeric.ops.overview)、[C++ 标准草案：Generalized numeric operations](https://eel.is/c++draft/numeric.ops)。
+
+##### 13.6.1 `std::accumulate`：把一个范围累积成一个结果
+
+`std::accumulate` 可以先直观地理解成：
+
+> **从左到右遍历一个范围，把所有元素不断“累积”到一个初始值上。**
+
+最基本的形式是：
+
+```cpp
+std::accumulate(first, last, init);
+```
+
+三个参数分别表示：
+
+| 参数 | 含义 |
+| --- | --- |
+| `first` | 输入范围起点 |
+| `last` | 输入范围尾后位置，处理 `[first, last)` |
+| `init` | 累积操作的初始值 |
+
+没有提供第四个参数时，默认使用加法。例如：
+
+```cpp
+int values[]{1, 2, 3, 4};
+
+int sum = std::accumulate(values, values + 4, 0);
+```
+
+可以把执行过程近似理解成：
+
+```text
+初始：acc = 0
+
+读到 1：acc = 0 + 1 = 1
+读到 2：acc = 1 + 2 = 3
+读到 3：acc = 3 + 3 = 6
+读到 4：acc = 6 + 4 = 10
+```
+
+所以最终：
+
+```cpp
+sum == 10;
+```
+
+标准规定它会按照 `[first, last)` 的顺序依次处理元素，因此 `std::accumulate` 是一个**有确定遍历顺序的顺序累积算法**。
+
+参考：[C++ 标准草案：`std::accumulate`](https://eel.is/c++draft/accumulate)。
+
+###### `init` 不只是“从几开始”，还决定累加器类型
+
+`init` 有两个作用：
+
+1. 提供初始累积值；
+2. 决定累加器以及返回结果的类型 `T`。
+
+例如：
+
+```cpp
+std::vector<double> values{1.5, 2.5, 3.5};
+```
+
+如果写：
+
+```cpp
+auto result = std::accumulate(values.begin(), values.end(), 0);
+```
+
+这里 `0` 是 `int`，因此累加器类型也是 `int`。每一步的结果重新赋给 `int` 时可能丢失小数部分。
+
+更合适的是：
+
+```cpp
+auto result = std::accumulate(values.begin(), values.end(), 0.0);
+```
+
+这里 `0.0` 是 `double`，所以累加器和返回值都是 `double`。
+
+可以把这一点记成：
+
+> **写 `init` 时，不仅要考虑它的值，还要考虑它的类型。**
+
+###### 第四个参数 `op`：自定义“怎么累积”
+
+另一个常用形式是：
+
+```cpp
+std::accumulate(first, last, init, op);
+```
+
+此时不再固定做加法，而是反复执行类似：
+
+```cpp
+acc = op(acc, element);
+```
+
+例如希望计算：
+
+```text
+2 × 3 × 4 = 24
+```
+
+可以写：
+
+```cpp
+int values[]{2, 3, 4};
+
+int product = std::accumulate(
+    values,
+    values + 3,
+    1,
+    [](int acc, int x) {
+        return acc * x;
+    }
+);
+```
+
+这里 Lambda 的两个参数含义是：
+
+```text
+acc → 到目前为止已经累积出的结果
+x   → 当前遍历到的元素
+```
+
+执行过程：
+
+```text
+初始：acc = 1
+
+x = 2：acc = 1 × 2 = 2
+x = 3：acc = 2 × 3 = 6
+x = 4：acc = 6 × 4 = 24
+```
+
+乘法累积通常以 `1` 作为初始值，因为：
+
+```text
+加法单位元：0
+乘法单位元：1
+```
+
+如果乘法累积从 `0` 开始，那么后面无论乘什么最终都会得到 `0`。
+
+###### 张量字节数：把 `sizeof(DataType)` 直接作为初始值
+
+对于形状：
+
+```cpp
+using DataType = float;
+int shape[]{1, 3, 224, 224};
+```
+
+连续张量的元素数量为：
+
+```text
+1 × 3 × 224 × 224
+```
+
+总字节数则为：
+
+```text
+sizeof(DataType) × 1 × 3 × 224 × 224
+```
+
+因此可以直接把 `sizeof(DataType)` 作为累积初始值：
+
+```cpp
+int size = std::accumulate(
+    shape,
+    shape + 4,
+    static_cast<int>(sizeof(DataType)),
+    [](int acc, int dim) {
+        return acc * dim;
+    }
+);
+```
+
+执行过程相当于：
+
+```text
+acc = sizeof(float)
+    × 1
+    × 3
+    × 224
+    × 224
+```
+
+在常见实现中 `sizeof(float) == 4`，所以本题得到：
+
+```text
+4 × 1 × 3 × 224 × 224 = 602112
+```
+
+这里使用：
+
+```cpp
+shape
+shape + 4
+```
+
+是因为内置数组在这种表达式中可以转换成指向首元素的指针，而指针本身也满足这里所需的输入迭代器操作，因此同样可以表示 `[shape, shape + 4)` 这个范围。
+
+###### 与 `std::transform` 的区别
+
+`std::transform` 和 `std::accumulate` 都会遍历输入范围，但结果形态不同：
+
+```text
+std::transform
+多个输入元素
+    ↓ 每个元素分别变换
+多个输出元素
+```
+
+例如：
+
+```text
+[1, 2, 3] → [2, 4, 6]
+```
+
+而：
+
+```text
+std::accumulate
+多个输入元素
+    ↓ 不断合并到 acc
+一个最终结果
+```
+
+例如：
+
+```text
+[1, 2, 3, 4] → 10
+```
+
+从函数式编程术语看，可以把 `transform` 类比为 **map（映射）**，把 `accumulate` 类比为 **fold/reduce（折叠/归约）**。
+
+> [!IMPORTANT]
+> `std::accumulate` 的核心模型是：先用 `init` 初始化累加器，然后按顺序把 `[first, last)` 中的每个元素和当前累加器合并，最终返回一个值。`init` 的**值和类型**都很重要。
+
+参考：[C++ 标准草案：`std::accumulate`](https://eel.is/c++draft/accumulate)、[cppreference：`std::accumulate`](https://en.cppreference.com/w/cpp/algorithm/accumulate)。
