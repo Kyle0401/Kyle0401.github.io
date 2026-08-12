@@ -147,7 +147,7 @@ sizeof(std::vector<bool>)  // 40
 > `24` 和 `40` 都不是 C++ 标准规定的固定值。`sizeof(std::vector<T>)` 与 `sizeof(std::vector<bool>)` 都依赖具体标准库实现、ABI、编译模式等。练习题中如果特别写了“平台相关”，应以实际运行环境的输出为准。
 
 > [!IMPORTANT]
-> `std::vector<bool>` 是 `std::vector` 的特殊化版本。它通常使用位压缩，因此普通 `vector` 的“一个元素对应一个完整对象、用普通元素指针表示位置”的直观模型不能完全照搬到 `vector<bool>`。
+> `std::vector<bool>` 是 `std::vector` 的特殊化版本。它通常使用位压缩，因此普通 `vector` 的“一个元素对应一个完整对象、用普通元素指针表示位置”的直观模型不能完全照搬到它身上。
 
 参考：[cppreference：std::vector<bool>](https://en.cppreference.com/w/cpp/container/vector_bool)、[cppreference：模板特化](https://en.cppreference.com/w/cpp/language/template_specialization)。
 
@@ -581,3 +581,438 @@ return map.contains(key);
 > 判断是否存在时，不要写 `return map[key];`。这不仅会在 key 不存在时修改 `map`，而且 `map[key]` 返回的是 mapped value，并不是“key 是否存在”的布尔结果。
 
 参考：[cppreference：`std::map::find`](https://en.cppreference.com/w/cpp/container/map/find)、[cppreference：`std::map::end`](https://en.cppreference.com/w/cpp/container/map/end)、[cppreference：`std::map::contains`](https://en.cppreference.com/w/cpp/container/map/contains)。
+
+#### 13.5 `std::transform`：逐元素转换算法
+
+`std::transform` 是 `<algorithm>` 中的标准算法，用来把输入范围中的元素逐个交给一个转换操作处理，并把每次处理得到的结果写入输出范围。
+
+最常用的一元版本可以概念上写成：
+
+```cpp
+std::transform(first, last, result, op);
+```
+
+四个参数分别表示：
+
+| 参数 | 含义 |
+| --- | --- |
+| `first` | 输入范围的起点 |
+| `last` | 输入范围的尾后位置，范围为 `[first, last)` |
+| `result` | 输出范围的起始位置 |
+| `op` | 对每个输入元素执行的转换操作 |
+
+例如：
+
+```cpp
+#include <algorithm>
+#include <vector>
+
+std::vector<int> a{1, 2, 3};
+std::vector<int> b(a.size());
+
+std::transform(
+    a.begin(),
+    a.end(),
+    b.begin(),
+    [](int x) {
+        return x * 2;
+    }
+);
+```
+
+执行后：
+
+```text
+a = [1, 2, 3]
+       │  │  │
+       ×2 ×2 ×2
+       ↓  ↓  ↓
+b = [2, 4, 6]
+```
+
+可以把它近似理解为：
+
+```cpp
+for (std::size_t i = 0; i < a.size(); ++i) {
+    b[i] = a[i] * 2;
+}
+```
+
+也就是说，`std::transform` 把“遍历范围”和“对每个元素做什么”分离开来：算法负责遍历，调用者只需要提供转换规则。
+
+##### 13.5.1 `op` 是什么：可调用对象
+
+`op` 不是某个固定类型的特殊语法，而是一个**可调用对象（callable object）**：只要它能够接受当前输入元素，并返回一个可以写入输出位置的结果，就可以传给 `std::transform`。
+
+常见形式包括：
+
+- 普通函数；
+- 函数对象；
+- Lambda 表达式。
+
+在现代 C++ 中，最常见的是直接写 Lambda。例如：
+
+```cpp
+[](int x) {
+    return x * 2;
+}
+```
+
+这整个表达式就是一个可以被调用的对象。把它拆开看：
+
+```text
+[]        (int x)        { return x * 2; }
+↑             ↑                  ↑
+捕获列表      参数列表            函数体
+```
+
+###### `[]`：捕获列表
+
+开头的方括号是 Lambda 的**捕获列表**。
+
+```cpp
+[]
+```
+
+这里为空，表示这个 Lambda **不从外层作用域捕获任何局部变量**。
+
+例如下面的 `factor` 是外层局部变量：
+
+```cpp
+int factor = 2;
+```
+
+如果 Lambda 想使用它，可以显式捕获：
+
+```cpp
+[factor](int x) {
+    return x * factor;
+}
+```
+
+这里 `[factor]` 表示按值捕获 `factor`。
+
+因此：
+
+```cpp
+[](int x) { return x * 2; }
+```
+
+中的 `[]` 并不是“参数为空”，它描述的是**是否使用 Lambda 外面的局部变量**。
+
+###### `(int x)`：参数列表
+
+这一部分：
+
+```cpp
+(int x)
+```
+
+和普通函数的形参列表非常相似。
+
+在：
+
+```cpp
+std::transform(a.begin(), a.end(), b.begin(), op);
+```
+
+中，可以把算法的工作过程概念上理解为反复执行：
+
+```cpp
+*result = op(*first);
+```
+
+因此当 `a` 是：
+
+```cpp
+std::vector<int> a{1, 2, 3};
+```
+
+Lambda 会依次收到这些元素：
+
+```text
+第一次：x = 1
+第二次：x = 2
+第三次：x = 3
+```
+
+这里写 `int x` 表示按值接收当前元素，因此 `x` 是当前输入值的一个局部形参。
+
+###### `{ return x * 2; }`：函数体与返回值
+
+Lambda 的函数体：
+
+```cpp
+{
+    return x * 2;
+}
+```
+
+定义了真正的转换规则。
+
+对于：
+
+```cpp
+[](int x) {
+    return x * 2;
+}
+```
+
+可以理解为存在一个类似的普通函数：
+
+```cpp
+int double_value(int x) {
+    return x * 2;
+}
+```
+
+然后把它交给 `transform`：
+
+```cpp
+std::transform(a.begin(), a.end(), b.begin(), double_value);
+```
+
+二者在这里承担的是同一种角色：**告诉 `transform` 每取得一个输入元素后应该怎样计算输出值。**
+
+如果 Lambda 没有显式写返回类型，编译器通常可以根据 `return` 表达式推导返回类型。上例中的 `x * 2` 是 `int`，因此这里的返回类型可以推导为 `int`。
+
+Lambda 的一般形式可以先记成：
+
+```cpp
+[capture](parameters) {
+    // 函数体
+    return result;
+}
+```
+
+如果需要显式写返回类型，还可以写成：
+
+```cpp
+[capture](parameters) -> ReturnType {
+    return result;
+}
+```
+
+例如：
+
+```cpp
+[](int x) -> int {
+    return x * 2;
+}
+```
+
+参考：[cppreference：Lambda 表达式](https://en.cppreference.com/w/cpp/language/lambda)。
+
+##### 13.5.2 输入类型和输出类型可以不同
+
+`std::transform` 并不要求输入元素和输出元素具有相同类型。关键是 `op` 的返回结果能够写入输出迭代器所指向的位置。
+
+例如下面把 `int` 先乘以 `2`，再转换为 `std::string`：
+
+```cpp
+std::vector<int> val{8, 13, 21, 34, 55};
+std::vector<std::string> ans(val.size());
+
+std::transform(
+    val.begin(),
+    val.end(),
+    ans.begin(),
+    [](int x) {
+        return std::to_string(x * 2);
+    }
+);
+```
+
+这里的数据流是：
+
+```text
+int
+ ↓
+乘以 2
+ ↓
+int
+ ↓ std::to_string
+std::string
+```
+
+例如第一个元素：
+
+```text
+8 → 16 → "16"
+```
+
+最终：
+
+```cpp
+ans == std::vector<std::string>{"16", "26", "42", "68", "110"};
+```
+
+这也是 `transform` 与普通“原地修改”概念需要区分的地方：它描述的是一个**映射关系**，输入类型和输出类型完全可以不同。
+
+参考：[cppreference：`std::transform`](https://en.cppreference.com/w/cpp/algorithm/transform)、[cppreference：`std::to_string`](https://en.cppreference.com/w/cpp/string/basic_string/to_string)。
+
+##### 13.5.3 使用 `ans.begin()` 时，输出元素必须已经存在
+
+下面这种写法是正确的：
+
+```cpp
+std::vector<std::string> ans(val.size());
+
+std::transform(
+    val.begin(),
+    val.end(),
+    ans.begin(),
+    [](int x) {
+        return std::to_string(x * 2);
+    }
+);
+```
+
+因为：
+
+```cpp
+std::vector<std::string> ans(val.size());
+```
+
+已经创建了 `val.size()` 个 `std::string` 元素，`transform` 可以从 `ans.begin()` 开始依次给这些现有元素赋值。
+
+而下面这样不能直接使用：
+
+```cpp
+std::vector<std::string> ans;
+
+std::transform(
+    val.begin(),
+    val.end(),
+    ans.begin(),  // 错误思路：ans 中目前没有可写入的元素
+    op
+);
+```
+
+这里 `ans.size() == 0`，并不存在足够的输出元素供算法写入。
+
+可以把两种状态理解为：
+
+```text
+std::vector<std::string> ans(val.size());
+
+[""][""][""][""][""]
+ ↑
+ ans.begin()
+
+这些元素已经存在，可以被赋新值。
+```
+
+而：
+
+```text
+std::vector<std::string> ans;
+
+[]
+ ↑
+ ans.begin() == ans.end()
+
+当前没有任何元素可供赋值。
+```
+
+> [!IMPORTANT]
+> `reserve()` 只增加容量，不创建元素，因此仅仅 `ans.reserve(val.size())` 后仍然不能把 `ans.begin()` 当作已有 `val.size()` 个输出元素来写。
+
+##### 13.5.4 使用 `std::back_inserter`：让结果自动追加到 `vector` 尾部
+
+如果不想提前创建输出元素，可以让 `transform` 通过 `std::back_inserter` 向容器尾部插入结果：
+
+```cpp
+#include <iterator>
+
+std::vector<std::string> ans;
+
+std::transform(
+    val.begin(),
+    val.end(),
+    std::back_inserter(ans),
+    [](int x) {
+        return std::to_string(x * 2);
+    }
+);
+```
+
+此时可以概念上理解为每产生一个结果，就执行类似：
+
+```cpp
+ans.push_back(result);
+```
+
+因此：
+
+```text
+开始： []
+8  → "16"  → ["16"]
+13 → "26"  → ["16", "26"]
+21 → "42"  → ["16", "26", "42"]
+...
+```
+
+两种写法可以这样比较：
+
+| 写法 | 使用前 `ans` 的状态 | 输出方式 |
+| --- | --- | --- |
+| `ans.begin()` | 必须已经存在足够数量的元素 | 给现有元素赋值 |
+| `std::back_inserter(ans)` | 可以为空 | 在尾部不断插入新元素 |
+
+参考：[cppreference：`std::back_inserter`](https://en.cppreference.com/w/cpp/iterator/back_inserter)。
+
+##### 13.5.5 二元 `transform`：两个输入元素产生一个输出
+
+`std::transform` 还提供二元版本，可以同时从两个输入范围取得元素：
+
+```cpp
+std::vector<int> a{1, 2, 3};
+std::vector<int> b{4, 5, 6};
+std::vector<int> c(a.size());
+
+std::transform(
+    a.begin(),
+    a.end(),
+    b.begin(),
+    c.begin(),
+    [](int x, int y) {
+        return x + y;
+    }
+);
+```
+
+这里的 Lambda 有两个形参：
+
+```cpp
+[](int x, int y) {
+    return x + y;
+}
+```
+
+每次分别接收两个输入范围当前位置的元素：
+
+```text
+a:   1   2   3
+     +   +   +
+b:   4   5   6
+     ↓   ↓   ↓
+c:   5   7   9
+```
+
+因此一元版本可以概念化为：
+
+```cpp
+output[i] = op(input[i]);
+```
+
+二元版本则可以概念化为：
+
+```cpp
+output[i] = op(input1[i], input2[i]);
+```
+
+> [!IMPORTANT]
+> `std::transform` 的核心不是“乘以 2”或“转字符串”，而是：**把输入范围中的元素交给 `op`，再把 `op` 的返回值写到输出范围。** `op` 决定“怎么变”，`transform` 负责“逐元素应用这个变换”。
+
+参考：[cppreference：`std::transform`](https://en.cppreference.com/w/cpp/algorithm/transform)。
