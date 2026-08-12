@@ -582,7 +582,46 @@ return map.contains(key);
 
 参考：[cppreference：`std::map::find`](https://en.cppreference.com/w/cpp/container/map/find)、[cppreference：`std::map::end`](https://en.cppreference.com/w/cpp/container/map/end)、[cppreference：`std::map::contains`](https://en.cppreference.com/w/cpp/container/map/contains)。
 
-#### 13.5 `std::transform`：逐元素转换算法
+#### 13.5 `<algorithm>`：标准算法库
+
+`<algorithm>` 是 C++ 标准库中的一个头文件，提供了大量用于**查找、排序、复制、变换、比较、划分**等操作的通用算法。
+
+```cpp
+#include <algorithm>
+```
+
+这些算法通常并不属于某个具体容器，而是通过**迭代器表示要处理的范围**。因此，同一个算法往往可以作用于 `std::vector`、`std::array` 以及其他满足相应迭代器要求的数据结构。
+
+可以把 STL 中这几个概念的分工理解为：
+
+```text
+容器（container）
+    │
+    │ 保存数据，并提供 begin()/end()
+    ↓
+迭代器（iterator）
+    │
+    │ 描述算法要处理的范围
+    ↓
+算法（algorithm）
+    │
+    └── find / sort / transform / copy / ...
+```
+
+例如：
+
+```cpp
+std::sort(vec.begin(), vec.end());
+```
+
+这里 `std::sort` 并不需要知道 `vec` 是怎样管理内存的，它主要通过 `vec.begin()` 与 `vec.end()` 得到迭代器范围，再按照算法要求操作其中的元素。
+
+> [!IMPORTANT]
+> `<algorithm>` 是**头文件**，不是类，也不是命名空间。`std::transform`、`std::sort` 等算法位于 `std` 命名空间中；`#include <algorithm>` 的作用是让程序获得这些标准算法的声明。
+
+参考：[cppreference：Algorithms library](https://en.cppreference.com/w/cpp/algorithm)。
+
+##### 13.5.1 `std::transform`：逐元素转换算法
 
 `std::transform` 是 `<algorithm>` 中的标准算法，用来把输入范围中的元素逐个交给一个转换操作处理，并把每次处理得到的结果写入输出范围。
 
@@ -640,7 +679,7 @@ for (std::size_t i = 0; i < a.size(); ++i) {
 
 也就是说，`std::transform` 把“遍历范围”和“对每个元素做什么”分离开来：算法负责遍历，调用者只需要提供转换规则。
 
-##### 13.5.1 `op` 是什么：可调用对象
+###### `op` 是什么：可调用对象
 
 `op` 不是某个固定类型的特殊语法，而是一个**可调用对象（callable object）**：只要它能够接受当前输入元素，并返回一个可以写入输出位置的结果，就可以传给 `std::transform`。
 
@@ -666,7 +705,7 @@ for (std::size_t i = 0; i < a.size(); ++i) {
 捕获列表      参数列表            函数体
 ```
 
-###### `[]`：捕获列表
+**`[]`：捕获列表**
 
 开头的方括号是 Lambda 的**捕获列表**。
 
@@ -700,7 +739,7 @@ int factor = 2;
 
 中的 `[]` 并不是“参数为空”，它描述的是**是否使用 Lambda 外面的局部变量**。
 
-###### `(int x)`：参数列表
+**`(int x)`：参数列表**
 
 这一部分：
 
@@ -738,7 +777,7 @@ Lambda 会依次收到这些元素：
 
 这里写 `int x` 表示按值接收当前元素，因此 `x` 是当前输入值的一个局部形参。
 
-###### `{ return x * 2; }`：函数体与返回值
+**`{ return x * 2; }`：函数体与返回值**
 
 Lambda 的函数体：
 
@@ -803,7 +842,7 @@ Lambda 的一般形式可以先记成：
 
 参考：[cppreference：Lambda 表达式](https://en.cppreference.com/w/cpp/language/lambda)。
 
-##### 13.5.2 输入类型和输出类型可以不同
+###### 输入类型和输出类型可以不同
 
 `std::transform` 并不要求输入元素和输出元素具有相同类型。关键是 `op` 的返回结果能够写入输出迭代器所指向的位置。
 
@@ -851,7 +890,7 @@ ans == std::vector<std::string>{"16", "26", "42", "68", "110"};
 
 参考：[cppreference：`std::transform`](https://en.cppreference.com/w/cpp/algorithm/transform)、[cppreference：`std::to_string`](https://en.cppreference.com/w/cpp/string/basic_string/to_string)。
 
-##### 13.5.3 使用 `ans.begin()` 时，输出元素必须已经存在
+###### 使用 `ans.begin()` 时，输出元素必须已经存在
 
 下面这种写法是正确的：
 
@@ -918,7 +957,7 @@ std::vector<std::string> ans;
 > [!IMPORTANT]
 > `reserve()` 只增加容量，不创建元素，因此仅仅 `ans.reserve(val.size())` 后仍然不能把 `ans.begin()` 当作已有 `val.size()` 个输出元素来写。
 
-##### 13.5.4 使用 `std::back_inserter`：让结果自动追加到 `vector` 尾部
+###### 使用 `std::back_inserter`：让结果自动追加到 `vector` 尾部
 
 如果不想提前创建输出元素，可以让 `transform` 通过 `std::back_inserter` 向容器尾部插入结果：
 
@@ -962,7 +1001,7 @@ ans.push_back(result);
 
 参考：[cppreference：`std::back_inserter`](https://en.cppreference.com/w/cpp/iterator/back_inserter)。
 
-##### 13.5.5 二元 `transform`：两个输入元素产生一个输出
+###### 二元 `transform`：两个输入元素产生一个输出
 
 `std::transform` 还提供二元版本，可以同时从两个输入范围取得元素：
 
