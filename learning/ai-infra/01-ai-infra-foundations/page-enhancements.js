@@ -222,6 +222,67 @@
     });
   }
 
+  function addCudaCoreExplanationNote() {
+    Array.prototype.forEach.call(content.querySelectorAll('.doc-page-body > p'), function (paragraph) {
+      if (paragraph.textContent.indexOf('每个 SM 都包含本地寄存器文件、统一数据缓存，以及多个执行计算的功能单元') === -1) return;
+
+      var insertAfter = paragraph;
+      var sibling = paragraph.nextElementSibling;
+      while (sibling && sibling.classList.contains('markdown-alert')) {
+        if (sibling.hasAttribute('data-cuda-core-explanation-note')) return;
+        if (
+          sibling.hasAttribute('data-register-file-explanation-note') ||
+          sibling.hasAttribute('data-sm-explanation-note')
+        ) {
+          insertAfter = sibling;
+        }
+        sibling = sibling.nextElementSibling;
+      }
+
+      var note = document.createElement('aside');
+      note.className = 'markdown-alert markdown-alert-note';
+      note.setAttribute('role', 'note');
+      note.setAttribute('data-cuda-core-explanation-note', '');
+
+      var title = document.createElement('p');
+      title.className = 'markdown-alert-title';
+      title.textContent = '补充：为什么这里没有单独介绍 CUDA Core / SP？';
+
+      var abstraction = document.createElement('p');
+      abstraction.textContent = '本指南在这里使用更高层的“功能单元（functional units）”来概括 SM 内部的计算资源，并没有把 CUDA Core 作为 CUDA 编程模型中的一个独立层级来展开。CUDA Core 也不是“功能单元”的同义词：在具体 NVIDIA GPU 微架构资料中，CUDA Core 通常指 SM 内用于普通标量算术的一类执行核心（例如 FP32 CUDA Core）；Tensor Core、LD/ST 单元、SFU 等则是 SM 内的其他执行资源。';
+
+      var portability = document.createElement('p');
+      portability.textContent = '这种表述有意保持跨架构抽象。不同 GPU 架构中，各类执行单元的数量、类型与组织方式都可能变化，而线程（Thread）、线程束（Warp）、线程块（Block）和 SM 等编程模型概念相对稳定。因此，在本指南中看到“功能单元”时，可以把 CUDA Core 理解为其中一类具体的硬件执行资源，而不是缺失了一个与 SM 并列的层级。';
+
+      var terminology = document.createElement('p');
+      terminology.textContent = '关于 SP 的称呼也要结合资料来源理解：当前 NVIDIA PTX ISA 使用 Scalar Processor（SP）core，而 SM 是 Streaming Multiprocessor。部分旧资料或教学课件会把 SP 展开为 Streaming Processor。若要研究 CUDA Core / SP 的具体组成，应进一步查阅 PTX ISA 以及对应 GPU 架构的官方资料。';
+
+      var references = document.createElement('p');
+      references.appendChild(document.createTextNode('参考：'));
+      var programmingModelLink = document.createElement('a');
+      programmingModelLink.href = 'https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/programming-model.html';
+      programmingModelLink.target = '_blank';
+      programmingModelLink.rel = 'noopener noreferrer';
+      programmingModelLink.textContent = 'CUDA Programming Guide：Programming Model';
+      references.appendChild(programmingModelLink);
+      references.appendChild(document.createTextNode('；'));
+      var ptxLink = document.createElement('a');
+      ptxLink.href = 'https://docs.nvidia.com/cuda/parallel-thread-execution/';
+      ptxLink.target = '_blank';
+      ptxLink.rel = 'noopener noreferrer';
+      ptxLink.textContent = 'NVIDIA PTX ISA';
+      references.appendChild(ptxLink);
+      references.appendChild(document.createTextNode('。'));
+
+      note.appendChild(title);
+      note.appendChild(abstraction);
+      note.appendChild(portability);
+      note.appendChild(terminology);
+      note.appendChild(references);
+      insertAfter.insertAdjacentElement('afterend', note);
+    });
+  }
+
   function fixLocalReferenceTargets() {
     var figureTargets = {};
     Array.prototype.forEach.call(content.querySelectorAll('.doc-page-body .figure'), function (figure) {
@@ -305,6 +366,7 @@
     addGpuArchitectureFullNames();
     addRegisterFileExplanationNote();
     addSmExplanationNote();
+    addCudaCoreExplanationNote();
     fixLocalReferenceTargets();
     addInterconnectExplanationNote();
     addCudaExplanationNote();
