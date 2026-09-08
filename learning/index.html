@@ -56,6 +56,7 @@
                         <span class="filter-label">技术方向</span>
                         <div class="filter-options" role="group" aria-label="按技术方向筛选">
                             <button class="filter-chip active" type="button" data-filter-value="all" aria-pressed="true">全部</button>
+                            <button class="filter-chip" type="button" data-filter-value="chip-verification" aria-pressed="false">芯片验证</button>
                             <button class="filter-chip" type="button" data-filter-value="language" aria-pressed="false">编程语言</button>
                             <button class="filter-chip" type="button" data-filter-value="engineering" aria-pressed="false">工程工具</button>
                             <button class="filter-chip" type="button" data-filter-value="embedded" aria-pressed="false">嵌入式</button>
@@ -76,12 +77,31 @@
                 </div>
 
                 <div class="filter-summary" aria-live="polite">
-                    <span id="result-count" class="result-count">共 10 项学习记录</span>
+                    <span id="result-count" class="result-count">共 11 项学习记录</span>
                     <button id="reset-filters" class="reset-filters" type="button" hidden>清除全部筛选</button>
                 </div>
             </div>
 
             <div class="record-grid" id="learning-grid">
+                <a
+                    class="record-card"
+                    href="https://open-verify.cc/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-entry="learning"
+                    data-category="chip-verification"
+                    data-status="ongoing"
+                    data-search="万众一芯 open verify 芯片验证 数字ic验证 systemverilog uvm 仿真验证 功能覆盖率 代码覆盖率"
+                >
+                    <div class="card-meta">
+                        <span class="status">已建立·持续完善</span>
+                        <span class="category-label">芯片验证</span>
+                    </div>
+                    <h2>万众一芯</h2>
+                    <p>记录芯片验证基础、SystemVerilog、UVM、覆盖率与验证实践等学习内容。</p>
+                    <span class="card-arrow">→</span>
+                </a>
+
                 <a
                     class="record-card"
                     href="./2025-summer-llm-ai-system-camp/"
