@@ -188,22 +188,23 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         if (siteCards.length > 2) {
-            var travelCard = siteCards[2];
-            travelCard.querySelector('h1').textContent = '旅行';
-            travelCard.querySelector('p').textContent = '记录旅行攻略和见闻';
-            travelCard.setAttribute('role', 'link');
-            travelCard.setAttribute('tabindex', '0');
-            travelCard.style.cursor = 'pointer';
+            var paperCard = siteCards[2];
+            paperCard.querySelector('h1').textContent = '论文阅读学习';
+            paperCard.querySelector('p').textContent = '记录论文阅读与学习';
+            paperCard.querySelector('.projectItemRight img').alt = '论文阅读学习图标';
+            paperCard.setAttribute('role', 'link');
+            paperCard.setAttribute('tabindex', '0');
+            paperCard.style.cursor = 'pointer';
 
-            function openTravelDirectory() {
-                window.location.href = './travel/';
+            function openPaperDirectory() {
+                window.location.href = './papers/';
             }
 
-            travelCard.addEventListener('click', openTravelDirectory);
-            travelCard.addEventListener('keydown', function (event) {
+            paperCard.addEventListener('click', openPaperDirectory);
+            paperCard.addEventListener('keydown', function (event) {
                 if (event.key === 'Enter' || event.key === ' ') {
                     event.preventDefault();
-                    openTravelDirectory();
+                    openPaperDirectory();
                 }
             });
         }
