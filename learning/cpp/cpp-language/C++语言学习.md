@@ -5310,3 +5310,10 @@ int main()
 默认参数中的 `std::source_location::current()` 会记录调用点，而不是固定记录 `trace()` 函数体内部的位置。
 
 打印式调试适合快速确认控制流和变量状态，但不能替代断点调试、Sanitizer、Valgrind、静态分析和自动化测试。多线程输出还可能交错，不能仅凭日志顺序推断线程间先后关系。
+
+## 四、练习题
+
+课程练习与作业代码统一放在以下仓库中：
+
+[前往 C++ 习题仓库：Kyle0401/learning-cxx](https://github.com/Kyle0401/learning-cxx)
+
