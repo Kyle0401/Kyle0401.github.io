@@ -390,7 +390,7 @@
     setupGroupedOutline();
 
     var baseScript = document.createElement('script');
-    baseScript.src = './cpp-language-page-base.js?v=20260811b';
+    baseScript.src = './cpp-language-page-base.js?v=20260923a';
     baseScript.async = false;
     baseScript.addEventListener('load', function () {
         setupGroupedOutline();
