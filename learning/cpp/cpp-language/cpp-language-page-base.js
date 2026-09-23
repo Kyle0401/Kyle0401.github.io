@@ -1041,7 +1041,7 @@
         );
     }
 
-    fetch('./C++语言学习.md?v=20260808a')
+    fetch('./C++语言学习.md?v=20260923a')
         .then(function (response) {
             if (!response.ok) throw new Error('HTTP ' + response.status);
             return response.text();
