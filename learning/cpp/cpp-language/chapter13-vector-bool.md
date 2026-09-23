@@ -1056,6 +1056,199 @@ output[i] = op(input1[i], input2[i]);
 
 参考：[cppreference：`std::transform`](https://en.cppreference.com/w/cpp/algorithm/transform)。
 
+
+##### 13.5.2 `std::copy`：复制一个范围到另一个位置
+
+`std::copy` 是 `<algorithm>` 中的标准算法，用来把一个范围中的元素按顺序复制到另一个位置。
+
+最常用的形式可以写成：
+
+```cpp
+std::copy(first, last, result);
+```
+
+三个参数分别表示：
+
+| 参数 | 含义 |
+| --- | --- |
+| `first` | 源范围的起点 |
+| `last` | 源范围的尾后位置，实际复制范围是 `[first, last)` |
+| `result` | 目标范围的起始位置 |
+
+例如，把数组 `src` 中的 3 个元素复制到数组 `dst` 从下标 3 开始的位置：
+
+```cpp
+#include <algorithm>
+
+int src[]{10, 20, 30};
+int dst[]{1, 2, 3, 4, 5, 6, 7, 8};
+
+std::copy(src, src + 3, dst + 3);
+```
+
+执行后：
+
+```text
+复制前：
+
+src: [10] [20] [30]
+       │    │    │
+       └────┼────┼──────────────┐
+            │    │              │
+dst: [1] [2] [3] [4] [5] [6] [7] [8]
+                 ↑
+               dst + 3
+
+复制后：
+
+dst: [1] [2] [3] [10] [20] [30] [7] [8]
+```
+
+其中：
+
+```cpp
+src
+```
+
+表示源数组首元素的位置，也就是 `&src[0]`；
+
+```cpp
+src + 3
+```
+
+表示 `&src[3]`，它是复制范围的**尾后位置**，因此真正复制的是：
+
+```text
+src[0]
+src[1]
+src[2]
+```
+
+而：
+
+```cpp
+dst + 3
+```
+
+表示从 `dst[3]` 开始写入。
+
+因此可以把：
+
+```cpp
+std::copy(src, src + 3, dst + 3);
+```
+
+近似理解为：
+
+```cpp
+dst[3] = src[0];
+dst[4] = src[1];
+dst[5] = src[2];
+```
+
+也可以记成一个常用模板：
+
+```cpp
+std::copy(src, src + len, dst + pos);
+```
+
+含义是：
+
+> 把 `src` 开始的 `len` 个元素，复制到 `dst` 从 `pos` 位置开始的一段区域。
+
+例如：
+
+```cpp
+std::copy(a, a + 5, b + 10);
+```
+
+表示：
+
+```text
+a[0] ~ a[4]
+    ↓ 复制
+b[10] ~ b[14]
+```
+
+###### 目标位置必须有足够的可写空间
+
+`std::copy` 不会自动帮普通数组扩容，也不会自动检查目标空间是否足够。
+
+例如：
+
+```cpp
+int src[]{1, 2, 3};
+int dst[4]{};
+
+std::copy(src, src + 3, dst + 2);  // 错误思路
+```
+
+这里会尝试写入：
+
+```text
+dst[2]
+dst[3]
+dst[4]  ← 已经越界
+```
+
+因此使用前必须保证目标范围至少能够容纳所有要复制的元素。
+
+对于 `std::vector` 也是一样，如果直接使用普通迭代器作为输出位置，目标元素必须已经存在：
+
+```cpp
+std::vector<int> src{1, 2, 3};
+std::vector<int> dst(5);
+
+std::copy(src.begin(), src.end(), dst.begin() + 1);
+```
+
+执行后，`src` 的三个元素会被写到 `dst[1]`、`dst[2]`、`dst[3]`。
+
+如果希望把元素直接追加到一个空 `vector` 中，可以配合 `std::back_inserter`：
+
+```cpp
+#include <iterator>
+
+std::vector<int> src{1, 2, 3};
+std::vector<int> dst;
+
+std::copy(src.begin(), src.end(), std::back_inserter(dst));
+```
+
+此时效果类似于依次调用：
+
+```cpp
+dst.push_back(1);
+dst.push_back(2);
+dst.push_back(3);
+```
+
+###### 与 `memcpy` 的区别
+
+对于简单的连续内存数据，也经常能看到：
+
+```cpp
+std::memcpy(dst + 3, src, 3 * sizeof(int));
+```
+
+但二者的抽象层次不同：
+
+| 函数 | 操作单位 | 适用对象 |
+| --- | --- | --- |
+| `std::copy` | **元素** | 一般 C++ 对象和迭代器范围 |
+| `std::memcpy` | **字节** | 适合按原始内存复制的类型 |
+
+学习和编写普通 C++ 代码时，通常优先考虑 `std::copy`，因为它直接表达“复制元素”的意图，不需要手动计算 `sizeof(T)`。
+
+> [!WARNING]
+> 如果源范围和目标范围位于同一段序列中并且发生重叠，不能简单假设 `std::copy` 一定适合。目标起点落在源范围内部、且位于源起点之后时，通常应考虑 `std::copy_backward`。对于按字节复制的 C 接口，重叠内存应使用 `std::memmove`，而不是 `std::memcpy`。
+
+> [!IMPORTANT]
+> `std::copy(first, last, result)` 的核心模型是：**复制 `[first, last)` 中的所有元素，并从 `result` 开始依次写入。** 对内置数组来说，指针可以直接充当这里的迭代器，所以 `std::copy(src, src + len, dst + pos)` 是非常常见的写法。
+
+参考：[cppreference：`std::copy`](https://en.cppreference.com/w/cpp/algorithm/copy)、[cppreference：`std::copy_backward`](https://en.cppreference.com/w/cpp/algorithm/copy_backward)、[cppreference：`std::memcpy`](https://en.cppreference.com/w/cpp/string/byte/memcpy)、[cppreference：`std::memmove`](https://en.cppreference.com/w/cpp/string/byte/memmove)。
+
+
 #### 13.6 `<numeric>`：数值算法
 
 `<numeric>` 是 C++ 标准库中提供一组**数值相关泛型算法**的头文件。它和 `<algorithm>` 一样，很多设施都通过迭代器描述输入范围，因此从学习结构上适合和 STL 的“容器—迭代器—算法”体系放在一起。
