@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="整理李重光《基本乐理》中单拍子、复拍子、混合拍子与拍子的音值组合法，并结合 4/4、6/8、7/8、9/8 题目分析。">
+    <title>单拍子、复拍子与拍子的音值组合法 · Kyle</title>
+    <link rel="icon" type="image/svg+xml" href="../../static/img/logo-jy.svg">
+    <link rel="stylesheet" href="../../static/css/learning.css">
+    <style>
+        .article-shell { width: min(920px, calc(100% - 40px)); margin: 0 auto; padding: 30px 0 72px; }
+        .article-header { margin: 38px 0 26px; }
+        .article-kicker { margin: 0 0 12px; color: #5b6ee1; font-size: 13px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+        .article-header h1 { margin: 0; font-size: clamp(31px, 5vw, 52px); line-height: 1.2; letter-spacing: -.035em; }
+        .article-summary { max-width: 790px; margin: 18px 0 0; color: #6d7687; font-size: 16px; line-height: 1.85; }
+        .article-meta { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 20px; }
+        .article-meta span { padding: 7px 11px; color: #5764ba; background: #eef0ff; border-radius: 999px; font-size: 13px; font-weight: 700; }
+        .article { padding: 34px 38px; background: rgba(255,255,255,.92); border: 1px solid rgba(255,255,255,.76); border-radius: 24px; box-shadow: 0 15px 42px rgba(35,45,80,.08); }
+        .article h2 { margin: 42px 0 14px; font-size: 27px; letter-spacing: -.02em; }
+        .article h2:first-child { margin-top: 0; }
+        .article h3 { margin: 28px 0 10px; font-size: 21px; }
+        .article p, .article li { color: #3e485c; font-size: 16px; line-height: 1.9; }
+        .article strong { color: #172033; }
+        .article code { padding: 2px 7px; color: #4c57a8; background: #eef0ff; border-radius: 7px; font-family: Consolas, "SFMono-Regular", monospace; }
+        .formula { margin: 18px 0; padding: 17px 20px; background: #f8f9fc; border: 1px solid #e6eaf2; border-radius: 14px; font-family: Consolas, "SFMono-Regular", monospace; font-size: 16px; line-height: 1.8; overflow-x: auto; white-space: pre-wrap; }
+        .meter-strip { display: grid; gap: 10px; margin: 18px 0 24px; }
+        .meter-row { display: grid; grid-template-columns: 110px 1fr; gap: 14px; align-items: center; }
+        .meter-label { color: #566078; font-weight: 800; }
+        .beats { display: flex; flex-wrap: wrap; gap: 6px; }
+        .beat-group { display: inline-flex; gap: 3px; padding: 8px 10px; background: #f5f6fb; border: 1px solid #e1e6f0; border-radius: 10px; }
+        .beat { min-width: 34px; padding: 3px 6px; border-radius: 7px; text-align: center; font-size: 14px; font-weight: 700; }
+        .beat.strong { background: #e9ebff; color: #4e59ae; }
+        .beat.secondary { background: #f1ecff; color: #715da9; }
+        .beat.weak { color: #6d7687; }
+        .note-table-wrap { margin: 20px 0 28px; overflow-x: auto; border: 1px solid #e3e8f2; border-radius: 16px; }
+        .note-table { width: 100%; min-width: 680px; border-collapse: collapse; background: #fff; }
+        .note-table th, .note-table td { padding: 15px 17px; border-bottom: 1px solid #e9edf5; text-align: left; vertical-align: top; line-height: 1.65; }
+        .note-table th { color: #4e5870; background: #f6f7fb; font-size: 14px; }
+        .note-table td { color: #3e485c; font-size: 15px; }
+        .note-table tr:last-child td { border-bottom: 0; }
+        .callout { margin: 24px 0; padding: 18px 20px; color: #3e485c; background: #f4f2ff; border-left: 4px solid #7b6bd6; border-radius: 0 14px 14px 0; line-height: 1.85; }
+        .warn { background: #fff7ed; border-left-color: #f59e0b; }
+        .ok { background: #eefbf4; border-left-color: #22a06b; }
+        .question-card { margin: 20px 0; padding: 20px 22px; border: 1px solid #e5e9f2; border-radius: 16px; background: #fbfcfe; }
+        .question-card h3 { margin-top: 0; }
+        .tag-bad, .tag-good { display: inline-block; margin-left: 8px; padding: 3px 8px; border-radius: 999px; font-size: 12px; vertical-align: 2px; }
+        .tag-bad { color: #9a3412; background: #ffedd5; }
+        .tag-good { color: #166534; background: #dcfce7; }
+        .summary-box { margin-top: 36px; padding: 22px; background: linear-gradient(135deg, #eef0ff, #f7f2ff); border-radius: 17px; }
+        .summary-box p { margin: 0; }
+        .article-footer { margin-top: 28px; color: #7b8391; font-size: 13px; text-align: center; }
+        @media (max-width: 700px) {
+            .article-shell { width: min(100% - 28px, 920px); padding-top: 20px; }
+            .article-header { margin-top: 28px; }
+            .article { padding: 25px 21px; border-radius: 20px; }
+            .article p, .article li { font-size: 15px; line-height: 1.85; }
+            .meter-row { grid-template-columns: 1fr; gap: 6px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="article-shell">
+        <header class="topbar">
+            <a class="brand" href="../../" aria-label="返回 Kyle 主页">
+                <span class="brand-mark">K</span>
+                <span>Kyle · Music Notes</span>
+            </a>
+            <a class="back-link" href="../">← 返回音乐杂谈</a>
+        </header>
+
+        <section class="article-header">
+            <p class="article-kicker">Basic Music Theory · Meter</p>
+            <h1>单拍子、复拍子与拍子的音值组合法</h1>
+            <p class="article-summary">依据李重光《基本乐理》第九讲“各种拍子”和第十讲“拍子的音值组合法”整理。重点解决两个容易混淆的问题：为什么本书把 4/4 理解为 2/4 + 2/4、把 6/8 理解为 3/8 + 3/8，以及做音值组合题时为什么“总时值正确”仍然可能记谱错误。</p>
+            <div class="article-meta">
+                <span>基本乐理</span>
+                <span>节奏与节拍</span>
+                <span>音值组合法</span>
+                <span>2026-09-27</span>
+            </div>
+        </section>
+
+        <article class="article">
+            <h2>1. 先区分：拍号总时值 ≠ 拍子的内部结构</h2>
+            <p>看到 <code>4/4</code>，当然可以说“一小节总共有四个四分音符的时值”；看到 <code>6/8</code>，也可以说“一小节总共有六个八分音符的时值”。但这只回答了<strong>这一小节有多长</strong>，没有回答这些单位之间<strong>怎样形成强弱层次</strong>。</p>
+            <div class="callout"><strong>这部分知识最核心的观察：</strong>拍子不仅是一个分数，更是一套强拍、弱拍、次强拍的组织方式。判断单拍子、复拍子，以及做音值组合法题时，都要看这种内部结构。</div>
+
+            <h2>2. 本书中的单拍子</h2>
+            <p>按照本书的术语体系，<strong>每小节只有两拍或三拍的拍子叫单拍子</strong>。因此分子为 2 或 3 的常见拍号，如 <code>2/4</code>、<code>3/4</code>、<code>2/8</code>、<code>3/8</code>，属于单拍子。</p>
+            <p>单拍子的基本强弱规律可以理解为：</p>
+
+            <div class="meter-strip">
+                <div class="meter-row">
+                    <div class="meter-label">2/4</div>
+                    <div class="beats">
+                        <span class="beat-group"><span class="beat strong">强</span><span class="beat weak">弱</span></span>
+                    </div>
+                </div>
+                <div class="meter-row">
+                    <div class="meter-label">3/4 或 3/8</div>
+                    <div class="beats">
+                        <span class="beat-group"><span class="beat strong">强</span><span class="beat weak">弱</span><span class="beat weak">弱</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <p>可以把一个单拍子理解成一个<strong>从强拍开始的基本拍组</strong>。</p>
+
+            <h2>3. 本书中的复拍子</h2>
+            <p>本书把<strong>由完全相同的单拍子结合而成的拍子</strong>称为复拍子。几个单拍子合并后，第一个单拍子的强拍仍是整个小节的强拍；后面各单拍子原来的强拍会降一级，成为<strong>次强拍</strong>。</p>
+
+            <h3>为什么 4/4 = 2/4 + 2/4？</h3>
+            <p>4/4 的四个四分音符位置并不是完全同级的，它的强弱层次是：</p>
+            <div class="meter-strip">
+                <div class="meter-row">
+                    <div class="meter-label">4/4</div>
+                    <div class="beats">
+                        <span class="beat-group"><span class="beat strong">强</span><span class="beat weak">弱</span></span>
+                        <span class="beat-group"><span class="beat secondary">次强</span><span class="beat weak">弱</span></span>
+                    </div>
+                </div>
+            </div>
+            <div class="formula">4/4 = 2/4 + 2/4
+     = (强 弱) + (次强 弱)</div>
+            <p>这里的“=”首先是在表达<strong>拍子结构的组合</strong>，而不只是做分数加法。第 3 拍之所以是次强拍，正是因为它对应第二个 2/4 单拍子原来的强拍。</p>
+
+            <h3>为什么 6/8 = 3/8 + 3/8？</h3>
+            <p>一个 3/8 单拍子的结构是“强—弱—弱”。两个相同的 3/8 组合起来，就形成 6/8：</p>
+            <div class="meter-strip">
+                <div class="meter-row">
+                    <div class="meter-label">6/8</div>
+                    <div class="beats">
+                        <span class="beat-group"><span class="beat strong">强</span><span class="beat weak">弱</span><span class="beat weak">弱</span></span>
+                        <span class="beat-group"><span class="beat secondary">次强</span><span class="beat weak">弱</span><span class="beat weak">弱</span></span>
+                    </div>
+                </div>
+            </div>
+            <div class="formula">6/8 = 3/8 + 3/8
+     = (强 弱 弱) + (次强 弱 弱)</div>
+            <p>所以 6/8 的关键不是“六个八分音符”，而是<strong>3 + 3</strong> 的组织方式。</p>
+
+            <div class="callout warn"><strong>为什么不能说 6/8 = 2/8 + 2/8 + 2/8？</strong><br>从纯数学上当然有 6/8 = 2/8 + 2/8 + 2/8，但那会形成 2 + 2 + 2 的强弱组织，已经不是这里所说的 6/8 拍内部结构。拍号的理解不能只做分数运算，必须同时看强弱关系。</div>
+
+            <h3>常见复拍子的结构</h3>
+            <div class="note-table-wrap">
+                <table class="note-table">
+                    <thead>
+                        <tr><th>拍号</th><th>本书中的结构</th><th>可以记成</th><th>主要分组</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>4/4</td><td>两个相同的 2/4</td><td>2/4 + 2/4</td><td>2 + 2</td></tr>
+                        <tr><td>6/8</td><td>两个相同的 3/8</td><td>3/8 + 3/8</td><td>3 + 3</td></tr>
+                        <tr><td>9/8</td><td>三个相同的 3/8</td><td>3/8 + 3/8 + 3/8</td><td>3 + 3 + 3</td></tr>
+                        <tr><td>12/8</td><td>四个相同的 3/8</td><td>3/8 × 4</td><td>3 + 3 + 3 + 3</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="callout"><strong>术语提醒：</strong>这里严格沿用李重光《基本乐理》的分类，因此 4/4 在本书中按“复拍子”理解。不同乐理体系或英文教材对 simple / compound meter 的术语划分可能不同，复习本课程时以本书定义为准。</div>
+
+            <h2>4. 混合拍子：由不同的单拍子组合</h2>
+            <p>如果组合起来的单拍子并不完全相同，本书把它归入<strong>混合拍子</strong>。例如五拍子和七拍子常见的组合方式为：</p>
+            <div class="formula">5 拍子：2 + 3 或 3 + 2
+
+7 拍子：2 + 2 + 3、2 + 3 + 2、3 + 2 + 2</div>
+            <p>因此 <code>7/8</code> 不能只理解成“七个八分音符凑满一小节”，还必须知道这一小节具体采用哪一种内部组合。</p>
+
+            <h2>5. 什么是“拍子的音值组合法”？</h2>
+            <p>第十讲的出发点是：<strong>把各种时值的音符按照拍子的结构进行组合，使读谱者一眼能看出节拍组织。</strong></p>
+            <p>做题时可以分两层检查：</p>
+            <ol>
+                <li><strong>总时值是否正确：</strong>这一小节的音符加起来有没有正好等于拍号规定的总长度；</li>
+                <li><strong>结构是否清楚：</strong>音符、附点和连线有没有把重要拍点或单拍子之间的分界隐藏起来。</li>
+            </ol>
+            <div class="callout ok"><strong>非常重要：</strong>“总时值相等”只是必要条件，不是充分条件。音值组合题真正考的是能不能从写法上直接读出拍子的内部结构。</div>
+
+            <h3>单拍子的基本原则</h3>
+            <p>单拍子中，各单位拍之间应尽量看得清楚。当一个持续音跨过重要拍点而使拍子结构不明显时，通常需要把它拆成几个音符，再用延音线连接。</p>
+
+            <h3>复拍子的基本原则</h3>
+            <p>复拍子应先按构成它的单拍子分组，再在每一个单拍子内部按照单拍子的音值组合规则书写。例如：</p>
+            <div class="formula">4/4 → 2/4 | 2/4
+6/8 → 3/8 | 3/8
+9/8 → 3/8 | 3/8 | 3/8</div>
+            <p>所以在 6/8 中尤其要警惕把两个 3/8 之间的分界隐藏掉；9/8 则应能看出三个 3/8 的结构。</p>
+
+            <h3>混合拍子的基本原则</h3>
+            <p>混合拍子更需要把内部组合显示出来。若一个持续音覆盖了多个内部拍组，应根据拍子的结构次序拆成几个音符，并用延音线连接，而不是仅用一个很长的音符把整段盖住。</p>
+
+            <h2>6. 结合题目：四个选项怎么判断？</h2>
+            <p>这道题最适合用“<strong>先算总时值，再检查分组边界</strong>”的方法。</p>
+
+            <div class="question-card">
+                <h3>选项 1：4/4 <span class="tag-bad">错误</span></h3>
+                <p>4/4 在本书中按 <code>2/4 + 2/4</code> 理解，同时每个四分音符拍点也应尽量清楚。题中有附点音值跨过拍点，虽然总时值可以凑满，但把拍点藏在一个附点音符内部，使节拍结构不够清晰。</p>
+                <p><strong>判断重点：</strong>不是“加起来够不够 4/4”，而是有没有把应当看得见的拍点写出来。</p>
+            </div>
+
+            <div class="question-card">
+                <h3>选项 2：6/8 <span class="tag-bad">错误</span></h3>
+                <p>6/8 的结构是 <code>3/8 + 3/8</code>，也就是 <code>3 + 3</code>。题中的长音跨越了两个 3/8 单拍子之间的分界，使这条最重要的内部边界看不出来。</p>
+                <div class="formula">正确的视觉目标：
+[ 3 个八分音符的时值 ] | [ 3 个八分音符的时值 ]</div>
+            </div>
+
+            <div class="question-card">
+                <h3>选项 3：7/8 <span class="tag-bad">错误</span></h3>
+                <p>7/8 属于混合拍子的典型情形，必须体现实际采用的 <code>2+2+3</code>、<code>2+3+2</code> 或 <code>3+2+2</code> 等结构。题中直接用一个很长的音值再接最后一个八分音符，虽然总时值等于 7/8，却看不出内部组合，因此不符合本章强调的音值组合法。</p>
+            </div>
+
+            <div class="question-card">
+                <h3>选项 4：9/8 <span class="tag-good">正确</span></h3>
+                <p>9/8 的结构是 <code>3/8 + 3/8 + 3/8</code>，也就是 <code>3 + 3 + 3</code>。题中的音符虽然有一个声音跨过分组边界，但它在边界处被拆开并用延音线连接，因此三个 3/8 的结构仍然清楚。</p>
+                <div class="formula">(2 + 1) | (1 + 2) | 3
+    3     |     3     | 3</div>
+                <p>这恰好体现了延音线在音值组合法中的作用：<strong>声音可以连续，但节拍结构不能被写法遮住。</strong></p>
+            </div>
+
+            <h2>7. 一套稳定的做题流程</h2>
+            <ol>
+                <li>看拍号，先确定一小节总时值；</li>
+                <li>判断它在本书中属于单拍子、复拍子还是混合拍子；</li>
+                <li>如果是复拍子，先拆成相同的单拍子，例如 6/8 → 3+3；</li>
+                <li>如果是混合拍子，先确定具体组合，例如 7/8 → 2+2+3；</li>
+                <li>把题目中的每个音值换算成最方便观察的单位；</li>
+                <li>检查长音、附点音符有没有跨过关键分组边界；</li>
+                <li>若跨界导致结构被隐藏，通常应在边界处拆开并用延音线连接。</li>
+            </ol>
+
+            <div class="summary-box">
+                <p><strong>一句话记忆：</strong>拍号先告诉你“小节有多长”，强弱关系再告诉你“小节内部怎么分组”；音值组合法的目标，就是让这种分组在谱面上一眼可见。做题时永远先算总时值，再看拍点和分组边界有没有被藏起来。</p>
+            </div>
+        </article>
+
+        <footer class="article-footer">Kyle Music Notes · 基本乐理：拍子与音值组合法</footer>
+    </div>
+</body>
+</html>
