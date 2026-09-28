@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Windows PowerShell 下启动 Codex CLI 的命令速查">
+    <title>Codex CLI 启动命令 · Kyle</title>
+    <link rel="icon" type="image/svg+xml" href="../../static/img/logo-jy.svg">
+    <link rel="stylesheet" href="../../static/css/learning.css">
+    <style>
+        .article-shell { width: min(920px, calc(100% - 40px)); margin: 0 auto; padding: 30px 0 72px; }
+        .article-header { margin: 38px 0 26px; }
+        .article-kicker { margin: 0 0 12px; color: #5b6ee1; font-size: 13px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+        .article-header h1 { margin: 0; font-size: clamp(31px, 5vw, 52px); line-height: 1.2; letter-spacing: -.035em; }
+        .article-summary { max-width: 790px; margin: 18px 0 0; color: #6d7687; font-size: 16px; line-height: 1.85; }
+        .article-meta { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 20px; }
+        .article-meta span { padding: 7px 11px; color: #5764ba; background: #eef0ff; border-radius: 999px; font-size: 13px; font-weight: 700; }
+        .article { padding: 34px 38px; background: rgba(255,255,255,.92); border: 1px solid rgba(255,255,255,.76); border-radius: 24px; box-shadow: 0 15px 42px rgba(35,45,80,.08); }
+        .article h2 { margin: 38px 0 14px; font-size: 27px; letter-spacing: -.02em; }
+        .article h2:first-child { margin-top: 0; }
+        .article p, .article li { color: #3e485c; font-size: 16px; line-height: 1.9; }
+        .article strong { color: #172033; }
+        .article code { padding: 2px 7px; color: #4c57a8; background: #eef0ff; border-radius: 7px; font-family: Consolas, "SFMono-Regular", monospace; }
+        .code-block { margin: 18px 0 24px; padding: 18px 20px; color: #e8ecf5; background: #1f2430; border-radius: 14px; font-family: Consolas, "SFMono-Regular", monospace; font-size: 15px; line-height: 1.8; overflow-x: auto; white-space: pre; }
+        .callout { margin: 24px 0; padding: 18px 20px; color: #3e485c; background: #f4f2ff; border-left: 4px solid #7b6bd6; border-radius: 0 14px 14px 0; line-height: 1.85; }
+        .command-table { width: 100%; border-collapse: collapse; margin: 18px 0 24px; }
+        .command-table th, .command-table td { padding: 14px 16px; border: 1px solid #e4e8f0; text-align: left; vertical-align: top; line-height: 1.7; }
+        .command-table th { background: #f6f7fb; color: #4e5870; }
+        .article-footer { margin-top: 28px; color: #7b8391; font-size: 13px; text-align: center; }
+        @media (max-width: 700px) {
+            .article-shell { width: min(100% - 28px, 920px); padding-top: 20px; }
+            .article { padding: 25px 21px; border-radius: 20px; }
+            .article p, .article li { font-size: 15px; line-height: 1.85; }
+        }
+    </style>
+</head>
+<body>
+    <div class="article-shell">
+        <header class="topbar">
+            <a class="brand" href="../../" aria-label="返回 Kyle 主页">
+                <span class="brand-mark">K</span>
+                <span>Kyle · Tool Notes</span>
+            </a>
+            <a class="back-link" href="../">← 返回工具使用</a>
+        </header>
+
+        <section class="article-header">
+            <p class="article-kicker">Codex · CLI</p>
+            <h1>Codex CLI 启动命令</h1>
+            <p class="article-summary">记录当前 Windows PowerShell 环境下启动 Codex CLI 的固定命令。使用自定义 <code>CODEX_HOME</code>，并通过指定的 <code>codex.cmd</code> 启动。</p>
+            <div class="article-meta">
+                <span>PowerShell</span>
+                <span>Codex CLI</span>
+                <span>Windows</span>
+                <span>2026-09-28</span>
+            </div>
+        </section>
+
+        <article class="article">
+            <h2>1. 启动命令</h2>
+            <p>打开 PowerShell 后依次执行：</p>
+            <div class="code-block">$env:CODEX_HOME = 'F:\CodexCLIHome'
+& 'F:\nodeJS\node_global\codex.cmd' --no-daemon</div>
+
+            <p>第一行指定 Codex CLI 使用的主目录；第二行调用本机安装的 <code>codex.cmd</code> 并启动交互式 Codex CLI。</p>
+
+            <table class="command-table">
+                <thead>
+                    <tr>
+                        <th>部分</th>
+                        <th>含义</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>$env:CODEX_HOME</code></td>
+                        <td>设置当前 PowerShell 会话中的环境变量，告诉 Codex 使用哪个目录保存和读取配置。</td>
+                    </tr>
+                    <tr>
+                        <td><code>F:\CodexCLIHome</code></td>
+                        <td>当前使用的 Codex 配置与数据目录。</td>
+                    </tr>
+                    <tr>
+                        <td><code>&</code></td>
+                        <td>PowerShell 的调用运算符，用来执行后面的程序或脚本路径。</td>
+                    </tr>
+                    <tr>
+                        <td><code>F:\nodeJS\node_global\codex.cmd</code></td>
+                        <td>本机通过 Node.js 全局安装的 Codex CLI 启动脚本。</td>
+                    </tr>
+                    <tr>
+                        <td><code>--no-daemon</code></td>
+                        <td>以不使用后台 daemon 的方式启动 Codex CLI。</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="callout"><strong>注意：</strong><code>$env:CODEX_HOME = ...</code> 只对当前 PowerShell 会话生效。关闭当前终端后重新打开 PowerShell，需要再次执行这一行，除非以后把它设置成持久环境变量。</div>
+
+            <h2>2. 检查 Codex CLI 版本</h2>
+            <div class="code-block">& 'F:\nodeJS\node_global\codex.cmd' --version</div>
+
+            <h2>3. 检查登录状态</h2>
+            <div class="code-block">& 'F:\nodeJS\node_global\codex.cmd' login status</div>
+            <p>如果当前主要通过自定义 API Provider 使用 Codex CLI，显示 <code>Not logged in</code> 并不一定意味着模型 API 无法使用；ChatGPT 登录状态与自定义 API Provider 的认证是两回事。</p>
+
+            <h2>4. 记忆版</h2>
+            <p>以后忘记怎么启动时，只需要记住两步：</p>
+            <div class="code-block"># 1. 指定 Codex Home
+$env:CODEX_HOME = 'F:\CodexCLIHome'
+
+# 2. 启动 Codex CLI
+& 'F:\nodeJS\node_global\codex.cmd' --no-daemon</div>
+        </article>
+
+        <footer class="article-footer">Kyle Tool Notes · Codex CLI</footer>
+    </div>
+</body>
+</html>
