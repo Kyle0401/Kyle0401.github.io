@@ -38,6 +38,10 @@
         .note-table th { color: #4e5870; background: #f6f7fb; font-size: 14px; }
         .note-table td { color: #3e485c; font-size: 15px; }
         .note-table tr:last-child td { border-bottom: 0; }
+        .source-links { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 18px; }
+        .source-link { display: inline-flex; align-items: center; gap: 6px; padding: 7px 11px; color: #4f5fb8; background: #f0f2ff; border: 1px solid #dfe3ff; border-radius: 999px; font-size: 13px; font-weight: 700; text-decoration: none; transition: transform .16s ease, background .16s ease; }
+        .source-link:hover { background: #e7eaff; transform: translateY(-1px); }
+        .source-link::before { content: "PDF"; display: inline-grid; place-items: center; min-width: 28px; height: 20px; padding: 0 4px; color: #fff; background: #6673d9; border-radius: 5px; font-size: 10px; font-weight: 800; letter-spacing: .04em; }
         .callout { margin: 24px 0; padding: 18px 20px; color: #3e485c; background: #f4f2ff; border-left: 4px solid #7b6bd6; border-radius: 0 14px 14px 0; line-height: 1.85; }
         .warn { background: #fff7ed; border-left-color: #f59e0b; }
         .ok { background: #eefbf4; border-left-color: #22a06b; }
@@ -89,6 +93,7 @@
             <div class="callout"><strong>这部分知识最核心的观察：</strong>拍子不仅是一个分数，更是一套强拍、弱拍、次强拍的组织方式。判断单拍子、复拍子，以及做音值组合法题时，都要看这种内部结构。</div>
 
             <h2>2. 本书中的单拍子</h2>
+            <div class="source-links"><a class="source-link" href="./%E5%9F%BA%E6%9C%AC%E4%B9%90%E7%90%86.pdf#page=62" target="_blank" rel="noopener">教材第 62 页：单拍子</a></div>
             <p>按照本书的术语体系，<strong>每小节只有两拍或三拍的拍子叫单拍子</strong>。因此分子为 2 或 3 的常见拍号，如 <code>2/4</code>、<code>3/4</code>、<code>2/8</code>、<code>3/8</code>，属于单拍子。</p>
             <p>单拍子的基本强弱规律可以理解为：</p>
 
@@ -110,9 +115,11 @@
             <p>可以把一个单拍子理解成一个<strong>从强拍开始的基本拍组</strong>。</p>
 
             <h2>3. 本书中的复拍子</h2>
+            <div class="source-links"><a class="source-link" href="./%E5%9F%BA%E6%9C%AC%E4%B9%90%E7%90%86.pdf#page=64" target="_blank" rel="noopener">教材第 64 页：复拍子</a></div>
             <p>本书把<strong>由完全相同的单拍子结合而成的拍子</strong>称为复拍子。几个单拍子合并后，第一个单拍子的强拍仍是整个小节的强拍；后面各单拍子原来的强拍会降一级，成为<strong>次强拍</strong>。</p>
 
             <h3>为什么 4/4 = 2/4 + 2/4？</h3>
+            <div class="source-links"><a class="source-link" href="./%E5%9F%BA%E6%9C%AC%E4%B9%90%E7%90%86.pdf#page=64" target="_blank" rel="noopener">查看 4/4 的复拍子结构</a></div>
             <p>4/4 的四个四分音符位置并不是完全同级的，它的强弱层次是：</p>
             <div class="meter-strip">
                 <div class="meter-row">
@@ -128,6 +135,7 @@
             <p>这里的“=”首先是在表达<strong>拍子结构的组合</strong>，而不只是做分数加法。第 3 拍之所以是次强拍，正是因为它对应第二个 2/4 单拍子原来的强拍。</p>
 
             <h3>为什么 6/8 = 3/8 + 3/8？</h3>
+            <div class="source-links"><a class="source-link" href="./%E5%9F%BA%E6%9C%AC%E4%B9%90%E7%90%86.pdf#page=64" target="_blank" rel="noopener">查看 6/8 的复拍子结构</a></div>
             <p>一个 3/8 单拍子的结构是“强—弱—弱”。两个相同的 3/8 组合起来，就形成 6/8：</p>
             <div class="meter-strip">
                 <div class="meter-row">
@@ -162,6 +170,7 @@
             <div class="callout"><strong>术语提醒：</strong>这里严格沿用李重光《基本乐理》的分类，因此 4/4 在本书中按“复拍子”理解。不同乐理体系或英文教材对 simple / compound meter 的术语划分可能不同，复习本课程时以本书定义为准。</div>
 
             <h2>4. 混合拍子：由不同的单拍子组合</h2>
+            <div class="source-links"><a class="source-link" href="./%E5%9F%BA%E6%9C%AC%E4%B9%90%E7%90%86.pdf#page=66" target="_blank" rel="noopener">教材第 66 页：混合拍子定义</a><a class="source-link" href="./%E5%9F%BA%E6%9C%AC%E4%B9%90%E7%90%86.pdf#page=67" target="_blank" rel="noopener">教材第 67 页：5 拍子、7 拍子组合示例</a></div>
             <p>如果组合起来的单拍子并不完全相同，本书把它归入<strong>混合拍子</strong>。例如五拍子和七拍子常见的组合方式为：</p>
             <div class="formula">5 拍子：2 + 3 或 3 + 2
 
@@ -169,6 +178,7 @@
             <p>因此 <code>7/8</code> 不能只理解成“七个八分音符凑满一小节”，还必须知道这一小节具体采用哪一种内部组合。</p>
 
             <h2>5. 什么是“拍子的音值组合法”？</h2>
+            <div class="source-links"><a class="source-link" href="./%E5%9F%BA%E6%9C%AC%E4%B9%90%E7%90%86.pdf#page=72" target="_blank" rel="noopener">教材第 72 页：第十讲“拍子的音值组合法”</a></div>
             <p>第十讲的出发点是：<strong>把各种时值的音符按照拍子的结构进行组合，使读谱者一眼能看出节拍组织。</strong></p>
             <p>做题时可以分两层检查：</p>
             <ol>
@@ -178,9 +188,11 @@
             <div class="callout ok"><strong>非常重要：</strong>“总时值相等”只是必要条件，不是充分条件。音值组合题真正考的是能不能从写法上直接读出拍子的内部结构。</div>
 
             <h3>单拍子的基本原则</h3>
+            <div class="source-links"><a class="source-link" href="./%E5%9F%BA%E6%9C%AC%E4%B9%90%E7%90%86.pdf#page=72" target="_blank" rel="noopener">教材第 72–73 页：单拍子的音值组合法</a></div>
             <p>单拍子中，各单位拍之间应尽量看得清楚。当一个持续音跨过重要拍点而使拍子结构不明显时，通常需要把它拆成几个音符，再用延音线连接。</p>
 
             <h3>复拍子的基本原则</h3>
+            <div class="source-links"><a class="source-link" href="./%E5%9F%BA%E6%9C%AC%E4%B9%90%E7%90%86.pdf#page=74" target="_blank" rel="noopener">教材第 74 页：复拍子的音值组合法</a></div>
             <p>复拍子应先按构成它的单拍子分组，再在每一个单拍子内部按照单拍子的音值组合规则书写。例如：</p>
             <div class="formula">4/4 → 2/4 | 2/4
 6/8 → 3/8 | 3/8
@@ -188,9 +200,11 @@
             <p>所以在 6/8 中尤其要警惕把两个 3/8 之间的分界隐藏掉；9/8 则应能看出三个 3/8 的结构。</p>
 
             <h3>混合拍子的基本原则</h3>
+            <div class="source-links"><a class="source-link" href="./%E5%9F%BA%E6%9C%AC%E4%B9%90%E7%90%86.pdf#page=74" target="_blank" rel="noopener">教材第 74–75 页：混合拍子的音值组合法</a></div>
             <p>混合拍子更需要把内部组合显示出来。若一个持续音覆盖了多个内部拍组，应根据拍子的结构次序拆成几个音符，并用延音线连接，而不是仅用一个很长的音符把整段盖住。</p>
 
             <h2>6. 结合题目：四个选项怎么判断？</h2>
+            <div class="source-links"><a class="source-link" href="./%E5%9F%BA%E6%9C%AC%E4%B9%90%E7%90%86.pdf#page=72" target="_blank" rel="noopener">回看音值组合法总则</a><a class="source-link" href="./%E5%9F%BA%E6%9C%AC%E4%B9%90%E7%90%86.pdf#page=74" target="_blank" rel="noopener">回看复拍子与混合拍子规则</a></div>
             <p>这道题最适合用“<strong>先算总时值，再检查分组边界</strong>”的方法。</p>
 
             <figure class="question-figure">
