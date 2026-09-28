@@ -104,7 +104,39 @@
             <div class="code-block">& 'F:\nodeJS\node_global\codex.cmd' login status</div>
             <p>如果当前主要通过自定义 API Provider 使用 Codex CLI，显示 <code>Not logged in</code> 并不一定意味着模型 API 无法使用；ChatGPT 登录状态与自定义 API Provider 的认证是两回事。</p>
 
-            <h2>4. 记忆版</h2>
+            <h2>4. 自定义 API 与 ChatGPT 登录可以同时存在</h2>
+            <p>当前 Codex CLI 使用的是自定义模型 Provider（例如 <code>codex_team</code>），模型请求通过对应的 API Key 进行认证。这和 Codex CLI 的 ChatGPT 登录状态是两套不同的认证链路。</p>
+
+            <div class="code-block">自定义 API Key  → 模型请求
+ChatGPT 登录     → ChatGPT 身份 / 远程插件与连接器能力</div>
+
+            <p>因此，即使模型仍然走自定义 API，也可以额外登录 ChatGPT。这样不需要放弃现有的 API Provider。</p>
+
+            <div class="code-block">$env:CODEX_HOME = 'F:\CodexCLIHome'
+& 'F:\nodeJS\node_global\codex.cmd' login</div>
+
+            <p><code>login</code> 会启动 Codex CLI 的 ChatGPT 登录流程。登录完成后，可以再次检查状态：</p>
+
+            <div class="code-block">& 'F:\nodeJS\node_global\codex.cmd' login status</div>
+
+            <p>如果登录成功，通常会显示已经通过 ChatGPT 登录。此时模型仍然可以继续使用 <code>model_provider = "codex_team"</code> 指定的自定义 Provider；ChatGPT 登录不会自动把模型切回 OpenAI 官方 Provider。</p>
+
+            <div class="callout"><strong>为什么需要额外登录 ChatGPT？</strong><br>仅使用自定义 API 时，Codex CLI 可能拿不到需要 ChatGPT 身份认证的远程插件目录，例如 GitHub 等连接器。额外登录 ChatGPT 后，可以再通过 <code>/plugins</code> 或 <code>plugin list --available</code> 检查这些插件是否对当前账号下发。是否实际出现仍取决于当前账号和远程插件目录。</div>
+
+            <p>可以使用下面的 PowerShell 命令检查当前可用插件中是否存在 GitHub：</p>
+
+            <div class="code-block">$data = & 'F:\nodeJS\node_global\codex.cmd' plugin list --available --json |
+    ConvertFrom-Json
+
+$data.available |
+    Where-Object { $_.name -eq 'github' } |
+    Format-List *</div>
+
+            <p>如果有结果，说明 GitHub 插件已经出现在当前可用目录中；如果没有输出，则当前目录中仍没有 GitHub。</p>
+
+            <div class="callout"><strong>不要混淆：</strong>自定义 Provider 配置中的 <code>requires_openai_auth = false</code> 是给该模型 Provider 使用的，不要为了登录 ChatGPT 或启用插件而直接改成 <code>true</code>。模型 API 认证和 ChatGPT 登录是两个不同问题。</div>
+
+            <h2>5. 记忆版</h2>
             <p>以后忘记怎么启动时，只需要记住两步：</p>
             <div class="code-block"># 1. 指定 Codex Home
 $env:CODEX_HOME = 'F:\CodexCLIHome'
