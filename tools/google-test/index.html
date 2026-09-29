@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Google Test C++ 单元测试笔记">
+    <title>Google Test · Kyle</title>
+    <link rel="icon" type="image/svg+xml" href="../../static/img/logo-jy.svg">
+    <link rel="stylesheet" href="../../static/css/learning.css">
+    <style>
+        .article-shell { width: min(920px, calc(100% - 40px)); margin: 0 auto; padding: 30px 0 72px; }
+        .article-header { margin: 38px 0 26px; }
+        .article-kicker { margin: 0 0 12px; color: #5b6ee1; font-size: 13px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+        .article-header h1 { margin: 0; font-size: clamp(31px, 5vw, 52px); line-height: 1.2; letter-spacing: -.035em; }
+        .article-summary { max-width: 790px; margin: 18px 0 0; color: #6d7687; font-size: 16px; line-height: 1.85; }
+        .article-meta { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 20px; }
+        .article-meta span { padding: 7px 11px; color: #5764ba; background: #eef0ff; border-radius: 999px; font-size: 13px; font-weight: 700; }
+        .article { padding: 34px 38px; background: rgba(255,255,255,.92); border: 1px solid rgba(255,255,255,.76); border-radius: 24px; box-shadow: 0 15px 42px rgba(35,45,80,.08); }
+        .article h2 { margin: 38px 0 14px; font-size: 27px; letter-spacing: -.02em; }
+        .article h2:first-child { margin-top: 0; }
+        .article p, .article li { color: #3e485c; font-size: 16px; line-height: 1.9; }
+        .article strong { color: #172033; }
+        .article code { padding: 2px 7px; color: #4c57a8; background: #eef0ff; border-radius: 7px; font-family: Consolas, "SFMono-Regular", monospace; }
+        .code-block { margin: 18px 0 24px; padding: 18px 20px; color: #e8ecf5; background: #1f2430; border-radius: 14px; font-family: Consolas, "SFMono-Regular", monospace; font-size: 15px; line-height: 1.8; overflow-x: auto; white-space: pre; }
+        .callout { margin: 24px 0; padding: 18px 20px; color: #3e485c; background: #f4f2ff; border-left: 4px solid #7b6bd6; border-radius: 0 14px 14px 0; line-height: 1.85; }
+        .command-table { width: 100%; border-collapse: collapse; margin: 18px 0 24px; }
+        .command-table th, .command-table td { padding: 14px 16px; border: 1px solid #e4e8f0; text-align: left; vertical-align: top; line-height: 1.7; }
+        .command-table th { background: #f6f7fb; color: #4e5870; }
+        .article-footer { margin-top: 28px; color: #7b8391; font-size: 13px; text-align: center; }
+        @media (max-width: 700px) {
+            .article-shell { width: min(100% - 28px, 920px); padding-top: 20px; }
+            .article { padding: 25px 21px; border-radius: 20px; }
+            .article p, .article li { font-size: 15px; line-height: 1.85; }
+        }
+    </style>
+</head>
+<body>
+    <div class="article-shell">
+        <header class="topbar">
+            <a class="brand" href="../../" aria-label="返回 Kyle 主页">
+                <span class="brand-mark">K</span>
+                <span>Kyle · Tool Notes</span>
+            </a>
+            <a class="back-link" href="../">← 返回工具使用</a>
+        </header>
+
+        <section class="article-header">
+            <p class="article-kicker">C++ · Testing</p>
+            <h1>Google Test</h1>
+            <p class="article-summary">记录 Google Test（gtest）的常用写法，包括测试用例、断言、测试夹具以及 CMake 集成。</p>
+            <div class="article-meta">
+                <span>C++</span>
+                <span>Google Test</span>
+                <span>Unit Test</span>
+                <span>2026-09-29</span>
+            </div>
+        </section>
+
+        <article class="article">
+            <h2>1. Google Test 是什么</h2>
+            <p>Google Test，通常简称 <code>gtest</code>，是 C++ 项目中常用的单元测试框架。测试代码通过 <code>TEST</code>、<code>TEST_F</code> 等宏组织，并使用 <code>EXPECT_*</code> 或 <code>ASSERT_*</code> 系列断言检查实际结果是否符合预期。</p>
+
+            <h2>2. 最基本的测试</h2>
+            <div class="code-block">#include &lt;gtest/gtest.h&gt;
+
+int add(int a, int b)
+{
+    return a + b;
+}
+
+TEST(AddTest, TwoPositiveNumbers)
+{
+    EXPECT_EQ(add(1, 2), 3);
+}</div>
+
+            <p><code>TEST(AddTest, TwoPositiveNumbers)</code> 中，第一个参数是测试套件名，第二个参数是测试名。</p>
+
+            <h2>3. EXPECT 与 ASSERT</h2>
+            <table class="command-table">
+                <thead>
+                    <tr>
+                        <th>形式</th>
+                        <th>失败后的行为</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>EXPECT_*</code></td>
+                        <td>记录失败，但当前测试函数继续执行。</td>
+                    </tr>
+                    <tr>
+                        <td><code>ASSERT_*</code></td>
+                        <td>记录失败，并立即结束当前测试函数。</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="code-block">EXPECT_EQ(a, b);
+EXPECT_NE(a, b);
+EXPECT_TRUE(condition);
+EXPECT_FALSE(condition);
+
+ASSERT_EQ(a, b);
+ASSERT_NE(a, b);</div>
+
+            <h2>4. 测试夹具 TEST_F</h2>
+            <p>当多个测试需要共享初始化和清理逻辑时，可以定义继承自 <code>::testing::Test</code> 的测试夹具，并在 <code>SetUp()</code>、<code>TearDown()</code> 中准备和清理测试环境。</p>
+
+            <div class="code-block">class MyTest : public ::testing::Test
+{
+protected:
+    void SetUp() override
+    {
+        value = 10;
+    }
+
+    int value;
+};
+
+TEST_F(MyTest, InitialValue)
+{
+    EXPECT_EQ(value, 10);
+}</div>
+
+            <h2>5. CMake 集成</h2>
+            <div class="code-block">find_package(GTest REQUIRED)
+
+add_executable(my_test test.cpp)
+
+target_link_libraries(my_test
+    PRIVATE
+    GTest::gtest_main
+)
+
+include(GoogleTest)
+gtest_discover_tests(my_test)</div>
+
+            <div class="callout"><strong>后续可以继续补充：</strong>参数化测试、死亡测试、Mock、CTest、测试过滤、命令行参数，以及在实际 C++ 项目中的目录组织方式。</div>
+        </article>
+
+        <footer class="article-footer">Kyle Tool Notes · Google Test</footer>
+    </div>
+</body>
+</html>
