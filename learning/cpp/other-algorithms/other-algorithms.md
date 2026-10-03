@@ -12,6 +12,91 @@
 
 本次丢分的关键在于：**找到位置之后是否结束本轮搜索，以及搜索区间为空时是否仍然执行插入。**
 
+### 首次提交的错误代码（50 分）
+
+下面保留第一次提交的完整程序，仅调整排版，并用注释标出两个出错的位置。原来的执行逻辑保持不变，后面的错误分析可以直接对照这份代码阅读。
+
+```cpp
+#include <iostream>
+using namespace std;
+
+void BinSertSort(int* arr, int n)
+{
+    for (int i = 1; i < n; i++)
+    {
+        int low = 0;
+        int high = i - 1;
+        while (low <= high)
+        {
+            int mid = (low + high) / 2;
+            if (arr[mid] == arr[i])
+            {
+                int tmp = arr[i];
+                for (int j = i - 1; j >= mid + 1; j--)
+                {
+                    arr[j + 1] = arr[j];
+                }
+                arr[mid + 1] = tmp;
+                // 错误一：这里没有 break，也没有更新 low/high
+            }
+            else if (arr[mid] > arr[i])
+            {
+                if (low == high)
+                {
+                    int tmp = arr[i];
+                    for (int j = i - 1; j >= mid; j--)
+                    {
+                        arr[j + 1] = arr[j];
+                    }
+                    arr[mid] = tmp;
+                    break;
+                }
+                high = mid - 1;
+            }
+            else
+            {
+                if (low == high)
+                {
+                    int tmp = arr[i];
+                    for (int j = i - 1; j >= mid + 1; j--)
+                    {
+                        arr[j + 1] = arr[j];
+                    }
+                    arr[mid + 1] = tmp;
+                    break;
+                }
+                low = mid + 1;
+            }
+        }
+        // 错误二：搜索区间变空时，没有在循环外按 low 补上插入
+    }
+}
+
+int main()
+{
+    int n;
+    cin >> n;
+    int arr[n];
+    for (int i = 0; i < n; i++)
+    {
+        cin >> arr[i];
+    }
+
+    BinSertSort(arr, n);
+
+    for (int i = 0; i < n; i++)
+    {
+        if (i == n - 1)
+        {
+            cout << arr[i] << endl;
+        }
+        else
+            cout << arr[i] << " ";
+    }
+    return 0;
+}
+```
+
 ### 错误一：相等分支完成插入后没有退出
 
 原代码遇到 `arr[mid] == arr[i]` 时，已经将元素插入到 `mid + 1`，却没有 `break`，也没有更新 `low`、`high`。
