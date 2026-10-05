@@ -20,7 +20,7 @@
     }
 
     var chapter5SectionPromise = loadNote(
-        './chapter5-return-values.md?v=20260812a',
+        './chapter5-return-values.md?v=20261006-reference-return',
         'Failed to load chapter 5 return value notes.'
     ).then(normalizeReferenceLabels);
 

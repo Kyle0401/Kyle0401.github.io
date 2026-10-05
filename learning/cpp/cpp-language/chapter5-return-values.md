@@ -32,7 +32,7 @@ return expression;
 | --- | --- | --- | --- |
 | 标量类型 | `int`、`double`、枚举、`T*` | 否 | 否 |
 | 类类型 | `std::string`、`std::vector<T>`、`std::unique_ptr<T>`、自定义类 | 是 | 满足条件时可能 |
-| 引用类型 | `T&`、`const T&` | 不产生新的 `T` 返回对象 | 否 |
+| 引用类型 | `T&`、`const T&` | 不产生新的 `T` 返回对象；具体用法见 5.3.11 | 否 |
 
 这里尤其要区分 **“变量”** 和 **“类对象”**。
 
@@ -832,4 +832,120 @@ forward(drop(reset(forward(forward(reset(nullptr))))));
 9. `std::move` 本身不搬运资源；真正的移动效果由目标类型的移动语义决定。
 10. 对 `unique_ptr` 要分别追踪智能指针对象和它拥有的资源对象。
 
-参考：[C++ 标准草案：object model](https://eel.is/c++draft/intro.object)、[C++ 标准草案：types](https://eel.is/c++draft/basic.types)、[C++ 标准草案：function call](https://eel.is/c++draft/expr.call)、[C++ 标准草案：copy/move elision](https://eel.is/c++draft/class.copy.elision)、[C++ 标准草案：move-eligible expressions](https://eel.is/c++draft/expr.prim.id)、[C++ 标准草案：return statement](https://eel.is/c++draft/stmt.return)、[cppreference：copy elision](https://en.cppreference.com/w/cpp/language/copy_elision)、[cppreference：return statement](https://en.cppreference.com/w/cpp/language/return)。
+------
+
+##### 5.3.11 引用返回：借用已有对象，避免复制
+
+按引用返回会让调用方继续访问一个已经存在的对象，不会为了返回结果再构造一个同类型对象。它适合原地修改后返回原对象，或者提供对已有对象的访问。
+
+###### 参数中的 `&` 与返回类型中的 `&`
+
+以正负数分区函数为例：
+
+```cpp
+std::vector<double>& sortArrayByPN(std::vector<double>& nums);
+```
+
+两个 `&` 分别控制不同的环节：
+
+| 位置 | 含义 |
+| --- | --- |
+| 参数 `std::vector<double>& nums` | 形参直接引用调用方的数组，函数可以修改原数组；传参时不复制整个 `vector` |
+| 返回类型 `std::vector<double>&` | 返回同一个 `vector` 的引用，返回时不再复制整个数组 |
+
+> [!IMPORTANT]
+> **引用传参不等于引用返回。** 参数与返回类型要分别判断；只在参数上写 `&`，不能消除按值返回已有对象时的复制。
+
+###### 同样是 `return nums;`，返回类型决定含义
+
+下面两个函数只比较返回方式，不执行数组分区：
+
+```cpp
+#include <vector>
+
+std::vector<double> returnByValue(std::vector<double>& nums) {
+    return nums;  // 从调用方的 vector 复制构造返回对象
+}
+
+std::vector<double>& returnByReference(std::vector<double>& nums) {
+    return nums;  // 返回调用方 vector 的引用
+}
+```
+
+`returnByValue` 中的 `nums` 是一个左值引用形参，引用的是调用方已经存在的对象。返回类型却是 `std::vector<double>`，所以这里的 `return nums;` 会复制构造一个新的 `vector`；它不是返回具名局部类对象的 NRVO 场景，也不会把这个左值引用形参自动当作移动源。
+
+`returnByReference` 的返回类型是 `std::vector<double>&`，所以同样的 `return nums;` 只是让返回引用绑定到原对象，不会复制它，也不会转移它的所有权：
+
+```cpp
+std::vector<double> a{-2.0, 3.5};
+auto& result = returnByReference(a);
+
+result[0] = -8.0;  // a[0] 也变成 -8.0
+bool same_object = (&result == &a);  // true
+```
+
+对于正负数分区函数，原来的分区循环可以保持，返回类型写成 `std::vector<double>&`，结尾仍然写 `return nums;`。
+
+> [!NOTE]
+> 上述复制结论针对“按值返回左值引用形参所引用的对象”。不要推广为“所有按值返回都会复制”：返回同类型 prvalue 可以直接构造结果，返回具名局部类对象还可能使用 NRVO 或移动，见 5.3.4～5.3.7。
+
+设数组长度为 `n`，仅比较这两个函数的返回过程：
+
+| 返回方式 | 返回时是否构造数组副本 | 返回过程的时间 | 返回结果所需的新增存储 |
+| --- | --- | --- | --- |
+| `std::vector<double>` + `return nums;` | 是 | O(n) | O(n) |
+| `std::vector<double>&` + `return nums;` | 否 | O(1) | O(1) |
+
+这里讨论的是返回开销，分区循环仍要单独分析。如果循环本身使用 O(n) 时间、O(1) 额外空间，那么按引用返回不会额外引入数组副本；按值返回则增加 O(n) 的复制时间和副本存储，但总时间仍是 O(n)。
+
+若题目或接口规定必须按值返回，应遵守既定签名。不要为了减少复制而擅自改成 `return std::move(nums);`，那会把调用方数组的资源移入返回结果，让原数组处于有效但未指定的状态。
+
+###### 调用方也要用引用接收
+
+函数按引用返回，并不意味着接收结果时一定不复制：
+
+```cpp
+std::vector<double> a{-2.0, 3.5};
+
+auto copy = returnByReference(a);        // vector<double>：仍然复制数组
+auto& ref = returnByReference(a);        // vector<double>&：引用原数组
+const auto& view = returnByReference(a); // const vector<double>&：只读访问原数组
+```
+
+普通 `auto` 会推导为非引用类型，所以 `copy` 是独立副本；`ref` 和 `view` 才继续引用 `a`。如果只是想原地处理数组，也可以直接调用函数，不接收返回结果。
+
+`const auto&` 限制的是通过 `view` 修改对象的能力，原数组仍然可以通过 `a` 或其他可修改引用改变；它不代表数组的所有权被转移。
+
+###### 生命周期：返回引用必须指向仍存活的对象
+
+返回引用只是借用对象，不会延长它的生命周期。上例能够正常使用，是因为 `a` 由调用方创建，函数返回后仍然存在；引用形参 `nums` 离开函数作用域，不会销毁调用方的 `a`。
+
+下面的写法即使被编译器接受，返回后也会留下悬空引用：
+
+```cpp
+const std::vector<double>& badReturn() {
+    std::vector<double> local{-2.0, 3.5};
+    return local;  // 错误用法：local 在函数结束时被销毁
+}
+```
+
+同样，不能返回指向按值形参的引用，因为那个形参对象也会在调用结束时被销毁。返回 `const T&` 仍然需要遵守生命周期要求，`const` 不能让一个已经销毁的对象继续存在。
+
+若函数需要创建一个新数组并交给调用方，应按值返回：
+
+```cpp
+std::vector<double> makeNumbers() {
+    std::vector<double> result{-2.0, 3.5};
+    return result;  // 可能 NRVO；否则可使用移动，结果由调用方持有
+}
+```
+
+若函数只是修改调用方数组，调用方又不需要返回值，可以直接使用 `void` 接口：
+
+```cpp
+void sortArrayByPN(std::vector<double>& nums);
+```
+
+> **选择原则：返回新对象时通常按值；继续访问已有对象时可以按引用，但必须保证被引用对象仍然存活。调用方需要保持引用语义时，也要使用 `auto&` 或 `const auto&` 接收。**
+
+参考：[C++ 标准草案：引用初始化](https://eel.is/c++draft/dcl.init.ref)、[C++ 标准草案：auto 类型推导](https://eel.is/c++draft/dcl.spec.auto)、[C++ 标准草案：object model](https://eel.is/c++draft/intro.object)、[C++ 标准草案：types](https://eel.is/c++draft/basic.types)、[C++ 标准草案：function call](https://eel.is/c++draft/expr.call)、[C++ 标准草案：copy/move elision](https://eel.is/c++draft/class.copy.elision)、[C++ 标准草案：move-eligible expressions](https://eel.is/c++draft/expr.prim.id)、[C++ 标准草案：return statement](https://eel.is/c++draft/stmt.return)、[cppreference：copy elision](https://en.cppreference.com/w/cpp/language/copy_elision)、[cppreference：return statement](https://en.cppreference.com/w/cpp/language/return)。
