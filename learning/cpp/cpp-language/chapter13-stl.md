@@ -425,3 +425,85 @@ vec.capacity() >= 256;  // 标准保证
 > `resize(n)` 表示“让容器现在有 `n` 个元素”；`reserve(n)` 表示“提前准备至少能容纳 `n` 个元素的空间”。
 
 参考：[cppreference：`std::vector::reserve`](https://en.cppreference.com/w/cpp/container/vector/reserve)。
+
+##### 13.2.8 `begin()` / `end()`：迭代器与裸指针
+
+`std::vector` 使用迭代器表示元素位置。迭代器支持解引用和移动等操作，但不能因此假定它的类型就是裸指针。
+
+例如，下面的写法在使用类类型迭代器的标准库实现中会报错：
+
+```cpp
+std::vector<int> nums{3, 1, 2, 4};
+int* head = nums.begin();  // 错误：这里的迭代器不能隐式转换为 int*
+```
+
+编译器可能报告：
+
+```text
+no viable conversion from 'iterator' to 'int *'
+```
+
+`nums.begin()` 的返回类型是 `std::vector<int>::iterator`。报错中的 `__normal_iterator<int*, ...>` 是当前标准库使用的迭代器包装类型；即使它内部保存了 `int*`，包装对象与裸指针也不是同一种类型。
+
+> [!IMPORTANT]
+> 裸指针本身可以作为迭代器，但容器迭代器不一定是裸指针。标准没有规定 `std::vector<int>::iterator` 必须就是 `int*`；某些实现可能使用指针，另一些实现则使用包装类。通用代码应使用容器的迭代器类型或 `auto`，不要依赖实现细节。
+
+###### 用 `auto` 或显式迭代器类型接收
+
+推荐让编译器推导迭代器类型：
+
+```cpp
+auto head = nums.begin();
+auto tail = nums.end();
+```
+
+也可以显式写出类型：
+
+```cpp
+std::vector<int>::iterator head = nums.begin();
+std::vector<int>::iterator tail = nums.end();
+```
+
+`auto` 是编译期类型推导，变量仍然具有确定的静态类型；它不会把迭代器转换成指针。对于 `const std::vector<int>`，`begin()` / `end()` 返回 `const_iterator`，`auto` 也会相应推导出只读迭代器类型。
+
+`std::vector` 的迭代器支持 `*it`、`++it`、`--it`、`it + n` 和同一容器内的距离及大小比较。这些是迭代器支持的操作，并不意味着它的类型就是 `int*`；其他容器的迭代器也不一定支持 `+ n` 或 `<`。
+
+###### `end()` 是尾后位置，不能解引用
+
+| 表达式 | 表示的位置 | 是否可解引用 |
+| --- | --- | --- |
+| `nums.begin()` | 第一个元素；空容器时等于 `end()` | 仅非空时可以 |
+| `nums.end()` | 最后一个元素之后的位置 | 不可以 |
+| `nums.end() - 1` | 最后一个元素的位置 | 仅非空时可以 |
+
+普通遍历使用左闭右开的范围 `[begin(), end())`，这种写法也适用于空容器：
+
+```cpp
+for (auto it = nums.begin(); it != nums.end(); ++it) {
+    // 此时 it 指向有效元素，可以读取或修改 *it
+}
+```
+
+如果需要让左右两个迭代器分别指向首尾元素，必须先保证容器非空：
+
+```cpp
+if (!nums.empty()) {
+    auto head = nums.begin();
+    auto tail = nums.end() - 1;
+    // 在有效范围内使用 *head、*tail，并移动迭代器
+}
+```
+
+###### 确实需要裸指针时，使用 `data()`
+
+对于非 `const std::vector<int>`，`data()` 明确返回 `int*`：
+
+```cpp
+int* head = nums.data();
+```
+
+对于 `const std::vector<int>`，返回类型则是 `const int*`。`data()` 提供的是底层连续元素的地址，详见 13.2.2；即使成功取得指针，空容器时也不能通过它访问元素。
+
+另外，`vector` 发生重新分配后，之前取得的元素指针、引用和迭代器都会失效。即使没有重新分配，`push_back()` 也会使原来的 `end()` 失效；`insert()` 会使插入位置及其后的迭代器失效，`erase()` 会使删除位置及其后的迭代器失效。单纯修改或交换 `int` 元素的值则不会使迭代器失效。
+
+参考：[C++ 标准草案：`vector` 类型与迭代器接口](https://eel.is/c++draft/vector.overview)、[容器的 `begin()` / `end()` 要求](https://eel.is/c++draft/container.reqmts)、[`vector::data()`](https://eel.is/c++draft/vector.data)、[`vector` 修改操作与迭代器失效](https://eel.is/c++draft/vector.modifiers)。

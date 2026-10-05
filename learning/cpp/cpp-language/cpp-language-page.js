@@ -35,7 +35,7 @@
     ).then(normalizeReferenceLabels);
 
     var chapter13SectionPromise = Promise.all([
-        loadNote('./chapter13-stl.md?v=20260811c', 'Failed to load chapter 13 STL notes.'),
+        loadNote('./chapter13-stl.md?v=20261006a', 'Failed to load chapter 13 STL notes.'),
         loadNote('./chapter13-vector-bool.md?v=20260811b', 'Failed to load vector<bool> notes.')
     ]).then(function (sections) {
         return normalizeReferenceLabels(sections.filter(Boolean).join('\n\n'));
