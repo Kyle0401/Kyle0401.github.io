@@ -2251,6 +2251,87 @@ s == "123"
 
 标准库为整数和浮点类型提供了多组 `std::to_string` 重载，包括 `int`、`long`、`long long`、`float`、`double` 和 `long double` 等。
 
+#### 16.2 `<format>`：`std::format()` 格式化字符串（C++20）
+
+`std::format` 是 C++20 引入的**字符串格式化函数**，定义在 `<format>` 头文件中。它利用格式字符串中的 `{}` 占位符，把传入的参数填到指定位置，**返回格式化后的 `std::string`**，但它本身不会把内容打印到屏幕。
+
+##### 16.2.1 基本用法：`{}` 自动按顺序填入参数
+
+```cpp
+#include <format>
+#include <iostream>
+#include <string>
+
+int main() {
+    std::string name = "Kyle";
+    int age = 22;
+
+    std::cout << std::format("我叫{}，今年{}岁\n", name, age);
+    return 0;
+}
+```
+
+输出：
+
+```text
+我叫Kyle，今年22岁
+```
+
+执行时，第一个 `{}` 对应 `name`，第二个 `{}` 对应 `age`。不需要像 `printf` 一样为整数、字符串分别写 `%d`、`%s`。
+
+##### 16.2.2 用 `{0}`、`{1}` 指定参数位置
+
+```cpp
+std::string name = "Kyle";
+int age = 22;
+
+std::cout << std::format("{1}岁的人叫{0}\n", name, age);
+```
+
+输出：
+
+```text
+22岁的人叫Kyle
+```
+
+- `{0}` 代表 `std::format` 中格式字符串后面的**第 1 个参数**（这里是 `name`）。
+- `{1}` 代表**第 2 个参数**（这里是 `age`）。
+- 同一个格式字符串中，**不能混用**自动编号 `{}` 和手动编号 `{0}`、`{1}`。
+
+##### 16.2.3 格式控制与输出字面量大括号
+
+可以在大括号内加 `:` 和格式说明，控制精度、宽度等：
+
+```cpp
+std::cout << std::format("圆周率约为 {:.2f}\n", 3.14159);
+std::cout << std::format("编号：{:04}\n", 7);
+std::cout << std::format("显示大括号：{{}}\n");
+```
+
+输出：
+
+```text
+圆周率约为 3.14
+编号：0007
+显示大括号：{}
+```
+
+这里 `{:.2f}` 表示浮点数保留两位小数，`{:04}` 表示宽度至少为 4、用 `0` 填充；想输出字面量 `{` 或 `}`，要分别写成 `{{` 或 `}}`。
+
+##### 16.2.4 与 `std::cout`、`printf` 的区别
+
+| 写法 | 特点 |
+| --- | --- |
+| `std::cout << "年龄：" << age;` | 通过流插入运算符 `<<` 拼接输出 |
+| `std::cout << std::format("年龄：{}", age);` | 先格式化为 `std::string`，再交给 `cout` 输出 |
+| `std::printf("年龄：%d", age);` | 使用 C 风格格式说明符，`%d` 对应 `int` |
+
+> [!IMPORTANT]
+> - **`cout` 不会自动解释普通字符串中的 `{}`**；占位符由 `std::format` 处理，再把返回结果交给 `cout`。
+> - 使用 `std::format` 需要启用 C++20（例如 `g++ -std=c++20 main.cpp -o main`），**还需要编译器所配套的 C++ 标准库实现支持 `<format>`**；仅设置 `-std=c++20` 不保证旧工具链可用。
+
+参考：[cppreference：`std::format`](https://en.cppreference.com/w/cpp/utility/format/format.html)。
+
 ### 17、异常处理机制
 
 ```cpp
