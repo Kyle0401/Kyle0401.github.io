@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="三连音、附点音符与延音线的时值计算：附原题图片、逐步演算和乐理教材 PDF 跳转。">
+    <title>三连音、附点音符与延音线：时值计算 · Kyle Music Notes</title>
+    <link rel="icon" type="image/svg+xml" href="../../static/img/logo-jy.svg">
+    <link rel="stylesheet" href="../../static/css/learning.css">
+    <style>
+        .article-shell{width:min(100% - 36px,940px);margin:0 auto;padding:24px 0 75px}
+        .article-header{padding:38px 4px 22px}
+        .kicker{color:#6568b1;font-weight:800;letter-spacing:.08em;text-transform:uppercase;font-size:13px}
+        .article-header h1{margin:12px 0;font-size:clamp(29px,4.2vw,42px);line-height:1.3}
+        .lead{line-height:1.9;color:#687185;font-size:16px;max-width:820px}
+        .chips{display:flex;flex-wrap:wrap;gap:9px;margin-top:18px}
+        .chips span{border:1px solid #e0e4ef;background:#f7f8fe;padding:6px 12px;border-radius:999px;font-size:13px;color:#576279}
+        .article{padding:clamp(22px,5vw,48px);background:#fff;border:1px solid #e7eaf2;border-radius:24px;box-shadow:0 14px 38px rgba(37,44,80,.06);color:#384356}
+        .article h2{margin:42px 0 14px;font-size:24px;line-height:1.45;color:#25314d}
+        .article h2:first-child{margin-top:0}
+        .article h3{margin:27px 0 10px;font-size:18px;color:#2f3855}
+        .article p,.article li{line-height:1.95;font-size:16px}
+        .article ul,.article ol{padding-left:1.5em}
+        .source-links{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 18px}
+        .source-link{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:13px;padding:8px 12px;text-decoration:none;color:#525db2;background:#f0f2ff;border:1px solid #dfe2ff;border-radius:999px}
+        .source-link:hover{background:#e3e7ff}
+        .source-link:before{content:"PDF";font-size:10px;background:#6571d5;color:#fff;letter-spacing:.04em;padding:3px 5px;border-radius:4px}
+        .question-figure{margin:22px auto 30px;padding:20px;text-align:center;max-width:510px;background:#fafbfe;border:1px solid #e4e8f1;border-radius:18px}
+        .question-figure img{max-width:100%;height:auto;display:block;margin:auto;image-rendering:auto}
+        .question-figure figcaption{font-size:13px;color:#687284;line-height:1.8;margin-top:10px}
+        .callout{margin:18px 0 22px;background:#f4f3ff;border-left:4px solid #8176d8;border-radius:0 12px 12px 0;padding:15px 20px;line-height:1.85}
+        .warning{border-left-color:#e4a54f;background:#fff9ed}
+        .answer{font-size:20px;background:#eefaf4;border-left-color:#34a36c}
+        .formula{padding:17px 19px;background:#f7f8fd;border:1px solid #e8ebf3;border-radius:12px;line-height:2;font-size:17px;overflow-x:auto}
+        .steps{counter-reset:item;list-style:none;padding-left:0!important}
+        .steps li{counter-increment:item;margin:15px 0;padding:15px 18px 15px 54px;position:relative;background:#fafbff;border:1px solid #eceef6;border-radius:12px}
+        .steps li:before{content:counter(item);position:absolute;top:17px;left:17px;width:27px;height:27px;display:grid;place-items:center;border-radius:50%;background:#7379cd;color:white;font-weight:800;font-size:13px}
+        .table-wrap{overflow-x:auto;margin:16px 0}
+        table{width:100%;border-collapse:collapse;min-width:520px}
+        th,td{padding:13px 15px;text-align:left;border-bottom:1px solid #e8ecf2;vertical-align:top;line-height:1.6}
+        th{background:#f6f7fc;font-size:14px;color:#4c5673}
+        code{padding:2px 5px;border-radius:5px;background:#f3f4fa;font-family:Consolas,monospace}
+        .note{font-size:14px!important;color:#738097}
+        .article-footer{text-align:center;color:#7b8394;font-size:13px;margin-top:25px}
+        @media(max-width:650px){.article-shell{width:calc(100% - 26px)}.article{padding:25px 18px}.steps li{padding-left:49px}.article p,.article li{font-size:15px}}
+    </style>
+</head>
+<body>
+    <div class="article-shell">
+        <header class="topbar">
+            <a class="brand" href="../../" aria-label="返回 Kyle 主页"><span class="brand-mark">K</span><span>Kyle · Music Notes</span></a>
+            <a class="back-link" href="../">← 返回音乐杂谈</a>
+        </header>
+        <section class="article-header">
+            <p class="kicker">Basic Music Theory · Duration</p>
+            <h1>三连音、附点音符与延音线：时值计算</h1>
+            <p class="lead">用一道乐谱读谱题，把“三连音的 3 代 2”“附点的时值增加”和“延音线的时值相加”串起来。下文采用四分音符 = 1 拍的前提；如果拍的单位改变，时值本身并不改变。</p>
+            <div class="chips"><span>三连音</span><span>附点音符</span><span>延音线</span><span>2026-10-08</span></div>
+        </section>
+        <article class="article">
+            <h2>1. 例题：这串音符共占多少时值？</h2>
+            <figure class="question-figure">
+                <img src="./tuplet-question.png" width="331" height="118" alt="三个由数字 3 括起的四分音符三连音、一个附点二分音符和一个四分音符，音符间有延音线相连">
+                <figcaption>题目原图（已保存到本站仓库）。以四分音符为一拍，计算整串音符的时值。</figcaption>
+            </figure>
+            <div class="callout answer"><strong>答案：2 + 3 + 1 = 6 拍。</strong><br>更严谨地说，总长度是 <strong>6 个普通四分音符的时值</strong>；只有在“四分音符为一拍”的条件下，它才是 6 拍。</div>
+
+            <h2>2. 三连音（Triplet）：为什么三个四分音符只有 2 拍？</h2>
+            <p>上方括号和数字 <strong>3</strong> 表示“三连音”。最常见的三连音，是在<strong>两个同类普通音符</strong>原本占用的时间内，均匀演奏<strong>三个同类音符</strong>，也可以记作“<strong>3 代 2</strong>”。</p>
+            <div class="formula"><strong>三个等时值三连音的总时值 = 两个同类普通音符的总时值</strong><br>
+                每个三连音音符的实际时值 = 对应普通音符时值 × 2/3</div>
+            <p>图中三个都是<strong>四分音符三连音</strong>，因此每个实际占 2/3 拍：</p>
+            <div class="formula">2/3 + 2/3 + 2/3 = <strong>2 拍</strong></div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>常见写法</th><th>每个音的实际时值</th><th>三音合计（四分音符 = 1 拍）</th></tr></thead>
+                    <tbody>
+                        <tr><td>四分音符三连音</td><td>2/3 拍</td><td><strong>2 拍</strong></td></tr>
+                        <tr><td>八分音符三连音</td><td>1/3 拍</td><td><strong>1 拍</strong></td></tr>
+                        <tr><td>十六分音符三连音</td><td>1/6 拍</td><td><strong>1/2 拍</strong></td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="callout warning"><strong>适用范围：</strong>“三个音符的总时值等于其中两个普通音符时值之和”用于通常的<strong>等时值、3 代 2 三连音</strong>。并不是所有带数字 3 的音组都必须由三个相同音值的音组成，也不能把这句话机械套到其他连音符上。</div>
+            <div class="source-links"><a class="source-link" href="../meter-note-value-grouping/%E5%9F%BA%E6%9C%AC%E4%B9%90%E7%90%86.pdf#page=56" target="_blank" rel="noopener noreferrer">《基本乐理》第八讲：节奏、节拍（背景阅读）</a></div>
+            <p class="note">注：上面“3 代 2”的说明是常见三连音换算规则；目前未在这两份教材中确认到单独阐述此规则的精确段落，因此此处只提供相关的节奏章节作为背景阅读，而不将其当作直接引文。</p>
+
+            <h2>3. 附点音符：为什么附点二分音符是 3 拍？</h2>
+            <div class="source-links"><a class="source-link" href="../meter-note-value-grouping/%E5%9F%BA%E6%9C%AC%E4%B9%90%E7%90%86.pdf#page=20" target="_blank" rel="noopener noreferrer">《基本乐理》第四讲：基本音符时值、附点</a><a class="source-link" href="../meter-note-value-grouping/%E5%9F%BA%E6%9C%AC%E4%B9%90%E7%90%86.pdf#page=21" target="_blank" rel="noopener noreferrer">《基本乐理》：附点音值示例</a></div>
+            <p><strong>单附点</strong>使原音符时值增加一半，计算式为“原时值 × 3/2”。普通二分音符 = 2 个四分音符的时值，因此：</p>
+            <div class="formula">附点二分音符 = 2 + 2 × 1/2 = <strong>3 拍</strong></div>
+            <p>要特别注意：图中的附点位于<strong>空心符头右侧</strong>，它不是延长音记号（fermata），也不是三连音上的数字 3。</p>
+
+            <h2>4. 延音线（Tie）：为什么还要把它们加起来？</h2>
+            <div class="source-links"><a class="source-link" href="../%E5%9F%BA%E6%9C%AC%E4%B9%90%E7%90%86%E8%BF%9B%E9%98%B6.pdf#page=38" target="_blank" rel="noopener noreferrer">《基本乐理进阶》第 7.3 节：延音线与连音线区别</a><a class="source-link" href="../meter-note-value-grouping/%E5%9F%BA%E6%9C%AC%E4%B9%90%E7%90%86.pdf#page=21" target="_blank" rel="noopener noreferrer">《基本乐理》：延音线记谱</a></div>
+            <p>图中所有符头处在同一高度，下面的弧线逐个连接<strong>音高相同的相邻音符</strong>，因此这里是<strong>延音线（tie）</strong>：演奏时持续同一个音、不在每个连接点重新发音，但<strong>记谱总时值仍是各部分时值相加</strong>。</p>
+            <p>它和<strong>连音线（slur）</strong>不能混为一谈：连音线用于连贯演奏，可以跨不同音高；延音线则用于连接同音高并合并持续时值。</p>
+            <div class="callout"><strong>核心区分：</strong>三连音改变每个音的实际占时；附点增加原音符的音值；延音线不改变这些占时的计算规则，而是把它们连接成一段持续的声音。</div>
+
+            <h2>5. 按从左到右的顺序计算</h2>
+            <ol class="steps">
+                <li><strong>前三个四分音符：</strong>属于四分音符三连音，“三个占两个”的时值，所以合计 <strong>2 拍</strong>。</li>
+                <li><strong>第四个音：</strong>空心符头、带符干、右侧有附点，是附点二分音符；2 + 1 = <strong>3 拍</strong>。</li>
+                <li><strong>第五个音：</strong>普通四分音符，计 <strong>1 拍</strong>。</li>
+                <li><strong>结合延音线：</strong>2 + 3 + 1 = <strong>6 拍</strong>。所有音同高且彼此延续，听起来是一段连续六拍的长音。</li>
+            </ol>
+            <div class="formula">总时值 = 3 × (2/3) + (2 × 3/2) + 1 = <strong>6（个四分音符时值）</strong></div>
+
+            <h2>6. “6 拍”和“6 个四分音符时值”始终一样吗？</h2>
+            <div class="source-links"><a class="source-link" href="../%E5%9F%BA%E6%9C%AC%E4%B9%90%E7%90%86%E8%BF%9B%E9%98%B6.pdf#page=32" target="_blank" rel="noopener noreferrer">《基本乐理进阶》第 6.1 节：单位拍与拍号</a></div>
+            <p><strong>不始终一样。</strong>音符写定后，总时值可以用“四分音符时值”这一固定单位说明；说“多少拍”则必须知道一拍对应哪种音符。在四分音符 = 1 拍时是 6 拍；二分音符 = 1 拍时是 3 拍；八分音符 = 1 拍时是 12 拍。</p>
+            <p>例如《基本乐理进阶》第 6.1 节还提醒，6/8 拍在不同的分析体系中，既可以按八分音符计六拍，也可以按附点四分音符计两拍。读谱时要说明单位拍，不能仅凭音符数量判断拍数。</p>
+            <div class="callout answer"><strong>一句话记忆：</strong>三连音“3 代 2”，附点“原值加一半”，延音线“同音高时值相加”；最后先报<strong>音符总时值</strong>，再根据单位拍换算为<strong>拍数</strong>。</div>
+        </article>
+        <footer class="article-footer">Kyle Music Notes · 乐理笔记 · 教材仅作页码链接引用</footer>
+    </div>
+</body>
+</html>
