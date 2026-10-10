@@ -1,0 +1,23 @@
+.doc-page-body h3 {
+    position: relative;
+    margin: 34px 0 14px;
+    padding-bottom: 10px;
+    color: var(--docker-ink);
+    border-bottom: 1px solid var(--note-line);
+    font-size: 22px;
+    line-height: 1.5;
+    scroll-margin-top: 96px;
+}
+
+.doc-page-body h3:hover .heading-anchor { opacity: 1; }
+
+#outline-links a.outline-level-3 {
+    padding-left: 12px;
+    font-weight: 700;
+}
+
+#outline-links a.outline-level-4 { padding-left: 24px; }
+#outline-links a.outline-level-5 { padding-left: 36px; }
+#outline-links a.outline-level-6 { padding-left: 48px; }
+
+html[data-theme="dark"] .doc-page-body h3 { color: #f0f6fc; }
