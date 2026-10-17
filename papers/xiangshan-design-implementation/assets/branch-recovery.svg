@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="820" viewBox="0 0 1400 820" role="img">
+<title>误预测恢复边界与逆序恢复</title><desc>保留有效分支I2，撤销年轻错误路径I3至I6；两次写x5按年轻到老恢复P51、P40、P32。</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#48617b"/></marker></defs>
+<rect width="100%" height="100%" fill="white"/>
+<g font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" fill="#25364a">
+<text x="700" y="42" font-size="28" text-anchor="middle" font-weight="bold" fill="#25364a">
+<tspan x="700" dy="0">分支误预测：保留有效分支，撤销年轻错误路径</tspan>
+</text>
+<rect x="60" y="90" width="190" height="100" rx="10" fill="#edf7f1" stroke="#8ba1b7" stroke-width="1.7"/>
+<text x="155.0" y="130.98" font-size="22" text-anchor="middle" font-weight="normal" fill="#25364a">
+<tspan x="155.0" dy="0">I1</tspan>
+<tspan x="155.0" dy="33">正确前缀</tspan>
+</text>
+<rect x="277" y="90" width="190" height="100" rx="10" fill="#edf7f1" stroke="#8ba1b7" stroke-width="1.7"/>
+<text x="372.0" y="130.98" font-size="22" text-anchor="middle" font-weight="normal" fill="#25364a">
+<tspan x="372.0" dy="0">I2</tspan>
+<tspan x="372.0" dy="33">有效分支</tspan>
+</text>
+<rect x="494" y="90" width="190" height="100" rx="10" fill="#fff0ee" stroke="#8ba1b7" stroke-width="1.7"/>
+<text x="589.0" y="130.98" font-size="22" text-anchor="middle" font-weight="normal" fill="#25364a">
+<tspan x="589.0" dy="0">I3</tspan>
+<tspan x="589.0" dy="33">x5 → P40</tspan>
+</text>
+<rect x="711" y="90" width="190" height="100" rx="10" fill="#fff0ee" stroke="#8ba1b7" stroke-width="1.7"/>
+<text x="806.0" y="130.98" font-size="22" text-anchor="middle" font-weight="normal" fill="#25364a">
+<tspan x="806.0" dy="0">I4</tspan>
+<tspan x="806.0" dy="33">错误路径</tspan>
+</text>
+<rect x="928" y="90" width="190" height="100" rx="10" fill="#fff0ee" stroke="#8ba1b7" stroke-width="1.7"/>
+<text x="1023.0" y="130.98" font-size="22" text-anchor="middle" font-weight="normal" fill="#25364a">
+<tspan x="1023.0" dy="0">I5</tspan>
+<tspan x="1023.0" dy="33">x5 → P51</tspan>
+</text>
+<rect x="1145" y="90" width="190" height="100" rx="10" fill="#fff0ee" stroke="#8ba1b7" stroke-width="1.7"/>
+<text x="1240.0" y="130.98" font-size="22" text-anchor="middle" font-weight="normal" fill="#25364a">
+<tspan x="1240.0" dy="0">I6</tspan>
+<tspan x="1240.0" dy="33">错误路径</tspan>
+</text>
+<text x="267" y="224" font-size="21" text-anchor="middle" font-weight="normal" fill="#246643">
+<tspan x="267" dy="0">保留 I1、I2 的有效状态</tspan>
+</text>
+<text x="925" y="224" font-size="21" text-anchor="middle" font-weight="normal" fill="#a34437">
+<tspan x="925" dy="0">撤销 I3—I6 的未提交投机状态</tspan>
+</text>
+<text x="700" y="283" font-size="22" text-anchor="middle" font-weight="normal" fill="#25364a">
+<tspan x="700" dy="0">教学假设：I2 不写 x5；分支处有效映射 x5 → P32</tspan>
+</text>
+<rect x="65" y="335" width="350" height="130" rx="10" fill="#fff0ee" stroke="#8ba1b7" stroke-width="1.7"/>
+<text x="240.0" y="390.16" font-size="24" text-anchor="middle" font-weight="normal" fill="#25364a">
+<tspan x="240.0" dy="0">发现误预测时</tspan>
+<tspan x="240.0" dy="36">推测映射：x5 → P51</tspan>
+</text>
+<rect x="525" y="335" width="350" height="130" rx="10" fill="#edf4fc" stroke="#8ba1b7" stroke-width="1.7"/>
+<text x="700.0" y="390.16" font-size="24" text-anchor="middle" font-weight="normal" fill="#25364a">
+<tspan x="700.0" dy="0">先撤销 I5</tspan>
+<tspan x="700.0" dy="36">依据旧映射：x5 → P40</tspan>
+</text>
+<rect x="985" y="335" width="350" height="130" rx="10" fill="#edf7f1" stroke="#8ba1b7" stroke-width="1.7"/>
+<text x="1160.0" y="390.16" font-size="24" text-anchor="middle" font-weight="normal" fill="#25364a">
+<tspan x="1160.0" dy="0">再撤销 I3</tspan>
+<tspan x="1160.0" dy="36">恢复有效映射：x5 → P32</tspan>
+</text>
+<polyline points="415,400 525,400" fill="none" stroke="#48617b" stroke-width="2.5" marker-end="url(#arrow)"/>
+<polyline points="875,400 985,400" fill="none" stroke="#48617b" stroke-width="2.5" marker-end="url(#arrow)"/>
+<text x="700" y="513" font-size="20" text-anchor="middle" font-weight="normal" fill="#64748b">
+<tspan x="700" dy="0">逆序撤销保证较晚的更新先被去掉；可并行实现，但结果须等价。</tspan>
+</text>
+<rect x="65" y="580" width="350" height="100" rx="10" fill="#f4f6f9" stroke="#8ba1b7" stroke-width="1.7"/>
+<text x="240.0" y="621.39" font-size="21" text-anchor="middle" font-weight="normal" fill="#25364a">
+<tspan x="240.0" dy="0">屏蔽错误路径及迟到结果</tspan>
+<tspan x="240.0" dy="31">重定向前端</tspan>
+</text>
+<rect x="525" y="580" width="350" height="100" rx="10" fill="#f4f6f9" stroke="#8ba1b7" stroke-width="1.7"/>
+<text x="700.0" y="621.39" font-size="21" text-anchor="middle" font-weight="normal" fill="#25364a">
+<tspan x="700.0" dy="0">恢复映射与资源状态</tspan>
+<tspan x="700.0" dy="31">共享物理寄存器须正确管理</tspan>
+</text>
+<rect x="985" y="580" width="350" height="100" rx="10" fill="#f4f6f9" stroke="#8ba1b7" stroke-width="1.7"/>
+<text x="1160.0" y="621.39" font-size="21" text-anchor="middle" font-weight="normal" fill="#25364a">
+<tspan x="1160.0" dy="0">后续正确路径指令</tspan>
+<tspan x="1160.0" dy="31">使用恢复后的有效状态</tspan>
+</text>
+<text x="700" y="737" font-size="20" text-anchor="middle" font-weight="normal" fill="#64748b">
+<tspan x="700" dy="0">下方为需要协调的功能动作，可重叠进行；不是规定的逐周期顺序。</tspan>
+</text>
+<text x="700" y="782" font-size="19" text-anchor="middle" font-weight="normal" fill="#64748b">
+<tspan x="700" dy="0">精确异常的正常结果边界不同：故障指令本身不提交正常结果。</tspan>
+</text>
+</g></svg>

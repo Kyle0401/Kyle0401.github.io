@@ -1,0 +1,40 @@
+/* Reuse the established notebook layout and controls without changing shared pages. */
+@import url("../../learning/git/git-page.css?v=20260810a");
+
+.article .page-pagination a { text-decoration: none; }
+.doc-page-body h3 { color: var(--docker-ink); scroll-margin-top: 94px; }
+.doc-page-body h3:hover .heading-anchor { opacity: 1; }
+.doc-page-body img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 24px auto 12px;
+    border-radius: 10px;
+}
+.doc-page-body img[src$="image-20261016133909609.png"] { width: 289px; }
+.doc-page-body img[src$="image-20261016194929119.png"] { width: 194px; }
+#outline-links a.outline-level-3 { padding-left: 14px; font-size: 12.5px; font-weight: 600; }
+#outline-links a.outline-level-4 { padding-left: 28px; font-size: 12px; font-weight: 500; }
+#outline-links a.outline-level-5 { padding-left: 42px !important; font-size: 11.5px !important; }
+#outline-links a.outline-level-6 { padding-left: 56px !important; }
+.math-display {
+    max-width: 100%;
+    margin: 22px 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 3px 0;
+}
+.math-display .katex-display { margin: 0; }
+.math-inline { overflow-wrap: normal; }
+.math-error { white-space: pre-wrap; border: 1px dashed currentColor; }
+html[data-theme="dark"] .doc-page-body h3 { color: var(--docker-ink); }
+
+@media (max-width: 720px) {
+    .source-link.paper-pdf-link { display: inline-flex; }
+    .note-brand { gap: 7px; font-size: 12px; }
+    .topbar-actions { gap: 7px; }
+    .note-back { display: none; }
+}
+@media (max-width: 380px) {
+    .note-brand > span:last-child { max-width: 82px; line-height: 1.3; }
+}

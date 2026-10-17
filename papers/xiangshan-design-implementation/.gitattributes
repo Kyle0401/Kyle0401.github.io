@@ -1,0 +1,2 @@
+# Preserve the original SVG bytes when uploading from Windows.
+assets/*.svg -text
