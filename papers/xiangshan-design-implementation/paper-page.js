@@ -13,6 +13,11 @@
     var progressValue = document.getElementById('reading-progress-value');
     var progressLabel = document.getElementById('reading-progress-label');
     var themeToggle = document.getElementById('theme-toggle');
+    var searchRoot = document.getElementById('paper-search');
+    var searchInput = document.getElementById('paper-search-input');
+    var searchClear = document.getElementById('paper-search-clear');
+    var searchStatus = document.getElementById('paper-search-status');
+    var searchResults = document.getElementById('paper-search-results');
 
     if (!content || !pageNav || !outlineLinks || !pagination) return;
 
@@ -23,6 +28,15 @@
     var outlineObserver = null;
     var circleLength = 2 * Math.PI * 21;
     var md = null;
+    var searchRecords = [];
+    var visibleSearchResults = [];
+    var searchReady = false;
+    var searchComposing = false;
+    var searchTimer = null;
+    var searchedQuery = '';
+    var activeSearchIndex = -1;
+    var pendingSearchFocusTarget = null;
+    var renderVersion = 0;
 
     function escapeHtml(value) {
         return String(value)
@@ -33,6 +47,7 @@
     }
 
     function showLoadError(message) {
+        setSearchUnavailable('全文检索暂不可用：笔记加载失败，请刷新重试。');
         pageNav.innerHTML = '<p class="nav-loading">目录暂时无法加载。</p>';
         outlineLinks.innerHTML = '<p class="outline-empty">当前无可用目录</p>';
         pagination.innerHTML = '';
@@ -216,8 +231,296 @@
         }
         group.pages = pages;
         groups = [group];
+        searchRecords = [];
+        pages.forEach(function (page) {
+            var fragment = document.createElement('div');
+            fragment.innerHTML = md.render(page.lines.join('\n'));
+            // Index and render the same fragment, with one shared heading-numbering rule.
+            assignHeadingIds(fragment, page.index, false);
+            page.bodyHtml = fragment.innerHTML;
+            collectSearchRecords(page, fragment);
+        });
         if (docsTitle) docsTitle.textContent = siteTitle;
         if (chapterCount) chapterCount.textContent = pages.length + ' 个章节 · 按章阅读';
+    }
+
+    function normalizeSearchText(value) {
+        return String(value || '').replace(/\s+/g, ' ').trim();
+    }
+
+    function visitSearchText(node, append, onHeading) {
+        if (node.nodeType === 3) {
+            append(node.nodeValue);
+            return;
+        }
+        if (node.nodeType !== 1) return;
+        var tag = node.tagName;
+        if (onHeading && /^H[3-6]$/.test(tag)) {
+            onHeading(node);
+            return;
+        }
+        if (/^(SCRIPT|STYLE|BUTTON)$/.test(tag) || node.classList.contains('heading-anchor') ||
+            node.classList.contains('code-language')) return;
+
+        if (node.classList.contains('math-inline') || node.classList.contains('math-display')) {
+            // KaTeX contains both MathML and HTML; its annotation keeps one copy of the TeX.
+            var annotation = node.querySelector('annotation[encoding="application/x-tex"]');
+            var tex = annotation ? annotation.textContent : node.textContent;
+            append(node.classList.contains('math-display') ? ' ' + tex + ' ' : tex);
+            return;
+        }
+        if (tag === 'IMG') {
+            append(' ' + (node.getAttribute('alt') || '') + ' ');
+            return;
+        }
+        if (tag === 'BR' || tag === 'HR') {
+            append(' ');
+            return;
+        }
+
+        var block = /^(P|DIV|UL|OL|LI|BLOCKQUOTE|PRE|TABLE|THEAD|TBODY|TFOOT|TR|TH|TD|DL|DT|DD)$/.test(tag);
+        if (block) append(' ');
+        Array.prototype.forEach.call(node.childNodes, function (child) {
+            visitSearchText(child, append, onHeading);
+        });
+        if (block) append(' ');
+    }
+
+    function searchText(node) {
+        var parts = [];
+        visitSearchText(node, function (value) { parts.push(value); });
+        return normalizeSearchText(parts.join(''));
+    }
+
+    function collectSearchRecords(page, fragment) {
+        function makeRecord(title, targetId) {
+            return { title: title, targetId: targetId, chapter: page.plainTitle,
+                pageIndex: page.index, parts: [] };
+        }
+
+        var current = makeRecord(normalizeSearchText(page.plainTitle), page.route);
+        function finishRecord() {
+            current.body = normalizeSearchText(current.parts.join(''));
+            current.titleLower = current.title.toLowerCase();
+            current.bodyLower = current.body.toLowerCase();
+            delete current.parts;
+            searchRecords.push(current);
+        }
+
+        visitSearchText(fragment, function (value) {
+            current.parts.push(value);
+        }, function (heading) {
+            finishRecord();
+            current = makeRecord(searchText(heading), heading.id);
+        });
+        finishRecord();
+    }
+
+    function setSearchOpen(open) {
+        if (!searchRoot || !searchInput || !searchResults) return;
+        searchRoot.classList.toggle('is-open', Boolean(open));
+        searchResults.hidden = !open;
+        searchInput.setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (!open) {
+            activeSearchIndex = -1;
+            searchInput.removeAttribute('aria-activedescendant');
+            Array.prototype.forEach.call(searchResults.querySelectorAll('.paper-search-result'), function (link) {
+                link.classList.remove('is-active');
+                link.setAttribute('aria-selected', 'false');
+            });
+        }
+    }
+
+    function cancelSearchTimer() {
+        if (searchTimer !== null) window.clearTimeout(searchTimer);
+        searchTimer = null;
+    }
+
+    function closeSearchResults() {
+        var wasPending = searchTimer !== null;
+        cancelSearchTimer();
+        setSearchOpen(false);
+        if (wasPending && searchReady && searchStatus) {
+            searchStatus.textContent = '检索已收起，继续输入或聚焦搜索框可再次检索。';
+        }
+    }
+
+    function resetSearchResults() {
+        closeSearchResults();
+        searchedQuery = '';
+        visibleSearchResults = [];
+        if (searchResults) searchResults.innerHTML = '';
+        if (searchClear && searchInput) searchClear.hidden = !searchInput.value.length;
+        if (searchStatus && searchReady) {
+            searchStatus.textContent = '搜索本篇 ' + pages.length + ' 章的标题、正文、表格和代码。';
+        }
+    }
+
+    function setSearchUnavailable(message) {
+        searchReady = false;
+        resetSearchResults();
+        if (searchInput) searchInput.disabled = true;
+        if (searchClear) {
+            searchClear.hidden = true;
+            searchClear.disabled = true;
+        }
+        if (searchRoot) searchRoot.setAttribute('aria-busy', 'false');
+        if (searchStatus) searchStatus.textContent = message;
+    }
+
+    function highlightSearchText(text, query) {
+        var value = String(text || '');
+        if (!query) return escapeHtml(value);
+        var lower = value.toLowerCase();
+        var needle = query.toLowerCase();
+        var output = '';
+        var cursor = 0;
+        var index;
+        while ((index = lower.indexOf(needle, cursor)) !== -1) {
+            output += escapeHtml(value.slice(cursor, index));
+            output += '<mark>' + escapeHtml(value.slice(index, index + query.length)) + '</mark>';
+            cursor = index + query.length;
+        }
+        return output + escapeHtml(value.slice(cursor));
+    }
+
+    function searchSnippet(record, query) {
+        var source = record.body;
+        if (!source) return '章节或小节标题命中';
+        var index = record.bodyLower.indexOf(query.toLowerCase());
+        var start = index < 0 ? 0 : Math.max(0, index - 42);
+        var end = Math.min(source.length, index < 0 ? 112 : index + query.length + 70);
+        return (start > 0 ? '…' : '') + source.slice(start, end).trim() + (end < source.length ? '…' : '');
+    }
+
+    function runSearch() {
+        cancelSearchTimer();
+        if (!searchReady || !searchInput || !searchResults || searchComposing) return;
+        var query = normalizeSearchText(searchInput.value);
+        if (searchClear) searchClear.hidden = !searchInput.value.length;
+        if (!query) {
+            resetSearchResults();
+            return;
+        }
+
+        var needle = query.toLowerCase();
+        var titleMatches = [];
+        var bodyMatches = [];
+        searchRecords.forEach(function (record) {
+            if (record.titleLower.indexOf(needle) !== -1) titleMatches.push(record);
+            else if (record.bodyLower.indexOf(needle) !== -1) bodyMatches.push(record);
+        });
+        visibleSearchResults = titleMatches.concat(bodyMatches);
+        searchedQuery = query;
+        activeSearchIndex = -1;
+        searchInput.removeAttribute('aria-activedescendant');
+        searchResults.innerHTML = visibleSearchResults.map(function (record, index) {
+            var path = record.targetId === pages[record.pageIndex].route
+                ? '第 ' + (record.pageIndex + 1) + ' 章 · 章节正文' : record.chapter;
+            return '<a class="paper-search-result" id="paper-search-result-' + index +
+                '" role="option" aria-selected="false" data-search-index="' + index +
+                '" href="#' + escapeHtml(record.targetId) + '">' +
+                '<span class="paper-search-result-title">' + highlightSearchText(record.title, query) + '</span>' +
+                '<span class="paper-search-result-path">' + escapeHtml(path) + '</span>' +
+                '<span class="paper-search-result-snippet">' + highlightSearchText(searchSnippet(record, query), query) + '</span>' +
+                '</a>';
+        }).join('');
+        searchResults.scrollTop = 0;
+        if (searchStatus) {
+            searchStatus.textContent = visibleSearchResults.length
+                ? '找到 ' + visibleSearchResults.length + ' 条结果 · 本篇 ' + pages.length + ' 章'
+                : '没有找到“' + query + '”相关内容。';
+        }
+        setSearchOpen(visibleSearchResults.length > 0);
+    }
+
+    function scheduleSearch() {
+        if (!searchReady || !searchInput) return;
+        cancelSearchTimer();
+        if (searchClear) searchClear.hidden = !searchInput.value.length;
+        if (searchComposing) return;
+        if (!normalizeSearchText(searchInput.value)) {
+            resetSearchResults();
+            return;
+        }
+        setSearchOpen(false);
+        if (searchStatus) searchStatus.textContent = '正在检索全文…';
+        searchTimer = window.setTimeout(runSearch, 150);
+    }
+
+    function updateActiveSearchResult(index) {
+        if (!searchResults || !visibleSearchResults.length) return;
+        var links = searchResults.querySelectorAll('.paper-search-result');
+        activeSearchIndex = (index + links.length) % links.length;
+        Array.prototype.forEach.call(links, function (link, linkIndex) {
+            var active = linkIndex === activeSearchIndex;
+            link.classList.toggle('is-active', active);
+            link.setAttribute('aria-selected', active ? 'true' : 'false');
+        });
+        var active = links[activeSearchIndex];
+        searchInput.setAttribute('aria-activedescendant', active.id);
+        active.scrollIntoView({ block: 'nearest' });
+    }
+
+    function navigateToSearchResult(record) {
+        if (!record) return;
+        closeSearchResults();
+        if (searchInput) searchInput.blur();
+        pendingSearchFocusTarget = record.targetId;
+        if (decodedHash() === record.targetId) routeFromHash();
+        else window.location.hash = record.targetId;
+        closeMobileNavigation(false);
+    }
+
+    function initializeSearch() {
+        if (!searchRoot || !searchInput || !searchClear || !searchStatus || !searchResults) return;
+        searchInput.disabled = true;
+        searchClear.hidden = true;
+        searchRoot.setAttribute('aria-busy', 'true');
+        searchStatus.textContent = '正在加载本篇笔记，加载完成后可搜索。';
+        setSearchOpen(false);
+
+        searchInput.addEventListener('input', scheduleSearch);
+        searchInput.addEventListener('focus', function () {
+            if (normalizeSearchText(searchInput.value)) runSearch();
+        });
+        searchInput.addEventListener('compositionstart', function () {
+            searchComposing = true;
+            closeSearchResults();
+        });
+        searchInput.addEventListener('compositionend', function () {
+            searchComposing = false;
+            scheduleSearch();
+        });
+        searchInput.addEventListener('keydown', function (event) {
+            if (searchComposing || event.isComposing || event.keyCode === 229) return;
+            if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp' && event.key !== 'Enter') return;
+            if (searchTimer !== null || normalizeSearchText(searchInput.value) !== searchedQuery ||
+                !searchRoot.classList.contains('is-open')) runSearch();
+            if (!visibleSearchResults.length) return;
+            event.preventDefault();
+            if (event.key === 'Enter') {
+                navigateToSearchResult(visibleSearchResults[activeSearchIndex < 0 ? 0 : activeSearchIndex]);
+            } else {
+                var next = event.key === 'ArrowDown' ? activeSearchIndex + 1
+                    : activeSearchIndex < 0 ? visibleSearchResults.length - 1 : activeSearchIndex - 1;
+                updateActiveSearchResult(next);
+            }
+        });
+        searchClear.addEventListener('click', function () {
+            searchInput.value = '';
+            resetSearchResults();
+            searchInput.focus();
+        });
+        searchResults.addEventListener('click', function (event) {
+            var link = event.target.closest && event.target.closest('.paper-search-result');
+            if (!link || !searchResults.contains(link) || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+            event.preventDefault();
+            navigateToSearchResult(visibleSearchResults[Number(link.getAttribute('data-search-index'))]);
+        });
+        document.addEventListener('click', function (event) {
+            if (!searchRoot.contains(event.target)) closeSearchResults();
+        });
     }
 
     if (window.hljs && typeof window.hljs.registerLanguage === 'function') {
@@ -395,14 +698,15 @@
         });
     }
 
-    function assignHeadingIds() {
+    function assignHeadingIds(root, pageIndex, addAnchors) {
         var headingIndex = 0;
-        Array.prototype.forEach.call(content.querySelectorAll('.doc-page-body h3, .doc-page-body h4, .doc-page-body h5, .doc-page-body h6'), function (heading) {
+        Array.prototype.forEach.call(root.querySelectorAll('h3, h4, h5, h6'), function (heading) {
             headingIndex += 1;
-            var label = heading.textContent.trim();
-            var anchor = document.createElement('a');
-            heading.id = 'section-' + (currentPageIndex + 1) + '-' + headingIndex;
+            var label = heading.getAttribute('data-outline-label') || heading.textContent.trim();
+            heading.id = 'section-' + (pageIndex + 1) + '-' + headingIndex;
             heading.setAttribute('data-outline-label', label);
+            if (!addAnchors || heading.querySelector('.heading-anchor')) return;
+            var anchor = document.createElement('a');
             anchor.className = 'heading-anchor';
             anchor.href = '#' + heading.id;
             anchor.textContent = '#';
@@ -491,16 +795,16 @@
 
         currentPageIndex = Math.max(0, Math.min(index, pages.length - 1));
         var page = pages[currentPageIndex];
-        var bodyHtml = md.render(page.lines.join('\n'));
+        var version = ++renderVersion;
 
         content.innerHTML =
             '<header class="doc-page-header">' +
                 '<p class="doc-page-kicker">XIANGSHAN · 论文笔记' + ' · 第 ' + (currentPageIndex + 1) + ' / ' + pages.length + ' 章</p>' +
                 '<h1 id="' + escapeHtml(page.route) + '">' + page.titleHtml + '</h1>' +
             '</header>' +
-            '<div class="doc-page-body">' + bodyHtml + '</div>';
+            '<div class="doc-page-body">' + page.bodyHtml + '</div>';
 
-        assignHeadingIds();
+        assignHeadingIds(content.querySelector('.doc-page-body'), currentPageIndex, true);
         enhanceCallouts();
         enhanceTables();
         enhanceLinks();
@@ -512,7 +816,13 @@
         document.title = page.plainTitle + ' · 香山论文阅读 · Kyle';
 
         window.requestAnimationFrame(function () {
+            if (version !== renderVersion) return;
             var target = targetId ? document.getElementById(targetId) : null;
+            if (target && pendingSearchFocusTarget === target.id) {
+                pendingSearchFocusTarget = null;
+                target.setAttribute('tabindex', '-1');
+                target.focus({ preventScroll: true });
+            }
             if (target) target.scrollIntoView({ block: 'start' });
             else window.scrollTo({ top: 0, left: 0 });
             updateReadingProgress();
@@ -527,6 +837,7 @@
     function routeFromHash() {
         if (!pages.length) return;
         var hash = decodedHash();
+        if (pendingSearchFocusTarget && pendingSearchFocusTarget !== hash) pendingSearchFocusTarget = null;
         var pageMatch = hash.match(/^chapter-(\d+)$/);
         var sectionMatch = hash.match(/^section-(\d+)-(\d+)$/);
 
@@ -585,6 +896,8 @@
         }
     }
 
+    initializeSearch();
+
     if (themeToggle) {
         applyTheme(document.documentElement.getAttribute('data-theme'), false);
         themeToggle.addEventListener('click', function () {
@@ -603,7 +916,25 @@
     if (docsOverlay) docsOverlay.addEventListener('click', function () { closeMobileNavigation(true); });
 
     document.addEventListener('keydown', function (event) {
+        if (searchComposing || event.isComposing || event.keyCode === 229) return;
+        var isSearchShortcut = (event.ctrlKey || event.metaKey) && !event.altKey && !event.shiftKey &&
+            String(event.key).toLowerCase() === 'k';
+        if (isSearchShortcut && searchInput && !searchInput.disabled) {
+            event.preventDefault();
+            if (mobileNavToggle && window.getComputedStyle(mobileNavToggle).display !== 'none') {
+                document.body.classList.add('nav-open');
+                mobileNavToggle.setAttribute('aria-expanded', 'true');
+            }
+            searchInput.focus();
+            searchInput.select();
+            return;
+        }
         if (event.key === 'Escape') {
+            if (searchTimer !== null || (searchRoot && searchRoot.classList.contains('is-open'))) {
+                event.preventDefault();
+                closeSearchResults();
+                return;
+            }
             closeMobileNavigation(true);
             return;
         }
@@ -639,6 +970,11 @@
         .then(function (markdown) {
             preparePages(markdown);
             routeFromHash();
+            searchReady = true;
+            if (searchInput) searchInput.disabled = false;
+            if (searchClear) searchClear.disabled = false;
+            if (searchRoot) searchRoot.setAttribute('aria-busy', 'false');
+            resetSearchResults();
         })
         .catch(function (error) {
             var detail = error && error.message ? '（' + error.message + '）' : '';

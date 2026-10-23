@@ -25,7 +25,7 @@
     <link rel="stylesheet" href="../../learning/docker/docker-page.css?v=20260718a">
     <link rel="stylesheet" href="../../learning/ai-infra/01-ai-infra-foundations/vendor/highlight.js/github-dark.min.css">
     <link rel="stylesheet" href="../../learning/ai-infra/01-ai-infra-foundations/vendor/katex/katex.min.css">
-    <link rel="stylesheet" href="./paper-page.css?v=20261017a">
+    <link rel="stylesheet" href="./paper-page.css?v=20261024a">
     <style>
         .article .page-pagination a { text-decoration: none; }
     </style>
@@ -60,6 +60,19 @@
                 <span class="docs-sidebar-kicker">XIANGSHAN · PAPER NOTES</span>
                 <strong id="docs-title">香山论文阅读</strong>
                 <span class="docs-sidebar-release" id="chapter-count">按章节分页</span>
+            </div>
+            <div class="paper-search" id="paper-search" role="search" aria-label="搜索整篇笔记">
+                <label class="paper-search-label" for="paper-search-input">全文检索</label>
+                <div class="paper-search-box">
+                    <span class="paper-search-icon" aria-hidden="true">⌕</span>
+                    <input id="paper-search-input" type="search" role="combobox" autocomplete="off" spellcheck="false"
+                        aria-autocomplete="list" aria-controls="paper-search-results" aria-expanded="false"
+                        aria-describedby="paper-search-status" placeholder="搜索全部 7 章…" disabled>
+                    <button class="paper-search-clear" id="paper-search-clear" type="button" aria-label="清空搜索" hidden>×</button>
+                </div>
+                <p class="paper-search-status" id="paper-search-status" role="status" aria-live="polite">正在加载笔记…</p>
+                <div class="paper-search-results" id="paper-search-results" role="listbox" aria-label="全文检索结果" hidden></div>
+                <p class="paper-search-hint">Ctrl / ⌘ K 快速搜索</p>
             </div>
             <nav class="page-nav" id="page-nav" aria-label="章节导航">
                 <p class="nav-loading">正在加载目录…</p>
@@ -111,6 +124,6 @@
     <script src="../../learning/ai-infra/01-ai-infra-foundations/vendor/markdown-it/markdown-it.min.js"></script>
     <script src="../../learning/ai-infra/01-ai-infra-foundations/vendor/highlight.js/highlight.min.js"></script>
     <script src="../../learning/ai-infra/01-ai-infra-foundations/vendor/katex/katex.min.js"></script>
-    <script src="./paper-page.js?v=20261023a"></script>
+    <script src="./paper-page.js?v=20261024a"></script>
 </body>
 </html>
