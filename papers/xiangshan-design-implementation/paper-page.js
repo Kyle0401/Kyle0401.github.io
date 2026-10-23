@@ -37,6 +37,7 @@
     var activeSearchIndex = -1;
     var pendingSearchFocusTarget = null;
     var renderVersion = 0;
+    var searchSelectionUsed = false;
 
     function escapeHtml(value) {
         return String(value)
@@ -238,6 +239,7 @@
             // Index and render the same fragment, with one shared heading-numbering rule.
             assignHeadingIds(fragment, page.index, false);
             page.bodyHtml = fragment.innerHTML;
+            page.firstSearchRecordIndex = searchRecords.length;
             collectSearchRecords(page, fragment);
         });
         if (docsTitle) docsTitle.textContent = siteTitle;
@@ -250,7 +252,7 @@
 
     function visitSearchText(node, append, onHeading) {
         if (node.nodeType === 3) {
-            append(node.nodeValue);
+            append(node.nodeValue, node);
             return;
         }
         if (node.nodeType !== 1) return;
@@ -266,15 +268,15 @@
             // KaTeX contains both MathML and HTML; its annotation keeps one copy of the TeX.
             var annotation = node.querySelector('annotation[encoding="application/x-tex"]');
             var tex = annotation ? annotation.textContent : node.textContent;
-            append(node.classList.contains('math-display') ? ' ' + tex + ' ' : tex);
+            append(node.classList.contains('math-display') ? ' ' + tex + ' ' : tex, node);
             return;
         }
         if (tag === 'IMG') {
-            append(' ' + (node.getAttribute('alt') || '') + ' ');
+            append(' ' + (node.getAttribute('alt') || '') + ' ', node);
             return;
         }
         if (tag === 'BR' || tag === 'HR') {
-            append(' ');
+            append(' ', node);
             return;
         }
 
@@ -303,6 +305,7 @@
             current.body = normalizeSearchText(current.parts.join(''));
             current.titleLower = current.title.toLowerCase();
             current.bodyLower = current.body.toLowerCase();
+            current.recordId = searchRecords.length;
             delete current.parts;
             searchRecords.push(current);
         }
@@ -384,13 +387,18 @@
         return output + escapeHtml(value.slice(cursor));
     }
 
-    function searchSnippet(record, query) {
+    function searchSnippet(record, query, offset) {
         var source = record.body;
         if (!source) return '章节或小节标题命中';
-        var index = record.bodyLower.indexOf(query.toLowerCase());
+        var index = typeof offset === 'number' ? offset : record.bodyLower.indexOf(query.toLowerCase());
         var start = index < 0 ? 0 : Math.max(0, index - 42);
         var end = Math.min(source.length, index < 0 ? 112 : index + query.length + 70);
         return (start > 0 ? '…' : '') + source.slice(start, end).trim() + (end < source.length ? '…' : '');
+    }
+
+    function searchResultHash(result, query) {
+        return 'match-' + (result.record.pageIndex + 1) + '-' + result.record.recordId +
+            '-' + result.offset + '-' + (result.mode === 'title' ? 't' : 'b') + '-' + encodeURIComponent(query);
     }
 
     function runSearch() {
@@ -406,29 +414,49 @@
         var needle = query.toLowerCase();
         var titleMatches = [];
         var bodyMatches = [];
+        var totalMatches = 0;
+        var maxResults = 150;
         searchRecords.forEach(function (record) {
-            if (record.titleLower.indexOf(needle) !== -1) titleMatches.push(record);
-            else if (record.bodyLower.indexOf(needle) !== -1) bodyMatches.push(record);
+            var titleOffset = record.titleLower.indexOf(needle);
+            if (titleOffset >= 0) {
+                titleMatches.push({ record: record, mode: 'title', offset: titleOffset });
+                totalMatches++;
+            }
+
+            var offset = 0;
+            var found;
+            while ((found = record.bodyLower.indexOf(needle, offset)) !== -1) {
+                totalMatches++;
+                if (bodyMatches.length < maxResults) {
+                    bodyMatches.push({ record: record, mode: 'body', offset: found });
+                }
+                offset = found + Math.max(needle.length, 1);
+            }
         });
-        visibleSearchResults = titleMatches.concat(bodyMatches);
+        visibleSearchResults = titleMatches.concat(bodyMatches).slice(0, maxResults);
         searchedQuery = query;
         activeSearchIndex = -1;
         searchInput.removeAttribute('aria-activedescendant');
-        searchResults.innerHTML = visibleSearchResults.map(function (record, index) {
-            var path = record.targetId === pages[record.pageIndex].route
-                ? '第 ' + (record.pageIndex + 1) + ' 章 · 章节正文' : record.chapter;
+        searchResults.innerHTML = visibleSearchResults.map(function (result, index) {
+            var record = result.record;
+            var path = '第 ' + (record.pageIndex + 1) + ' 章 · ' +
+                (result.mode === 'title' ? '标题命中' : '正文命中');
+            var snippet = result.mode === 'title' ? searchSnippet(record, query) :
+                searchSnippet(record, query, result.offset);
             return '<a class="paper-search-result" id="paper-search-result-' + index +
                 '" role="option" aria-selected="false" data-search-index="' + index +
-                '" href="#' + escapeHtml(record.targetId) + '">' +
+                '" href="#' + escapeHtml(searchResultHash(result, query)) + '">' +
                 '<span class="paper-search-result-title">' + highlightSearchText(record.title, query) + '</span>' +
                 '<span class="paper-search-result-path">' + escapeHtml(path) + '</span>' +
-                '<span class="paper-search-result-snippet">' + highlightSearchText(searchSnippet(record, query), query) + '</span>' +
+                '<span class="paper-search-result-snippet">' + highlightSearchText(snippet, query) + '</span>' +
                 '</a>';
         }).join('');
         searchResults.scrollTop = 0;
         if (searchStatus) {
-            searchStatus.textContent = visibleSearchResults.length
-                ? '找到 ' + visibleSearchResults.length + ' 条结果 · 本篇 ' + pages.length + ' 章'
+            searchStatus.textContent = totalMatches
+                ? '找到 ' + totalMatches + ' 处匹配' +
+                    (totalMatches > maxResults ? ' · 显示前 ' + maxResults + ' 处' : '') +
+                    ' · 本篇 ' + pages.length + ' 章'
                 : '没有找到“' + query + '”相关内容。';
         }
         setSearchOpen(visibleSearchResults.length > 0);
@@ -462,13 +490,14 @@
         active.scrollIntoView({ block: 'nearest' });
     }
 
-    function navigateToSearchResult(record) {
-        if (!record) return;
+    function navigateToSearchResult(result) {
+        if (!result) return;
         closeSearchResults();
         if (searchInput) searchInput.blur();
-        pendingSearchFocusTarget = record.targetId;
-        if (decodedHash() === record.targetId) routeFromHash();
-        else window.location.hash = record.targetId;
+        pendingSearchFocusTarget = null;
+        var hash = searchResultHash(result, searchedQuery);
+        if (decodedHash() === hash) routeFromHash();
+        else window.location.hash = hash;
         closeMobileNavigation(false);
     }
 
@@ -790,8 +819,129 @@
         if (restoreFocus && wasOpen && mobileNavToggle) mobileNavToggle.focus();
     }
 
-    function renderPage(index, targetId) {
+    function clearSearchHighlight() {
+        if (window.CSS && window.CSS.highlights) window.CSS.highlights.delete('paper-search-hit');
+        Array.prototype.forEach.call(content.querySelectorAll('.paper-search-hit-fallback'), function (element) {
+            element.classList.remove('paper-search-hit-fallback');
+        });
+        if (searchSelectionUsed) {
+            var selection = window.getSelection();
+            if (selection) selection.removeAllRanges();
+            searchSelectionUsed = false;
+        }
+    }
+
+    // Recreate the same normalized text stream as the search index, but retain
+    // DOM text-node offsets so the result can be positioned at the actual phrase.
+    function searchableCharacterMap(root, recordId) {
+        var chars = [];
+        var locations = [];
+        var currentRecordId = pages[currentPageIndex].firstSearchRecordIndex;
+
+        function append(value, node) {
+            if (recordId !== null && currentRecordId !== recordId) return;
+            var part = String(value || '');
+            for (var i = 0; i < part.length; i++) {
+                var character = part.charAt(i);
+                if (/\s/.test(character)) {
+                    if (chars.length && chars[chars.length - 1] !== ' ') {
+                        chars.push(' ');
+                        locations.push(node ? { node: node, offset: i } : null);
+                    }
+                } else {
+                    chars.push(character);
+                    locations.push(node ? { node: node, offset: i } : null);
+                }
+            }
+        }
+
+        visitSearchText(root, append, recordId === null ? null : function () {
+            currentRecordId++;
+        });
+        while (chars.length && chars[chars.length - 1] === ' ') {
+            chars.pop();
+            locations.pop();
+        }
+        return { text: chars.join(''), locations: locations };
+    }
+
+    function findNearestSearchOffset(text, query, expected) {
+        var needle = query.toLowerCase();
+        var haystack = text.toLowerCase();
+        if (haystack.slice(expected, expected + needle.length) === needle) return expected;
+
+        // Render enhancements (callout labels, for example) may alter whitespace.
+        // Find the closest corresponding occurrence instead of jumping to the heading.
+        var best = -1;
+        var distance = Infinity;
+        var index = 0;
+        while ((index = haystack.indexOf(needle, index)) !== -1) {
+            if (Math.abs(index - expected) < distance) {
+                best = index;
+                distance = Math.abs(index - expected);
+            }
+            index += Math.max(needle.length, 1);
+        }
+        return best;
+    }
+
+    function scrollToSearchRect(rect) {
+        if (!rect) return;
+        var y = window.scrollY + rect.top - Math.max(108, Math.min(200, window.innerHeight * 0.24));
+        window.scrollTo({ top: Math.max(0, y), left: window.scrollX, behavior: 'auto' });
+    }
+
+    function highlightExactSearchHit(hit) {
+        var record = searchRecords[hit.recordId];
+        if (!record || record.pageIndex !== currentPageIndex || !hit.query) return false;
+
+        var root = hit.mode === 'title'
+            ? document.getElementById(record.targetId)
+            : content.querySelector('.doc-page-body');
+        if (!root) return false;
+
+        var mapped = searchableCharacterMap(root, hit.mode === 'title' ? null : hit.recordId);
+        var offset = findNearestSearchOffset(mapped.text, hit.query, hit.offset);
+        if (offset < 0) return false;
+
+        var first = mapped.locations[offset];
+        var last = mapped.locations[offset + hit.query.length - 1];
+        if (!first || !last) return false;
+
+        if (first.node.nodeType === 3 && last.node.nodeType === 3) {
+            try {
+                var range = document.createRange();
+                range.setStart(first.node, first.offset);
+                range.setEnd(last.node, last.offset + 1);
+                if (window.CSS && window.CSS.highlights && window.Highlight) {
+                    window.CSS.highlights.set('paper-search-hit', new window.Highlight(range));
+                } else {
+                    var selection = window.getSelection();
+                    if (selection) {
+                        selection.removeAllRanges();
+                        selection.addRange(range);
+                        searchSelectionUsed = true;
+                    }
+                }
+                var rect = range.getBoundingClientRect();
+                if (!rect.width && !rect.height) return false;
+                scrollToSearchRect(rect);
+                return true;
+            } catch (error) {
+                // Fall through to element-level highlighting in older browsers.
+            }
+        }
+
+        var element = first.node.nodeType === 1 ? first.node : first.node.parentElement;
+        if (!element) return false;
+        element.classList.add('paper-search-hit-fallback');
+        scrollToSearchRect(element.getBoundingClientRect());
+        return true;
+    }
+
+    function renderPage(index, targetId, searchHit) {
         if (!pages.length) return;
+        clearSearchHighlight();
 
         currentPageIndex = Math.max(0, Math.min(index, pages.length - 1));
         var page = pages[currentPageIndex];
@@ -823,7 +973,9 @@
                 target.setAttribute('tabindex', '-1');
                 target.focus({ preventScroll: true });
             }
-            if (target) target.scrollIntoView({ block: 'start' });
+            if (searchHit && highlightExactSearchHit(searchHit)) {
+                // Keep the exact phrase in view rather than the section heading.
+            } else if (target) target.scrollIntoView({ block: 'start' });
             else window.scrollTo({ top: 0, left: 0 });
             updateReadingProgress();
         });
@@ -840,6 +992,25 @@
         if (pendingSearchFocusTarget && pendingSearchFocusTarget !== hash) pendingSearchFocusTarget = null;
         var pageMatch = hash.match(/^chapter-(\d+)$/);
         var sectionMatch = hash.match(/^section-(\d+)-(\d+)$/);
+        var searchMatch = hash.match(/^match-(\d+)-(\d+)-(\d+)-([tb])-(.+)$/);
+
+        if (searchMatch) {
+            var recordId = Number(searchMatch[2]);
+            var record = searchRecords[recordId];
+            var query = '';
+            try { query = decodeURIComponent(searchMatch[5]); }
+            catch (error) { query = ''; }
+            if (record && record.pageIndex + 1 === Number(searchMatch[1]) && query) {
+                if (searchInput && !searchInput.value) searchInput.value = query;
+                renderPage(record.pageIndex, record.targetId, {
+                    recordId: recordId,
+                    offset: Number(searchMatch[3]),
+                    mode: searchMatch[4] === 't' ? 'title' : 'body',
+                    query: query
+                });
+                return;
+            }
+        }
 
         if (pageMatch) {
             renderPage(Number(pageMatch[1]) - 1, hash);
