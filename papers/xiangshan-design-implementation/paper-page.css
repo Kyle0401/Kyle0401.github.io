@@ -95,6 +95,11 @@ html[data-theme="dark"] .doc-page-body h3 { color: var(--docker-ink); }
 .paper-search-result-path { display: block; margin-top: 3px; color: var(--note-muted); font-size: 10.5px; line-height: 1.6; }
 .paper-search-result-snippet { display: block; margin-top: 6px; font-size: 12px; line-height: 1.7; }
 .paper-search mark { padding: 0 1px; color: inherit; background: rgba(255, 196, 0, .3); border-radius: 2px; }
+/* Browser-native text range highlighting keeps Markdown links, code and formatting intact. */
+::highlight(paper-search-hit) { background-color: rgba(255, 196, 0, .55); color: inherit; text-decoration: underline; text-decoration-color: #bc7900; }
+.paper-search-hit-fallback { background-color: rgba(255, 196, 0, .35); outline: 2px solid rgba(202, 145, 0, .55); border-radius: 3px; }
+html[data-theme="dark"] ::highlight(paper-search-hit) { background-color: rgba(255, 196, 0, .40); text-decoration-color: #ffd368; }
+html[data-theme="dark"] .paper-search-hit-fallback { background-color: rgba(255, 196, 0, .25); }
 html[data-theme="dark"] #paper-search-input, html[data-theme="dark"] .paper-search-results { background: #0d1117; }
 html[data-theme="dark"] #paper-search-input:focus { box-shadow: 0 0 0 3px rgba(88, 166, 255, .15); }
 html[data-theme="dark"] .paper-search mark { background: rgba(255, 196, 0, .25); }
