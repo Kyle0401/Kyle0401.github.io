@@ -1,0 +1,49 @@
+{
+  "validated_on": "2026-11-10",
+  "case": "RV32 signed minimum-value self-remainder",
+  "rtl_sha256": "4f1f590802b4eae50d889104403f359bcd70d39a4926b132557f03587379dc07",
+  "waveform": "/home/kyle/.local/share/ucagent-reading/logs/audit-min-self-9mrgp7nm/min-self-rem.fst",
+  "waveform_sha256": "dad38a833c8a5323f5db9670ba0f54a59ae6aaccd0ac7da5e6109a59d7ecd400",
+  "waveform_reader": "pywellen==0.25.7",
+  "waveform_timescale": "1ps",
+  "signal_prefix": "TOP.IntegerDivider_top.IntegerDivider.",
+  "before_done_rising_edge": {
+    "tick": 16,
+    "values": {
+      "clk": 0,
+      "io_done": 0,
+      "post.io_negX": 1,
+      "post.io_sum": 68719476732,
+      "post.io_carry": 4,
+      "post.sumR": 0,
+      "post.reminder_D": 0,
+      "post.reminder_csaSum": 13,
+      "post.reminder_fixSign": 12
+    }
+  },
+  "done_rising_edge": {
+    "tick": 17,
+    "values": {
+      "clk": 1,
+      "io_done": 1,
+      "io_ready": 0,
+      "io_result": 1,
+      "io_useRem": 1,
+      "io_signed": 1,
+      "io_dividend": 2147483648,
+      "io_divisor": 2147483648,
+      "post.io_div0": 0,
+      "post.io_ALTB": 0,
+      "post.io_overflow": 0,
+      "post.reminder_fixed": 3,
+      "post.io_shiftR": 1,
+      "post.reminder_shifted": 1,
+      "post.io_reminder": 1
+    }
+  },
+  "done_step_including_submission": 3,
+  "expected_remainder": 0,
+  "actual_remainder": 1,
+  "observed_data_path": "36-bit corrected magnitude is 0 before sign restoration. The negative sign-restoration path yields 12, which becomes 3 after the registered shift by 2 and 1 after shiftR=1.",
+  "analysis": "RTL inverts all three 36-bit components and adds 15 instead of the 3 needed for exact two's-complement negation, leaving +12 in this case. No fixed RTL was simulated in this audit."
+}

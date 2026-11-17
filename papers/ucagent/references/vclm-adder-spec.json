@@ -1,0 +1,13 @@
+{
+  "scope": "Four maximum-operand combinations only",
+  "groups": {
+    "FG-ARITHMETIC": {
+      "FC-ADD": [
+        "CK-NEITHER-MAX",
+        "CK-ONLY-A-MAX",
+        "CK-ONLY-B-MAX",
+        "CK-BOTH-MAX"
+      ]
+    }
+  }
+}

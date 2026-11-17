@@ -1,0 +1,13 @@
+Reset complete: ready=1, done=0
+Case: signed_min_self, io_signed=1, dividend_bits=0x80000000, divisor_bits=0x80000000
+Request: quotient, dividend=-2147483648, divisor=-2147483648
+  step_from_submit=1: ready=0, done=0
+  step_from_submit=2: ready=0, done=0
+  step_from_submit=3: ready=0, done=1
+PASS: DIV signed_min_self, expected=0x00000001, actual=0x00000001
+Request: remainder, dividend=-2147483648, divisor=-2147483648
+  step_from_submit=1: ready=0, done=0
+  step_from_submit=2: ready=0, done=0
+  step_from_submit=3: ready=0, done=1
+FAIL: REM signed_min_self, expected=0x00000000, actual=0x00000001
+Summary: 1 passed, 1 failed
