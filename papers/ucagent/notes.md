@@ -2,6 +2,8 @@
 
 [阅读论文 PDF（英文原文，16 页）](./paper.pdf)
 
+[阅读中文全译 PDF](./paper-zh.pdf)
+
 这篇论文想完成的工作是：**给定一个硬件模块和它的功能规格，让大模型借助工具，组织并执行验证，最后留下测试代码和验证结果。**
 
 题目 **UCAgent: An End-to-End Agent for Block-Level Functional Verification**，可以译为：**UCAgent：面向模块级功能验证的端到端智能体**

@@ -726,7 +726,7 @@
     function enhanceLinks() {
         Array.prototype.forEach.call(content.querySelectorAll('a[href]'), function (link) {
             var href = link.getAttribute('href') || '';
-            if (/^https?:\/\//i.test(href) || /(?:^|\/)paper\.pdf(?:[?#]|$)/i.test(href)) {
+            if (/^https?:\/\//i.test(href) || /(?:^|\/)paper(?:-zh)?\.pdf(?:[?#]|$)/i.test(href)) {
                 link.target = '_blank';
                 link.rel = 'noopener noreferrer';
             }
@@ -1140,7 +1140,7 @@
     window.addEventListener('resize', updateReadingProgress);
     window.addEventListener('hashchange', routeFromHash);
 
-    fetch('./notes.md?v=20261117a')
+    fetch('./notes.md?v=20261118a')
         .then(function (response) {
             if (!response.ok) throw new Error('HTTP ' + response.status);
             return response.text();
