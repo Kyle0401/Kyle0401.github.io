@@ -698,7 +698,7 @@
     function enhanceCallouts() {
         var labels = {
             NOTE: '提示',
-            TIP: '技巧',
+            TIP: '提示',
             IMPORTANT: '重要',
             WARNING: '警告',
             CAUTION: '注意'
@@ -1140,7 +1140,7 @@
     window.addEventListener('resize', updateReadingProgress);
     window.addEventListener('hashchange', routeFromHash);
 
-    fetch('./notes.md?v=20261120a')
+    fetch('./notes.md?v=20261120b')
         .then(function (response) {
             if (!response.ok) throw new Error('HTTP ' + response.status);
             return response.text();
