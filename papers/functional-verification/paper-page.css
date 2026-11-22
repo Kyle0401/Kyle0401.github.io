@@ -1,0 +1,8 @@
+@import url("../xiangshan-design-implementation/paper-page.css?v=20261024b");
+
+.paper-full-title {
+    margin: 12px 0 0;
+    color: var(--note-muted);
+    font-size: 15px;
+    line-height: 1.5;
+}
