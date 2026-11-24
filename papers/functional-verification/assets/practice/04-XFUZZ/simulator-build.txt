@@ -1,0 +1,36 @@
+make emu CORE=inorder BOARD=sim XFUZZ=1 FIRRTL_COVER=mux NO_ZSTD_COMPRESSION=1 -j6
+make[1]: Entering directory '$XFUZZ_DEMO_DIR/difftest'
+Tue, 24 Nov 2026 22:40:07 +0800
+time -avp -o $XFUZZ_DEMO_DIR/build/time.log verilator --exe -O3 --cc --top-module SimTop +define+VERILATOR=1 +define+PRINTF_COND=1 +define+RANDOMIZE_REG_INIT +define+RANDOMIZE_MEM_INIT +define+RANDOMIZE_GARBAGE_ASSIGN +define+RANDOMIZE_DELAY=0 -Wno-STMTDLY -Wno-WIDTH --max-num-width 150000 --assert --x-assign unique --output-split 30000 --output-split-cfuncs 30000 -I$XFUZZ_DEMO_DIR/build/rtl -I$XFUZZ_DEMO_DIR/build/generated-src -CFLAGS "-I$XFUZZ_DEMO_DIR/difftest/src/test/csrc/common -I$XFUZZ_DEMO_DIR/difftest/config -DNOOP_HOME=\\\"$XFUZZ_DEMO_DIR\\\" -I$XFUZZ_DEMO_DIR/build/generated-src -I$XFUZZ_DEMO_DIR/difftest/src/test/csrc/plugin/include -I$XFUZZ_DEMO_DIR/difftest/src/test/csrc/difftest -DNO_ZSTD_COMPRESSION -I$XFUZZ_DEMO_DIR/difftest/src/test/csrc/plugin/spikedasm -DFUZZER_LIB -DFUZZING -DFIRRTL_COVER -I$XFUZZ_DEMO_DIR/difftest/src/test/csrc/verilator -DVERILATOR -DNUM_CORES=1 --std=c++17 -DVERILATOR_4_210" -LDFLAGS "-lz -lrt -lpthread $XFUZZ_DEMO_DIR/ccover/target/release/libfuzzer.a -ldl" -CFLAGS "\$(PGO_CFLAGS)" -LDFLAGS "\$(PGO_LDFLAGS)" -o $XFUZZ_DEMO_DIR/build/fuzzer +define+DIFFTEST --instr-count-dpi 1 --no-timing +define+VERILATOR_5 --quiet-stats -Mdir $XFUZZ_DEMO_DIR/build/emu-compile $XFUZZ_DEMO_DIR/build/rtl/SimTop.v $XFUZZ_DEMO_DIR/difftest/src/test/vsrc/common/SimJTAG.v $XFUZZ_DEMO_DIR/difftest/src/test/vsrc/common/ref.v $XFUZZ_DEMO_DIR/difftest/src/test/vsrc/common/assert.v $XFUZZ_DEMO_DIR/difftest/src/test/csrc/common/uart.cpp $XFUZZ_DEMO_DIR/difftest/src/test/csrc/common/vga.cpp $XFUZZ_DEMO_DIR/difftest/src/test/csrc/common/perf.cpp $XFUZZ_DEMO_DIR/difftest/src/test/csrc/common/SimJTAG.cpp $XFUZZ_DEMO_DIR/difftest/src/test/csrc/common/golden.cpp $XFUZZ_DEMO_DIR/difftest/src/test/csrc/common/keyboard.cpp $XFUZZ_DEMO_DIR/difftest/src/test/csrc/common/sdcard.cpp $XFUZZ_DEMO_DIR/difftest/src/test/csrc/common/flash.cpp $XFUZZ_DEMO_DIR/difftest/src/test/csrc/common/compress.cpp $XFUZZ_DEMO_DIR/difftest/src/test/csrc/common/dut.cpp $XFUZZ_DEMO_DIR/difftest/src/test/csrc/common/ram.cpp $XFUZZ_DEMO_DIR/difftest/src/test/csrc/common/common.cpp $XFUZZ_DEMO_DIR/difftest/src/test/csrc/common/remote_bitbang.cpp $XFUZZ_DEMO_DIR/difftest/src/test/csrc/common/coverage.cpp $XFUZZ_DEMO_DIR/difftest/src/test/csrc/common/lightsss.cpp $XFUZZ_DEMO_DIR/difftest/src/test/csrc/common/device.cpp $XFUZZ_DEMO_DIR/difftest/src/test/csrc/common/main.cpp $XFUZZ_DEMO_DIR/build/generated-src/difftest-dpic.cpp $XFUZZ_DEMO_DIR/build/generated-src/firrtl-cover.cpp $XFUZZ_DEMO_DIR/difftest/src/test/csrc/difftest/refproxy.cpp $XFUZZ_DEMO_DIR/difftest/src/test/csrc/difftest/difftest.cpp $XFUZZ_DEMO_DIR/difftest/src/test/csrc/difftest/difftrace.cpp $XFUZZ_DEMO_DIR/difftest/src/test/csrc/difftest/goldenmem.cpp $XFUZZ_DEMO_DIR/difftest/src/test/csrc/plugin/spikedasm/spikedasm.cpp $XFUZZ_DEMO_DIR/difftest/src/test/csrc/verilator/emu.cpp $XFUZZ_DEMO_DIR/difftest/src/test/csrc/verilator/snapshot.cpp
+Tue, 24 Nov 2026 22:40:11 +0800
+Building emu...
+make[2]: Entering directory '$XFUZZ_DEMO_DIR/difftest'
+time -avp -o $XFUZZ_DEMO_DIR/build/time.log make -s VM_PARALLEL_BUILDS=1 OPT_SLOW="-O0" \
+					OPT_FAST=-O3 \
+					PGO_CFLAGS= \
+					PGO_LDFLAGS= \
+					-C $XFUZZ_DEMO_DIR/build/emu-compile -f $XFUZZ_DEMO_DIR/build/emu-compile/VSimTop.mk
+$XFUZZ_DEMO_DIR/difftest/src/test/csrc/difftest/difftrace.cpp: In member function ‘void DiffTrace<T>::next_file_name(char*) [with T = DiffTestState]’:
+$XFUZZ_DEMO_DIR/difftest/src/test/csrc/difftest/difftrace.cpp:61:32: warning: ‘%lu’ directive output may be truncated writing between 1 and 20 bytes into a region of size between 0 and 127 [-Wformat-truncation=]
+   61 |   snprintf(file_name, 128, "%s/%lu.%s", dirname, trace_index, prefix);
+      |                                ^~~
+In file included from /usr/include/stdio.h:974,
+                 from /usr/include/c++/15/cstdio:47,
+                 from $XFUZZ_DEMO_DIR/difftest/src/test/csrc/common/common.h:25,
+                 from $XFUZZ_DEMO_DIR/difftest/src/test/csrc/difftest/difftrace.h:4,
+                 from $XFUZZ_DEMO_DIR/difftest/src/test/csrc/difftest/difftrace.cpp:1:
+In function ‘int snprintf(char*, size_t, const char*, ...)’,
+    inlined from ‘void DiffTrace<T>::next_file_name(char*) [with T = DiffTestState]’ at $XFUZZ_DEMO_DIR/difftest/src/test/csrc/difftest/difftrace.cpp:61:11:
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:68:35: note: ‘__builtin___snprintf_chk’ output between 7 and 153 bytes into a destination of size 128
+   68 |   return __builtin___snprintf_chk (__s, __n, __USE_FORTIFY_LEVEL - 1,
+      |          ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   69 |                                    __glibc_objsize (__s), __fmt,
+      |                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   70 |                                    __va_arg_pack ());
+      |                                    ~~~~~~~~~~~~~~~~~
+$XFUZZ_DEMO_DIR/difftest/src/test/csrc/plugin/spikedasm/spikedasm.cpp: In function ‘void execute_dasm_cmd()’:
+$XFUZZ_DEMO_DIR/difftest/src/test/csrc/plugin/spikedasm/spikedasm.cpp:45:10: warning: ignoring return value of ‘char* fgets(char*, int, FILE*)’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+   45 |     fgets(dasm_result, sizeof(dasm_result), ptr);
+      |     ~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+make[2]: Leaving directory '$XFUZZ_DEMO_DIR/difftest'
+make[1]: Leaving directory '$XFUZZ_DEMO_DIR/difftest'

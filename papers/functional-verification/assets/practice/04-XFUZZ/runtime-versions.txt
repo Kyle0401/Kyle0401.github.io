@@ -1,0 +1,10 @@
+NEMU reference used for successful runs
+af9d4ce51fc2087156b09f26d64a8e1cfb83332f
+41a0726604cfa274930cb1245a17c2ffc607e1dafeb72b889ccf077d62bf8226  $MINJIE_DIR/NEMU-ref/build/riscv64-nemu-interpreter-so
+Bundled reference
+504f19d62b7373695121c68df333726d7f5bc9ad4ddfd32e3116d1d729df38a9  $XFUZZ_DEMO_DIR/ready-to-run/riscv64-nemu-interpreter-so
+Bundled reference lacked difftest_display, as shown in the first replay log.
+Simulator built from the archived pinned sources
+61f5f42f3666ce3ab2ffc992ede9598539fe3b60297103992d1fea879a5872d5  $XFUZZ_DEMO_DIR/build/fuzzer
+XFUZZ Cargo dependency lock SHA-256
+ca9777821afb8566a51ab8d99e3abb566f18d461c5837df0295c20b26caf0507  $XFUZZ_DEMO_DIR/ccover/Cargo.lock

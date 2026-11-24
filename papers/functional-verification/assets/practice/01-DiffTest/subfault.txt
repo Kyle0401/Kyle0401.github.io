@@ -1,0 +1,48 @@
+Command: $MINJIE_DIR/results/difftest-learning/emu-subfault -i $MINJIE_DIR/results/difftest-learning/registers-drain.bin --diff $MINJIE_DIR/NEMU-ref/build/riscv64-nemu-interpreter-so --ram-size 128MB -C 5000 -I 64 -b 0 -e 0
+emu-subfault compiled at Nov 18 2026, 18:12:25
+Using simulated 32768B flash
+Using simulated 128MB RAM
+The image is $MINJIE_DIR/results/difftest-learning/registers-drain.bin
+The reference model is $MINJIE_DIR/NEMU-ref/build/riscv64-nemu-interpreter-so
+The first instruction of core 0 has commited. Difftest enabled.
+nemu does not enable flash fetch!
+
+============== Commit Group Trace (Core 0) ==============
+commit group [00]: pc 0080000000 cmtcnt 1
+commit group [01]: pc 0080000004 cmtcnt 1
+commit group [02]: pc 0080000008 cmtcnt 1
+commit group [03]: pc 008000000c cmtcnt 1 <--
+
+============== Commit Instr Trace ==============
+[00] commit pc 0000000080000000 inst 00000513 wen 1 dst 10 data 0000000000000000 idx 000
+[01] commit pc 0000000080000004 inst 00500293 wen 1 dst 05 data 0000000000000005 idx 000
+[02] commit pc 0000000080000008 inst 00328313 wen 1 dst 06 data 0000000000000008 idx 000
+[03] commit pc 000000008000000c inst 405303b3 wen 1 dst 07 data 0000000000000002 idx 000 <--
+
+==============  REF Regs  ==============
+---------------- Intger Registers ----------------
+  $0: 0x0000000000000000   ra: 0x923361a4e29d1b72   sp: 0x925b845f5ae88222   gp: 0xad3432412e25ca7c
+  tp: 0x4964b9cfd653f186   t0: 0x0000000000000005   t1: 0x0000000000000008   t2: 0x0000000000000003
+  s0: 0xb108c3e9400c739f   s1: 0xb956c90fbf1cfecd   a0: 0x0000000000000000   a1: 0x93165a42cfb4d366
+  a2: 0x46933b2161d0c883   a3: 0x45b847537a3fe0a2   a4: 0xceb2f48d8dc09b40   a5: 0xa5a19c327ee3c242
+  a6: 0xbb78f217d74bd655   a7: 0x744c109a8b9e2f1d   s2: 0x82f4348d2f6e201c   s3: 0x89970b0f1ecb7e81
+  s4: 0x3938b180b94b7e1a   s5: 0xae462cbb0096e7ae   s6: 0x38950c8d637d2157   s7: 0x1fd14d5ad32577c2
+  s8: 0x43d22b1e7929f70f   s9: 0x1bb9fad0701147f1  s10: 0x67ddf33466602ec2  s11: 0x9a163648c2093fbd
+  t3: 0x1cc636ce56ffc75e   t4: 0xbd25f29ca461e4eb   t5: 0x93ef6e148f8d2a0b   t6: 0xd5af0c5471b79a9e
+---------------- Privileged CSRs ----------------
+pc: 0x0000000080000010  privilege mode: M (mode: 3  v: 0  debug: 0)
+   mstatus: 0x0000000a00001800   sstatus: 0x0000000200000000
+    mcause: 0x0000000000000000      mepc: 0x0000000000000000     mtval: 0x0000000000000000
+    scause: 0x0000000000000000      sepc: 0x0000000000000000     stval: 0xb8923d6126918fa0
+  mscratch: 0x0000000000000000  sscratch: 0x0000000000000000
+     mtvec: 0x0000000000000000     stvec: 0x0000000000000000
+       mip: 0x0000000000000000       mie: 0x0000000000000000
+   mideleg: 0x0000000000000000   medeleg: 0x0000000000000000
+      satp: 0x0000000000000000
+ mcounteren: 0x0000000000000000 scounteren: 0x0000000000000000
+privilegeMode: 3
+     t2 different at pc = 0x0080000014, right = 0x0000000000000003, wrong = 0x0000000000000002
+Core 0: ABORT at pc = 0x80000014
+Core-0 instrCnt = 4, cycleCnt = 535, IPC = 0.007477
+Seed=0 Guest cycle spent: 537 (this will be different from cycleCnt if emu loads a snapshot)
+Host time spent: 344ms

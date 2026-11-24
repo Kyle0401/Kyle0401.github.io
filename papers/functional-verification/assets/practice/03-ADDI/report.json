@@ -1,0 +1,85 @@
+{
+  "bins": [
+    "positive",
+    "zero",
+    "negative"
+  ],
+  "seeds": [
+    "plus-1",
+    "zero",
+    "minus-1"
+  ],
+  "cases": [
+    {
+      "case": "plus-1",
+      "input_immediate": 1,
+      "committed_immediate": 1,
+      "bin": "positive",
+      "expected_writeback": 9,
+      "observed_writeback": 9,
+      "difftest_passed": true,
+      "simulator_exit": 0,
+      "trace": "commit pc 0000000080000008 inst 00128393 wen 1 dst 07 data 0000000000000009",
+      "log": "plus-1.log",
+      "errors": [],
+      "seed_decision": "initial seed",
+      "covered_bins": [
+        "positive"
+      ]
+    },
+    {
+      "case": "plus-2",
+      "input_immediate": 2,
+      "committed_immediate": 2,
+      "bin": "positive",
+      "expected_writeback": 10,
+      "observed_writeback": 10,
+      "difftest_passed": true,
+      "simulator_exit": 0,
+      "trace": "commit pc 0000000080000008 inst 00228393 wen 1 dst 07 data 000000000000000a",
+      "log": "plus-2.log",
+      "errors": [],
+      "seed_decision": "already covered",
+      "covered_bins": [
+        "positive"
+      ]
+    },
+    {
+      "case": "zero",
+      "input_immediate": 0,
+      "committed_immediate": 0,
+      "bin": "zero",
+      "expected_writeback": 8,
+      "observed_writeback": 8,
+      "difftest_passed": true,
+      "simulator_exit": 0,
+      "trace": "commit pc 0000000080000008 inst 00028393 wen 1 dst 07 data 0000000000000008",
+      "log": "zero.log",
+      "errors": [],
+      "seed_decision": "new bin",
+      "covered_bins": [
+        "positive",
+        "zero"
+      ]
+    },
+    {
+      "case": "minus-1",
+      "input_immediate": -1,
+      "committed_immediate": -1,
+      "bin": "negative",
+      "expected_writeback": 7,
+      "observed_writeback": 7,
+      "difftest_passed": true,
+      "simulator_exit": 0,
+      "trace": "commit pc 0000000080000008 inst fff28393 wen 1 dst 07 data 0000000000000007",
+      "log": "minus-1.log",
+      "errors": [],
+      "seed_decision": "new bin",
+      "covered_bins": [
+        "positive",
+        "zero",
+        "negative"
+      ]
+    }
+  ]
+}

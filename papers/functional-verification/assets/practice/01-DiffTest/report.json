@@ -1,0 +1,11 @@
+{
+  "normal_exit": 0,
+  "fault_exit": 1,
+  "differences": [
+    "t2 different at pc = 0x0080000014, right = 0x0000000000000003, wrong = 0x0000000000000002"
+  ],
+  "fault_commits": [
+    "[03] commit pc 000000008000000c inst 405303b3 wen 1 dst 07 data 0000000000000002 idx 000 <--"
+  ],
+  "reference": "NEMU-ref/build/riscv64-nemu-interpreter-so"
+}

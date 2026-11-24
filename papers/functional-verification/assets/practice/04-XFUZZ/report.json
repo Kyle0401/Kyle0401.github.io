@@ -1,0 +1,54 @@
+{
+  "metric": "firrtl.mux",
+  "simulation_seed": 0,
+  "cases": [
+    {
+      "input": "+1",
+      "instruction": "00128393",
+      "writeback": 9,
+      "points": 1410,
+      "hit_in_run": 634,
+      "cumulative": 634,
+      "new_points": 634
+    },
+    {
+      "input": "+1 repeat",
+      "instruction": "00128393",
+      "writeback": 9,
+      "points": 1410,
+      "hit_in_run": 634,
+      "cumulative": 634,
+      "new_points": 0
+    },
+    {
+      "input": "+2",
+      "instruction": "00228393",
+      "writeback": 10,
+      "points": 1410,
+      "hit_in_run": 634,
+      "cumulative": 634,
+      "new_points": 0
+    },
+    {
+      "input": "0",
+      "instruction": "00028393",
+      "writeback": 8,
+      "points": 1410,
+      "hit_in_run": 634,
+      "cumulative": 634,
+      "new_points": 0
+    },
+    {
+      "input": "-1",
+      "instruction": "fff28393",
+      "writeback": 7,
+      "points": 1410,
+      "hit_in_run": 644,
+      "cumulative": 644,
+      "new_points": 10
+    }
+  ],
+  "reference": "$MINJIE_DIR/NEMU-ref/build/riscv64-nemu-interpreter-so",
+  "coverage_percent": 45.674,
+  "repeat_matches": true
+}

@@ -1,0 +1,95 @@
+make sim-verilog CORE=inorder BOARD=sim FIRRTL_COVER=mux -j2
+mkdir -p $XFUZZ_DEMO_DIR/build/rtl
+mill -i NutShell.test.runMain top.TopMain -td $XFUZZ_DEMO_DIR/build/rtl --output-file SimTop.v BOARD=sim CORE=inorder --gen-mem-verilog full COVER=mux \
+	--repl-seq-mem -c:SimTop:-o:$XFUZZ_DEMO_DIR/build/rtl/SimTop.v.conf \
+	--infer-rw SimTop
+Picked up JAVA_TOOL_OPTIONS: -XX:ActiveProcessorCount=2 -Xmx2g -Djavax.net.ssl.trustStore=$MINJIE_DIR/tools/java-local/cacerts.p12 -Djavax.net.ssl.trustStoreType=PKCS12 -Xmx3g
+[info] compiling 2 Scala sources to $XFUZZ_DEMO_DIR/out/mill-build/compile.dest/classes ...
+[info] done compiling
+[info] compiling 18 Scala sources to $XFUZZ_DEMO_DIR/out/difftestDep/compile.dest/classes ...
+[warn] 7 deprecations
+[warn] 1 deprecation (since 2.13.0)
+[warn] 8 deprecations in total; re-run with -deprecation for details
+[warn] 42 feature warnings; re-run with -feature for details
+[warn] four warnings found
+[info] done compiling
+[info] compiling 38 Scala sources to $XFUZZ_DEMO_DIR/out/ccover/compile.dest/classes ...
+[warn] $XFUZZ_DEMO_DIR/ccover/instrumentation/src/rfuzz/TomlGenerator.scala:121:9: unreachable code
+[warn]         if(isGeneratedIdentifier(ref.name)) {
+[warn]         ^
+[warn] 169 deprecations
+[warn] 3 deprecations (since 2.13.0)
+[warn] 2 deprecations (since Chisel 3.6)
+[warn] 3 deprecations (since FIRRTL 1.3)
+[warn] 1 deprecation (since FIRRTL 1.3.3)
+[warn] 5 deprecations (since FIRRTL 1.4)
+[warn] 183 deprecations in total; re-run with -deprecation for details
+[warn] 6 feature warnings; re-run with -feature for details
+[warn] 9 warnings found
+[info] done compiling
+[info] compiling 79 Scala sources to $XFUZZ_DEMO_DIR/out/NutShell/compile.dest/classes ...
+[info] $XFUZZ_DEMO_DIR/src/main/scala/utils/Coverage.scala:1:1:
+[info] Found names but no class, trait or object is defined in the compilation unit.
+[info] The incremental compiler cannot record the dependency information in such case.
+[info] Some errors like unused import referring to a non-existent class might not be reported.
+[info]
+[info] /**************************************************************************************
+[info] ^
+[info] $XFUZZ_DEMO_DIR/src/main/scala/utils/Coverage.scala:1:1:
+[info] Found top level imports but no class, trait or object is defined in the compilation unit.
+[info] The incremental compiler cannot record the dependency information in such case.
+[info] Some errors like unused import referring to a non-existent class might not be reported.
+[info]
+[info] /**************************************************************************************
+[info] ^
+[warn] 6 deprecations
+[warn] 5 deprecations (since 2.13.0)
+[warn] 4 deprecations (since 2.13.3)
+[warn] 329 deprecations (since Chisel 3.5)
+[warn] 4 deprecations (since Chisel 3.6)
+[warn] 348 deprecations in total; re-run with -deprecation for details
+[warn] 2172 feature warnings; re-run with -feature for details
+[warn] 7 warnings found
+[info] done compiling
+[info] compiling 1 Scala source to $XFUZZ_DEMO_DIR/out/NutShell/test/compile.dest/classes ...
+[info] $XFUZZ_DEMO_DIR/src/test/scala/cache/CacheTest.scala:1:1:
+[info] Found names but no class, trait or object is defined in the compilation unit.
+[info] The incremental compiler cannot record the dependency information in such case.
+[info] Some errors like unused import referring to a non-existent class might not be reported.
+[info]
+[info] /**************************************************************************************
+[info] ^
+[info] $XFUZZ_DEMO_DIR/src/test/scala/cache/CacheTest.scala:1:1:
+[info] Found top level imports but no class, trait or object is defined in the compilation unit.
+[info] The incremental compiler cannot record the dependency information in such case.
+[info] Some errors like unused import referring to a non-existent class might not be reported.
+[info]
+[info] /**************************************************************************************
+[info] ^
+[info] done compiling
+Picked up JAVA_TOOL_OPTIONS: -XX:ActiveProcessorCount=2 -Xmx2g -Djavax.net.ssl.trustStore=$MINJIE_DIR/tools/java-local/cacerts.p12 -Djavax.net.ssl.trustStoreType=PKCS12 -Xmx3g
+====== Settings = (sim, inorder) ======
+EnableDebug = false
+EnableILA = true
+EnableMultiIssue = false
+EnableOutOfOrderExec = false
+EnableRVC = true
+FPGAPlatform = false
+HasDTLB = true
+HasDcache = true
+HasITLB = true
+HasIcache = true
+HasL2cache = true
+HasPrefetch = true
+IsRV32 = false
+MMIOBase = 0x40000000
+MMIOSize = 0x40000000
+MemMapBase = 0x0
+MemMapRegionBits = 0
+MmodeOnly = false
+NrExtIntr = 1
+ResetVector = 0x40000000
+[warn] src/main/scala/nutcore/backend/fu/CSR.scala:760:21: Dynamic index with width 4 is too small for extractee of width 64
+[warn]   val delegS = deleg(causeNO(3,0)) && (priviledgeMode < ModeM)
+[warn]                     ^
+[warn] There were 1 warning(s) during hardware elaboration.

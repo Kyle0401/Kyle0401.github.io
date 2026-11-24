@@ -1,0 +1,107 @@
+Command: $XFUZZ_DEMO_DIR/build/fuzzer --coverage firrtl.mux --verbose --auto-exit -- $MINJIE_DIR/results/addi-coverage-learning/run-uo7mtsbc/plus-1.bin $MINJIE_DIR/results/addi-coverage-learning/run-uo7mtsbc/plus-1.bin $MINJIE_DIR/results/addi-coverage-learning/run-uo7mtsbc/plus-2.bin $MINJIE_DIR/results/addi-coverage-learning/run-uo7mtsbc/zero.bin $MINJIE_DIR/results/addi-coverage-learning/run-uo7mtsbc/minus-1.bin -s 0 -b 0 -e 5000 -C 5000 -I 64 --ram-size 128MB --dump-commit-trace --diff $MINJIE_DIR/NEMU-ref/build/riscv64-nemu-interpreter-so
+emu compiled at Nov 24 2026, 22:40:13
+Using seed = 0
+Using simulated 32768B flash
+Using simulated 128MB RAM
+The image is $MINJIE_DIR/results/addi-coverage-learning/run-uo7mtsbc/plus-1.bin
+The reference model is $MINJIE_DIR/NEMU-ref/build/riscv64-nemu-interpreter-so
+The first instruction of core 0 has commited. Difftest enabled.
+nemu does not enable flash fetch!
+[00] commit pc 0000000080000000 inst 00000513 wen 1 dst 10 data 0000000000000000 idx 000
+[01] commit pc 0000000080000004 inst 00800293 wen 1 dst 05 data 0000000000000008 idx 000
+[02] commit pc 0000000080000008 inst 00128393 wen 1 dst 07 data 0000000000000009 idx 000
+[03] commit pc 000000008000000c inst 00000013 wen 0 dst 00 data 0000000000000000 idx 000
+[04] commit pc 0000000080000010 inst 00000013 wen 0 dst 00 data 0000000000000000 idx 000
+[05] commit pc 0000000080000014 inst 00000013 wen 0 dst 00 data 0000000000000000 idx 000
+Core 0: HIT GOOD TRAP at pc = 0x8000001c
+Core-0 instrCnt = 9, cycleCnt = 537, IPC = 0.016760
+SimMemory: img_size 4, req_all 16, req_in_range 4
+Seed=0 Guest cycle spent: 539 (this will be different from cycleCnt if emu loads a snapshot)
+Host time spent: 465ms
+COVERAGE: mux, 1410, 634, 634
+ExitCode: 0
+emu compiled at Nov 24 2026, 22:40:13
+Using seed = 0
+Using simulated 32768B flash
+Using simulated 128MB RAM
+The image is $MINJIE_DIR/results/addi-coverage-learning/run-uo7mtsbc/plus-1.bin
+The reference model is $MINJIE_DIR/NEMU-ref/build/riscv64-nemu-interpreter-so
+The first instruction of core 0 has commited. Difftest enabled.
+nemu does not enable flash fetch!
+[00] commit pc 0000000080000000 inst 00000513 wen 1 dst 10 data 0000000000000000 idx 000
+[01] commit pc 0000000080000004 inst 00800293 wen 1 dst 05 data 0000000000000008 idx 000
+[02] commit pc 0000000080000008 inst 00128393 wen 1 dst 07 data 0000000000000009 idx 000
+[03] commit pc 000000008000000c inst 00000013 wen 0 dst 00 data 0000000000000000 idx 000
+[04] commit pc 0000000080000010 inst 00000013 wen 0 dst 00 data 0000000000000000 idx 000
+[05] commit pc 0000000080000014 inst 00000013 wen 0 dst 00 data 0000000000000000 idx 000
+Core 0: HIT GOOD TRAP at pc = 0x8000001c
+Core-0 instrCnt = 9, cycleCnt = 537, IPC = 0.016760
+SimMemory: img_size 4, req_all 16, req_in_range 4
+Seed=0 Guest cycle spent: 539 (this will be different from cycleCnt if emu loads a snapshot)
+Host time spent: 40ms
+COVERAGE: mux, 1410, 634, 634
+ExitCode: 0
+emu compiled at Nov 24 2026, 22:40:13
+Using seed = 0
+Using simulated 32768B flash
+Using simulated 128MB RAM
+The image is $MINJIE_DIR/results/addi-coverage-learning/run-uo7mtsbc/plus-2.bin
+The reference model is $MINJIE_DIR/NEMU-ref/build/riscv64-nemu-interpreter-so
+The first instruction of core 0 has commited. Difftest enabled.
+nemu does not enable flash fetch!
+[00] commit pc 0000000080000000 inst 00000513 wen 1 dst 10 data 0000000000000000 idx 000
+[01] commit pc 0000000080000004 inst 00800293 wen 1 dst 05 data 0000000000000008 idx 000
+[02] commit pc 0000000080000008 inst 00228393 wen 1 dst 07 data 000000000000000a idx 000
+[03] commit pc 000000008000000c inst 00000013 wen 0 dst 00 data 0000000000000000 idx 000
+[04] commit pc 0000000080000010 inst 00000013 wen 0 dst 00 data 0000000000000000 idx 000
+[05] commit pc 0000000080000014 inst 00000013 wen 0 dst 00 data 0000000000000000 idx 000
+Core 0: HIT GOOD TRAP at pc = 0x8000001c
+Core-0 instrCnt = 9, cycleCnt = 537, IPC = 0.016760
+SimMemory: img_size 4, req_all 16, req_in_range 4
+Seed=0 Guest cycle spent: 539 (this will be different from cycleCnt if emu loads a snapshot)
+Host time spent: 36ms
+COVERAGE: mux, 1410, 634, 634
+ExitCode: 0
+emu compiled at Nov 24 2026, 22:40:13
+Using seed = 0
+Using simulated 32768B flash
+Using simulated 128MB RAM
+The image is $MINJIE_DIR/results/addi-coverage-learning/run-uo7mtsbc/zero.bin
+The reference model is $MINJIE_DIR/NEMU-ref/build/riscv64-nemu-interpreter-so
+The first instruction of core 0 has commited. Difftest enabled.
+nemu does not enable flash fetch!
+[00] commit pc 0000000080000000 inst 00000513 wen 1 dst 10 data 0000000000000000 idx 000
+[01] commit pc 0000000080000004 inst 00800293 wen 1 dst 05 data 0000000000000008 idx 000
+[02] commit pc 0000000080000008 inst 00028393 wen 1 dst 07 data 0000000000000008 idx 000
+[03] commit pc 000000008000000c inst 00000013 wen 0 dst 00 data 0000000000000000 idx 000
+[04] commit pc 0000000080000010 inst 00000013 wen 0 dst 00 data 0000000000000000 idx 000
+[05] commit pc 0000000080000014 inst 00000013 wen 0 dst 00 data 0000000000000000 idx 000
+Core 0: HIT GOOD TRAP at pc = 0x8000001c
+Core-0 instrCnt = 9, cycleCnt = 537, IPC = 0.016760
+SimMemory: img_size 4, req_all 16, req_in_range 4
+Seed=0 Guest cycle spent: 539 (this will be different from cycleCnt if emu loads a snapshot)
+Host time spent: 41ms
+COVERAGE: mux, 1410, 634, 634
+ExitCode: 0
+emu compiled at Nov 24 2026, 22:40:13
+Using seed = 0
+Using simulated 32768B flash
+Using simulated 128MB RAM
+The image is $MINJIE_DIR/results/addi-coverage-learning/run-uo7mtsbc/minus-1.bin
+The reference model is $MINJIE_DIR/NEMU-ref/build/riscv64-nemu-interpreter-so
+The first instruction of core 0 has commited. Difftest enabled.
+nemu does not enable flash fetch!
+[00] commit pc 0000000080000000 inst 00000513 wen 1 dst 10 data 0000000000000000 idx 000
+[01] commit pc 0000000080000004 inst 00800293 wen 1 dst 05 data 0000000000000008 idx 000
+[02] commit pc 0000000080000008 inst fff28393 wen 1 dst 07 data 0000000000000007 idx 000
+[03] commit pc 000000008000000c inst 00000013 wen 0 dst 00 data 0000000000000000 idx 000
+[04] commit pc 0000000080000010 inst 00000013 wen 0 dst 00 data 0000000000000000 idx 000
+[05] commit pc 0000000080000014 inst 00000013 wen 0 dst 00 data 0000000000000000 idx 000
+Core 0: HIT GOOD TRAP at pc = 0x8000001c
+Core-0 instrCnt = 9, cycleCnt = 537, IPC = 0.016760
+SimMemory: img_size 4, req_all 16, req_in_range 4
+Seed=0 Guest cycle spent: 539 (this will be different from cycleCnt if emu loads a snapshot)
+Host time spent: 37ms
+COVERAGE: mux, 1410, 644, 644
+ExitCode: 0
+Total Coverage:       45.674%

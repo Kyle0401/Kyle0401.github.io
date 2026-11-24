@@ -180,3 +180,122 @@ LightSSS 从**倒数第二份快照**重放，花约 **3 分钟**录下最后 **
 为什么叫「工作流集成」？
 
 作者提出两条原则。**协作式任务委派**是让掌握信息的一端负责把它提供出来，例如处理器设计端用探针报告指令提交。**动态信息交换**是让一次仿真产生的信息直接影响下一步，例如覆盖反馈改变 XFUZZ 接下来选哪些种子，DiffTest 的异常报告触发 LightSSS 重放。
+
+
+# 实践
+
+## 8.1 从提交探针追到 DiffTest 报告
+
+本节对应论文 §4.4 和 §5.1。实验环境是 WSL Ubuntu，使用单核顺序版 NutShell 的 Verilator RTL 仿真和 NEMU 参考库。先沿源码追踪一条指令如何提交，再用原来的减法小程序核对日志。 [论文 §4.4](https://jcst.ict.ac.cn/fileup/1000-9000/PDF/JCST-2023-4-2-3285-737.pdf#page=9) · [论文 §5.1、表 2](https://jcst.ict.ac.cn/fileup/1000-9000/PDF/JCST-2023-4-2-3285-737.pdf#page=11) · [实验版本](./assets/practice/01-DiffTest/build-manifest.json)
+
+1. **Chisel 端。** 顺序版的 `backend/seq/WBU.scala` 实例化 `DiffInstrCommit`，将 `valid` 接到这里的 `io.in.valid`，并传出 PC、指令编码和目标寄存器。乱序版在 `backend/ooo/ROB.scala` 根据退休条件报告提交。错误路径上的 `sub` 即使已经算完，也会在冲刷时被丢弃，因此不会作为有效提交推进参考模型。
+2. **Verilog 到 C++。** 生成的 `DummyDPICWrapper_InstrCommit.sv` 用 `io_valid & control_enable & ~reset` 生成 `enable`。`DiffExtInstrCommit.v` 在时钟上升沿且 `enable` 有效时调用 DPI-C 的 `v_difftest_InstrCommit(...)`。生成的 `difftest-dpic.cpp` 将 `io_pc`、`io_instr` 放进相应提交槽的 `packet->pc`、`packet->instr`。单核顺序版的 `difftest-state.h` 里是 `DifftestInstrCommit commit[1]`。写回值通过 `commit_data[1]` 传递，日志把它和 PC、指令、目的寄存器放在同一行供核对。
+3. **跑同一份程序。** `t1=8`，`t0=5`，在 PC `0x8000000c` 执行 `sub t2, t1, t0`。尾部放四条 `nop` 后结束。正常版通过差分并以 `GOOD TRAP` 退出（退出码 `0`）。故障版仅在生成的 `SUB` RTL 中翻转结果最低位，DiffTest 捕获 `t2` 不一致（退出码 `1`）。手算 `8−5=3`，与 NEMU 的参考值一致。 [测试镜像](./assets/practice/01-DiffTest/registers-drain.bin) · [正常日志](./assets/practice/01-DiffTest/good.txt) · [故障日志](./assets/practice/01-DiffTest/subfault.txt) · [差分报告](./assets/practice/01-DiffTest/report.json)
+
+```text
+[03] commit pc 000000008000000c inst 405303b3 wen 1 dst 07 data 0000000000000002 idx 000 <--
+t2 different at pc = 0x0080000014, right = 0x0000000000000003, wrong = 0x0000000000000002
+```
+
+第一行的 `0x8000000c` 是实际写错的 `sub` 的提交地址。第二行的 `0x80000014` 是检查器报告差异时使用的 DUT 上下文地址。定位写错的指令时，回到提交记录核对 PC、目标寄存器和写回数据。
+
+已有环境的复跑入口如下。该目录含已构建的两版 NutShell 仿真器和 NEMU 参考库。后面的实验也沿用这里的 `$minjie` 路径。
+
+```bash
+minjie="${MINJIE_DIR:?请先设置 MinJie 实验目录}"
+python3 "$minjie/difftest_demo.py"
+```
+
+## 8.2 LightSSS 快照重放与 FST 波形
+
+复用同一个减法教学故障，观察差分报错如何触发重放。第一次只给原有仿真器加 `--enable-fork`，主进程报错后子进程确实被唤醒，但日志提示 `Waveform not supported`。检查构建配置发现原仿真器未启用 trace，于是在 WSL 的独立构建目录中复用故障版生成的 RTL 和 DPI-C 文件，用 `EMU_TRACE=fst` 重建，再用 `--enable-fork` 跑同一镜像和 NEMU 参考库。 [论文 §4.6](https://jcst.ict.ac.cn/fileup/1000-9000/PDF/JCST-2023-4-2-3285-737.pdf#page=10)
+
+重新构建时，在原工作区加载 `nutshell_env.sh`。`build_dir` 指向已复制 `rtl/` 和 `generated-src/` 的独立构建目录。使用的构建命令如下。
+
+```bash
+make -C "$NOOP_HOME/difftest" emu BUILD_DIR="$build_dir" \
+  EMU_TRACE=fst RTL_SUFFIX=sv WITH_CHISELDB=0 WITH_CONSTANTIN=0 \
+  NO_ZSTD_COMPRESSION=1 -j6
+```
+
+| 重放日志位置 | 观察到的结果 |
+| --- | --- |
+| 第 20、44 行 | 主进程提交 `sub`，`x7` 写入 `2`。DiffTest 报告 NEMU 为 `3`、NutShell 为 `2`。 |
+| 第 45–46 行 | 保留的快照子进程被唤醒，开始记录 FST。 |
+| 第 60、84 行 | 子进程重新提交同一条 `sub`，再次报告同一个 `t2` 差异。 |
+
+在 FST 的时间戳 `535`，`commit.dpic.enable=1`，提交 PC 为 `0x8000000c`，指令字为 `0x405303b3`，目的寄存器为 `x7`，对应的 `commit_data` 为 `2`。波形和提交日志在这几项上吻合。 [主进程及重放日志](./assets/nutshell-sub-replay.txt) · [原始 FST 波形](./assets/nutshell-sub-replay.fst)
+
+本地短程序的快照很早，重放覆盖了几乎整个测试。论文 §5.4 的双核香山 Redis 案例在超过 168 小时的仿真中发现异常，从倒数第二份快照带波形重放最后约 30,800 个模拟周期，耗时约 3 分钟。这两个时间分别对应论文中的首次发现和带波形重放。 [论文 §5.4](https://jcst.ict.ac.cn/fileup/1000-9000/PDF/JCST-2023-4-2-3285-737.pdf#page=13)
+
+在已有的 FST 仿真器仍在原 WSL 构建目录时，可以用以下命令复跑。波形写到该构建目录的 `build/` 下，预期 DiffTest 捕获教学故障并返回 `1`。
+
+```bash
+lightsss="${LIGHTSSS_BUILD_DIR:?请先设置 LightSSS 的 WSL 构建目录}"
+NOOP_HOME="$lightsss" "$lightsss/build/emu" \
+  -i "$minjie/results/difftest-learning/registers-drain.bin" \
+  --diff "$minjie/NEMU-ref/build/riscv64-nemu-interpreter-so" \
+  --ram-size 128MB -C 5000 -I 64 -b 0 -e 0 --enable-fork
+```
+
+## 8.3 用 `addi` 教学分箱练习覆盖反馈
+
+继续用前面的正常 NutShell 仿真器和 NEMU 参考库。脚本生成四份固定镜像，每份先设置 `t0=8`，再在 `0x80000008` 执行 `addi t2, t0, imm`，最后经过四条 `nop` 和结束指令。开启 `--dump-commit-trace`，按 PC 选取实际提交的目标指令，将指令字高 12 位按有符号数解码，再归入正数、零、负数三个教学分箱。DiffTest 检查 DUT 和参考模型是否一致，脚本还单独核对 `x7` 写回是否等于 `8 + imm`。通过两项检查且首次命中新分箱的输入才进入种子集。 [覆盖反馈原理，论文 §4.5](https://jcst.ict.ac.cn/fileup/1000-9000/PDF/JCST-2023-4-2-3285-737.pdf#page=9)
+
+| 立即数 | 实际写回 `t2` | 教学分箱 | 累计覆盖 | 种子决策 |
+| ---: | ---: | --- | ---: | --- |
+| `+1` | 9 | 正数 | 1/3 | 初始种子 |
+| `+2` | 10 | 正数 | 1/3 | 该分箱已经命中 |
+| `0` | 8 | 零 | 2/3 | 保留，首次命中零 |
+| `−1` | 7 | 负数 | 3/3 | 保留，首次命中负数 |
+
+例如 `+1` 的提交记录里，`inst 00128393` 的立即数是 `0x001`，`wen 1 dst 07 data ...0009` 表示向 `t2` 写回 `9`。四个程序均通过 DiffTest，最终种子为 **`+1`、`0`、`−1`**。 `+2` 写回检查也通过了，但它和 `+1` 属于同一个教学分箱。 [结果报告](./assets/practice/03-ADDI/report.json) · [提交日志 `+1`](./assets/practice/03-ADDI/plus-1.txt) · [`+2`](./assets/practice/03-ADDI/plus-2.txt) · [`0`](./assets/practice/03-ADDI/zero.txt) · [`−1`](./assets/practice/03-ADDI/minus-1.txt)
+
+固定镜像归档为 [`+1`](./assets/practice/03-ADDI/plus-1.bin)、[`+2`](./assets/practice/03-ADDI/plus-2.bin)、[`0`](./assets/practice/03-ADDI/zero.bin)、[`−1`](./assets/practice/03-ADDI/minus-1.bin)。原工作区的脚本会重新生成镜像、运行并输出新的报告。
+
+```bash
+python3 "$minjie/addi_coverage_demo.py"
+```
+
+## 8.4 用官方 XFUZZ 测量实际 MUX 覆盖
+
+使用 XFUZZ 官方文档推荐的 FuzzingNutShell 示例，在独立 WSL 目录中按固定源码归档构建。NutShell 示例固定在 `a8ff113`，配套 DiffTest `abfdcdf`、XFUZZ `901d963`、LibAFL `a98805b`。用 Mill 0.11.8 生成插入 MUX 探针的 RTL，再将 Rust 生成的 `libfuzzer.a` 链接进 Verilator 仿真器 `build/fuzzer`。公开示例的版本可以逐项核对，2023 年 §5.2 的完整实验版本仍未确认。 [官方说明](https://github.com/OpenXiangShan/xfuzz#coverage-instrumentation-for-chisel-designs) · [示例源码](https://github.com/poemonsense/FuzzingNutShell/tree/a8ff113cd6161bb5809480d167fdf5200bfdafd8) · [源码版本](./assets/practice/04-XFUZZ/source-versions.txt) · [归档校验值](./assets/practice/04-XFUZZ/source-archives.sha256)
+
+以下构建命令在已配置 Java、Mill、Rust 和 Verilator 的 FuzzingNutShell 目录执行。`ccover/` 及其 LibAFL 依赖使用该示例固定的版本。 [Rust 构建日志](./assets/practice/04-XFUZZ/xfuzz-build.txt) · [RTL 生成日志](./assets/practice/04-XFUZZ/rtl-build.txt) · [仿真器构建日志](./assets/practice/04-XFUZZ/simulator-build.txt) · [Cargo 依赖锁定文件](./assets/practice/04-XFUZZ/xfuzz-Cargo.lock)
+
+```bash
+export NOOP_HOME="$PWD"
+export NUTSHELL_HOME="$PWD"
+export XFUZZ_HOME="$PWD/ccover"
+(cd ccover && cargo build --release)
+make sim-verilog CORE=inorder BOARD=sim FIRRTL_COVER=mux -j2
+make emu CORE=inorder BOARD=sim XFUZZ=1 FIRRTL_COVER=mux NO_ZSTD_COMPRESSION=1 -j6
+```
+
+首次启动使用示例附带的 NEMU。旧库缺少这版 DiffTest 要求的 `difftest_display` 符号，仿真在加载参考库时退出。改用前面 MinJie 实验已验证的 NEMU `af9d4ce` 后，通过了四个固定用例。覆盖类型选 `firrtl.mux`，使用固定输入模式和仿真随机种子 `0`。先单跑 `+1`，再按 `+1`、重复 `+1`、`+2`、`0`、`−1` 的顺序运行，最后在新的进程里重复整组。 [首次启动失败日志](./assets/practice/04-XFUZZ/bundled-nemu-failure.txt) · [实际运行版本](./assets/practice/04-XFUZZ/runtime-versions.txt) · [官方固定输入入口](https://github.com/OpenXiangShan/xfuzz/blob/901d963680c8e53115ac0e8b1e09039699bb6885/src/lib.rs)
+
+```text
+[02] commit pc 0000000080000008 inst 00128393 wen 1 dst 07 data 0000000000000009 idx 000
+COVERAGE: mux, 1410, 634, 634
+Total Coverage:       44.965%
+```
+
+`+1` 单跑日志里，提交记录确认 `t2=9`，`COVERAGE` 的三个数字分别是可计数的 MUX 覆盖点总数、本次命中数、累计命中数。Rust 端同时报告累计百分比。整组结果如下。 [单跑 `+1` 日志](./assets/practice/04-XFUZZ/plus-1.txt)
+
+| 输入 | 实际写回 `t2` | 单次命中 | 累计命中 | 新增点 |
+| --- | ---: | ---: | ---: | ---: |
+| `+1` | 9 | 634 | 634/1410 | 634 |
+| 重复 `+1` | 9 | 634 | 634/1410 | 0 |
+| `+2` | 10 | 634 | 634/1410 | 0 |
+| `0` | 8 | 634 | 634/1410 | 0 |
+| `−1` | 7 | 644 | 644/1410 | 10 |
+
+整组最终为 **644/1410（45.674%）**，同配置复跑的写回值和覆盖计数一致。教学分箱把 `0` 单独列为一个输入类别，所以它新增一个分箱。这里计数的是整个短程序运行期间发生过翻转的 MUX 选择条件，`0` 没有增添新的命中。`−1` 在这组输入中增加 10 个 MUX 覆盖点，日志给出的是计数，尚未定位这些点分别对应哪些电路。本地结果来自固定输入回放，论文 §5.2 评估的是自动生成测试。 [序列日志](./assets/practice/04-XFUZZ/sequence.txt) · [复跑日志](./assets/practice/04-XFUZZ/sequence-repeat.txt) · [结果报告](./assets/practice/04-XFUZZ/report.json) · [MUX 覆盖实现](https://github.com/OpenXiangShan/xfuzz/blob/901d963680c8e53115ac0e8b1e09039699bb6885/instrumentation/src/xfuzz/MuxCoverTransform.scala)
+
+已有 WSL 环境使用下面的入口。脚本先单跑 `+1`，再跑两遍完整序列，将输入镜像放在 `--` 后的仿真参数之前。仿真端使用 `-s 0`、`-b 0 -e 5000`、`-C 5000 -I 64`、`--ram-size 128MB` 和 `--dump-commit-trace`。公开日志首行保留了 `fuzzer` 的调用参数，本机路径用目录变量表示。 [实际复跑命令](./assets/practice/04-XFUZZ/replay-command.txt)
+
+```bash
+xfuzz_lab="${XFUZZ_LAB_DIR:?请先设置 XFUZZ 实验目录}"
+demo="${XFUZZ_DEMO_DIR:?请先设置已构建的 FuzzingNutShell 目录}"
+python3 "$xfuzz_lab/run_fixed_addi.py" "$demo"
+```

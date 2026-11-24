@@ -1,0 +1,1672 @@
+cargo build --release
+    Updating crates.io index
+warning: spurious network error (2 tries remaining): [56] Failure when receiving data from the peer (OpenSSL SSL_read: OpenSSL/3.6.2: error:0A000126:SSL routines::unexpected eof while reading, errno 0)
+warning: spurious network error (2 tries remaining): [55] Failed sending data to the peer (OpenSSL SSL_read: SSL_ERROR_SYSCALL, errno 0)
+warning: spurious network error (2 tries remaining): [55] Failed sending data to the peer (OpenSSL SSL_read: SSL_ERROR_SYSCALL, errno 0)
+warning: spurious network error (2 tries remaining): [55] Failed sending data to the peer (OpenSSL SSL_read: SSL_ERROR_SYSCALL, errno 0)
+warning: spurious network error (2 tries remaining): [55] Failed sending data to the peer (OpenSSL SSL_read: SSL_ERROR_SYSCALL, errno 0)
+     Locking 149 packages to latest compatible versions
+      Adding md5 v0.7.0 (available: v0.8.1)
+      Adding rand v0.8.8 (available: v0.10.4)
+ Downloading crates ...
+  Downloaded c2rust-bitfields-derive v0.18.0
+  Downloaded adler v1.0.2
+  Downloaded anstyle-query v1.1.5
+  Downloaded xxhash-rust v0.8.21
+  Downloaded wait-timeout v0.2.1
+  Downloaded autocfg v1.5.1
+  Downloaded version_check v0.9.5
+  Downloaded c2rust-bitfields v0.18.0
+  Downloaded adler2 v2.0.1
+  Downloaded cfg-if v1.0.5
+  Downloaded zmij v1.0.23
+  Downloaded bitflags v1.3.2
+  Downloaded cassowary v0.3.0
+  Downloaded bitflags v2.13.2
+  Downloaded anstream v1.0.0
+  Downloaded unicode-ident v1.0.27
+  Downloaded itoa v1.0.19
+  Downloaded addr2line v0.27.1
+  Downloaded anstyle v1.0.14
+  Downloaded hostname v0.3.1
+  Downloaded anstyle-parse v1.0.0
+  Downloaded either v1.19.0
+  Downloaded num-traits v0.2.19
+  Downloaded uuid v1.29.3
+  Downloaded ahash v0.8.13
+  Downloaded bincode v1.3.3
+  Downloaded lazy_static v1.5.1
+  Downloaded is_terminal_polyfill v1.70.2
+  Downloaded backtrace v0.3.77
+  Downloaded clap v4.6.9
+  Downloaded indoc v2.0.8
+  Downloaded zerocopy v0.8.64
+  Downloaded unicode-width v0.1.14
+  Downloaded aho-corasick v1.1.5
+  Downloaded postcard v1.2.0
+  Downloaded itertools v0.11.0
+  Downloaded paste v1.0.15
+  Downloaded signal-hook-mio v0.2.5
+  Downloaded signal-hook-registry v1.4.8
+  Downloaded quote v1.0.47
+  Downloaded thiserror v2.0.21
+  Downloaded typed-builder-macro v0.16.2
+  Downloaded ctor v0.2.9
+  Downloaded meminterval v0.4.2
+  Downloaded serde_core v1.0.229
+  Downloaded rustversion v1.0.23
+  Downloaded erased-serde v0.3.31
+  Downloaded parking_lot_core v0.9.12
+  Downloaded embedded-io v0.6.1
+  Downloaded match_cfg v0.1.0
+  Downloaded rand_core v0.6.4
+  Downloaded heck v0.4.1
+  Downloaded scopeguard v1.2.0
+  Downloaded clap_derive v4.6.9
+  Downloaded pin-utils v0.1.1
+  Downloaded serial_test v2.0.0
+  Downloaded thiserror-impl v2.0.21
+  Downloaded strum_macros v0.25.3
+  Downloaded serial_test_derive v2.0.0
+  Downloaded colorchoice v1.0.5
+  Downloaded clap_lex v1.1.2
+  Downloaded errno v0.3.15
+  Downloaded memoffset v0.7.1
+  Downloaded tuple_list v0.1.3
+  Downloaded md5 v0.7.0
+  Downloaded rand_chacha v0.3.1
+  Downloaded strum v0.25.0
+  Downloaded num_enum v0.7.6
+  Downloaded log v0.4.35
+  Downloaded typed-builder v0.16.2
+  Downloaded uds v0.4.2
+  Downloaded dashmap v5.5.3
+  Downloaded getrandom v0.4.3
+  Downloaded serde_derive v1.0.229
+  Downloaded embedded-io v0.4.0
+  Downloaded cobs v0.3.0
+  Downloaded ppv-lite86 v0.2.21
+  Downloaded libm v0.2.16
+  Downloaded rustc-demangle v0.1.28
+  Downloaded num_enum_derive v0.7.6
+  Downloaded memchr v2.8.3
+  Downloaded smallvec v1.16.6
+  Downloaded getrandom v0.2.17
+  Downloaded lock_api v0.4.14
+  Downloaded once_cell v1.21.4
+  Downloaded signal-hook v0.3.18
+  Downloaded parking_lot v0.12.5
+  Downloaded miniz_oxide v0.7.4
+  Downloaded proc-macro2 v1.0.107
+  Downloaded miniz_oxide v0.9.1
+  Downloaded serde v1.0.229
+  Downloaded rand v0.8.8
+  Downloaded mio v0.8.11
+  Downloaded crossterm v0.27.0
+  Downloaded hashbrown v0.14.5
+  Downloaded clap_builder v4.6.7
+  Downloaded ratatui v0.23.0
+  Downloaded regex v1.13.2
+  Downloaded serde_json v1.0.154
+  Downloaded syn v2.0.119
+  Downloaded syn v1.0.109
+  Downloaded nix v0.26.4
+  Downloaded syn v3.0.10
+  Downloaded unicode-segmentation v1.13.3
+  Downloaded regex-syntax v0.8.12
+  Downloaded gimli v0.34.0
+  Downloaded object v0.40.0
+  Downloaded libc v0.2.191
+  Downloaded regex-automata v0.4.19
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.27
+   Compiling libc v0.2.191
+   Compiling cfg-if v1.0.5
+   Compiling serde_core v1.0.229
+   Compiling rustversion v1.0.23
+   Compiling zerocopy v0.8.64
+   Compiling serde v1.0.229
+   Compiling autocfg v1.5.1
+   Compiling parking_lot_core v0.9.12
+   Compiling memchr v2.8.3
+   Compiling scopeguard v1.2.0
+   Compiling smallvec v1.16.6
+   Compiling version_check v0.9.5
+   Compiling log v0.4.35
+   Compiling once_cell v1.21.4
+   Compiling thiserror v2.0.21
+   Compiling signal-hook v0.3.18
+   Compiling getrandom v0.4.3
+   Compiling zmij v1.0.23
+   Compiling lock_api v0.4.14
+   Compiling syn v1.0.109
+   Compiling paste v1.0.15
+   Compiling serde_json v1.0.154
+   Compiling adler2 v2.0.1
+   Compiling ahash v0.8.13
+   Compiling heck v0.4.1
+   Compiling gimli v0.34.0
+   Compiling memoffset v0.7.1
+   Compiling num-traits v0.2.19
+   Compiling utf8parse v0.2.2
+   Compiling anstyle-parse v1.0.0
+   Compiling object v0.40.0
+   Compiling aho-corasick v1.1.5
+   Compiling miniz_oxide v0.9.1
+   Compiling bitflags v2.13.2
+   Compiling anstyle v1.0.14
+   Compiling colorchoice v1.0.5
+   Compiling regex-syntax v0.8.12
+   Compiling rustc-demangle v0.1.28
+   Compiling lazy_static v1.5.1
+   Compiling itoa v1.0.19
+   Compiling bitflags v1.3.2
+   Compiling libm v0.2.16
+   Compiling match_cfg v0.1.0
+   Compiling is_terminal_polyfill v1.70.2
+   Compiling adler v1.0.2
+   Compiling either v1.19.0
+   Compiling anstyle-query v1.1.5
+   Compiling pin-utils v0.1.1
+   Compiling miniz_oxide v0.7.4
+   Compiling anstream v1.0.0
+   Compiling indoc v2.0.8
+   Compiling cassowary v0.3.0
+   Compiling heck v0.5.0
+   Compiling itertools v0.11.0
+   Compiling unicode-segmentation v1.13.3
+   Compiling tuple_list v0.1.3
+   Compiling syn v3.0.10
+   Compiling syn v2.0.119
+   Compiling strsim v0.11.1
+   Compiling clap_lex v1.1.2
+   Compiling xxhash-rust v0.8.21
+   Compiling unicode-width v0.1.14
+   Compiling libafl_bolts v0.11.2 ($XFUZZ_DEMO_DIR/ccover/LibAFL/libafl_bolts)
+   Compiling libafl v0.11.2 ($XFUZZ_DEMO_DIR/ccover/LibAFL/libafl)
+warning: unexpected `cfg` condition name: `docrs`
+  --> LibAFL/libafl/build.rs:16:22
+   |
+16 | ...ot(docrs), ...
+   |       ^^^^^ help: there is a config with a similar name: `docsrs`
+   |
+   = help: consider using a Cargo feature instead
+   = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:
+            [lints.rust]
+            unexpected_cfgs = { level = "warn", check-cfg = ['cfg(docrs)'] }
+   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+   = note: `#[warn(unexpected_cfgs)]` on by default
+
+   Compiling clap_builder v4.6.7
+   Compiling md5 v0.7.0
+   Compiling errno v0.3.15
+   Compiling getrandom v0.2.17
+   Compiling mio v0.8.11
+   Compiling uds v0.4.2
+   Compiling signal-hook-registry v1.4.8
+   Compiling rand_core v0.6.4
+   Compiling addr2line v0.27.1
+   Compiling regex-automata v0.4.19
+   Compiling parking_lot v0.12.5
+   Compiling signal-hook-mio v0.2.5
+   Compiling nix v0.26.4
+   Compiling hostname v0.3.1
+   Compiling wait-timeout v0.2.1
+   Compiling crossterm v0.27.0
+   Compiling ppv-lite86 v0.2.21
+   Compiling regex v1.13.2
+   Compiling rand_chacha v0.3.1
+   Compiling rand v0.8.8
+   Compiling c2rust-bitfields-derive v0.18.0
+   Compiling uuid v1.29.3
+warning: `libafl` (build script) generated 1 warning
+   Compiling serde_derive v1.0.229
+   Compiling thiserror-impl v2.0.21
+   Compiling clap_derive v4.6.9
+   Compiling strum_macros v0.25.3
+   Compiling num_enum_derive v0.7.6
+   Compiling serial_test_derive v2.0.0
+   Compiling libafl_derive v0.11.2 ($XFUZZ_DEMO_DIR/ccover/LibAFL/libafl_derive)
+   Compiling typed-builder-macro v0.16.2
+   Compiling ctor v0.2.9
+   Compiling c2rust-bitfields v0.18.0
+   Compiling num_enum v0.7.6
+   Compiling cobs v0.3.0
+   Compiling strum v0.25.0
+   Compiling ratatui v0.23.0
+   Compiling clap v4.6.9
+   Compiling typed-builder v0.16.2
+   Compiling hashbrown v0.14.5
+   Compiling postcard v1.2.0
+   Compiling erased-serde v0.3.31
+   Compiling bincode v1.3.3
+   Compiling meminterval v0.4.2
+   Compiling backtrace v0.3.77
+   Compiling dashmap v5.5.3
+   Compiling serial_test v2.0.0
+warning: unexpected `cfg` condition name: `nightly`
+  --> LibAFL/libafl_bolts/src/lib.rs:10:13
+   |
+10 | ...tr(nightly, f...
+   |       ^^^^^^^
+   |
+   = help: expected names are: `docsrs`, `feature`, and `test` and 32 more
+   = help: consider using a Cargo feature instead
+   = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:
+            [lints.rust]
+            unexpected_cfgs = { level = "warn", check-cfg = ['cfg(nightly)'] }
+   = help: or consider adding `println!("cargo::rustc-check-cfg=cfg(nightly)");` to the top of the `build.rs`
+   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+   = note: `#[warn(unexpected_cfgs)]` on by default
+
+warning: unexpected `cfg` condition name: `nightly`
+  --> LibAFL/libafl_bolts/src/lib.rs:12:13
+   |
+12 | ...tr(nightly, f...
+   |       ^^^^^^^
+   |
+   = help: consider using a Cargo feature instead
+   = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:
+            [lints.rust]
+            unexpected_cfgs = { level = "warn", check-cfg = ['cfg(nightly)'] }
+   = help: or consider adding `println!("cargo::rustc-check-cfg=cfg(nightly)");` to the top of the `build.rs`
+   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition name: `nightly`
+  --> LibAFL/libafl_bolts/src/lib.rs:14:13
+   |
+14 | ...tr(nightly, f...
+   |       ^^^^^^^
+   |
+   = help: consider using a Cargo feature instead
+   = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:
+            [lints.rust]
+            unexpected_cfgs = { level = "warn", check-cfg = ['cfg(nightly)'] }
+   = help: or consider adding `println!("cargo::rustc-check-cfg=cfg(nightly)");` to the top of the `build.rs`
+   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition name: `nightly`
+   --> LibAFL/libafl_bolts/src/lib.rs:597:15
+    |
+597 | ...ot(nightly), ...
+    |       ^^^^^^^
+    |
+    = help: consider using a Cargo feature instead
+    = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:
+             [lints.rust]
+             unexpected_cfgs = { level = "warn", check-cfg = ['cfg(nightly)'] }
+    = help: or consider adding `println!("cargo::rustc-check-cfg=cfg(nightly)");` to the top of the `build.rs`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition name: `nightly`
+   --> LibAFL/libafl_bolts/src/lib.rs:600:7
+    |
+600 | #[cfg(nightly)]
+    |       ^^^^^^^
+    |
+    = help: consider using a Cargo feature instead
+    = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:
+             [lints.rust]
+             unexpected_cfgs = { level = "warn", check-cfg = ['cfg(nightly)'] }
+    = help: or consider adding `println!("cargo::rustc-check-cfg=cfg(nightly)");` to the top of the `build.rs`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unnecessary qualification
+   --> LibAFL/libafl_bolts/src/core_affinity.rs:270:17
+    |
+270 | ...   mem::...et_t>(),
+    |       ^^^^^...^^^^^
+    |
+note: the lint level is defined here
+   --> LibAFL/libafl_bolts/src/lib.rs:41:5
+    |
+ 41 |     unuse...tions,
+    |     ^^^^^...^^^^^
+help: remove the unnecessary path segments
+    |
+270 -                 mem::size_of::<cpu_set_t>(),
+270 +                 size_of::<cpu_set_t>(),
+    |
+
+warning: unnecessary qualification
+   --> LibAFL/libafl_bolts/src/core_affinity.rs:289:17
+    |
+289 | ...   mem::...et_t>(),
+    |       ^^^^^...^^^^^
+    |
+help: remove the unnecessary path segments
+    |
+289 -                 mem::size_of::<cpu_set_t>(),
+289 +                 size_of::<cpu_set_t>(),
+    |
+
+warning: unexpected `cfg` condition name: `target_arsch`
+  --> LibAFL/libafl_bolts/src/cpu.rs:11:5
+   |
+11 |     targe...cv32"
+   |     ^^^^^...^^^^^
+   |
+   = help: consider using a Cargo feature instead
+   = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:
+            [lints.rust]
+            unexpected_cfgs = { level = "warn", check-cfg = ['cfg(target_arsch, values("riscv32"))'] }
+   = help: or consider adding `println!("cargo::rustc-check-cfg=cfg(target_arsch, values(\"riscv32\"))");` to the top of the `build.rs`
+   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+help: there is a config with a similar name and value
+   |
+11 -     target_arsch = "riscv32"
+11 +     target_arch = "riscv32"
+   |
+
+warning: unexpected `cfg` condition name: `fature`
+    --> LibAFL/libafl_bolts/src/llmp.rs:2477:19
+     |
+2477 | ...fg(fatur...ebug")]
+     |       ^^^^^...^^^^^
+     |
+     = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+help: there is a config with a similar name and value
+     |
+2477 |             #[cfg(feature = "llmp_debug")]
+     |                    +
+
+warning: unnecessary qualification
+    --> LibAFL/libafl_bolts/src/llmp.rs:3178:21
+     |
+3178 | ...   std::...fused => {
+     |       ^^^^^...^^^^^
+     |
+help: remove the unnecessary path segments
+     |
+3178 -                     std::io::ErrorKind::ConnectionRefused => {
+3178 +                     ErrorKind::ConnectionRefused => {
+     |
+
+warning: unexpected `cfg` condition value: `freebsd`
+   --> LibAFL/libafl_bolts/src/minibsod.rs:133:11
+    |
+133 | ...ll(targe...ebsd", t...
+    |       ^^^^^...^^^^^
+    |
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+help: `freebsd` is an expected value for `target_os`
+    |
+133 - #[cfg(all(target_vendor = "freebsd", target_arch = "aarch64"))]
+133 + #[cfg(all(target_os = "freebsd", target_arch = "aarch64"))]
+    |
+
+warning: unexpected `cfg` condition value: `apple`
+   --> LibAFL/libafl_bolts/src/minibsod.rs:851:7
+    |
+851 | #[cfg(targe...pple")]
+    |       ^^^^^...^^^^^
+    |
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+help: `apple` is an expected value for `target_vendor`
+    |
+851 - #[cfg(target_env = "apple")]
+851 + #[cfg(target_vendor = "apple")]
+    |
+
+warning: unexpected `cfg` condition value: `apple`
+   --> LibAFL/libafl_bolts/src/minibsod.rs:937:5
+    |
+937 |     targe...pple",
+    |     ^^^^^...^^^^^
+    |
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+help: `apple` is an expected value for `target_vendor`
+    |
+937 -     target_env = "apple",
+937 +     target_vendor = "apple",
+    |
+
+warning: unnecessary qualification
+   --> LibAFL/libafl_bolts/src/shmem.rs:214:31
+    |
+214 | ...>= core:...::<T>());
+    |       ^^^^^...^^^^^
+    |
+help: remove the unnecessary path segments
+    |
+214 -         assert!(self.len() >= core::mem::size_of::<T>());
+214 +         assert!(self.len() >= size_of::<T>());
+    |
+
+warning: unnecessary qualification
+   --> LibAFL/libafl_bolts/src/shmem.rs:227:31
+    |
+227 | ...>= core:...::<T>());
+    |       ^^^^^...^^^^^
+    |
+help: remove the unnecessary path segments
+    |
+227 -         assert!(self.len() >= core::mem::size_of::<T>());
+227 +         assert!(self.len() >= size_of::<T>());
+    |
+
+warning: unnecessary qualification
+   --> LibAFL/libafl_bolts/src/shmem.rs:239:31
+    |
+239 | ...>= core:...::<T>() ...
+    |       ^^^^^...^^^^^
+    |
+help: remove the unnecessary path segments
+    |
+239 -         assert!(self.len() >= core::mem::size_of::<T>() * len);
+239 +         assert!(self.len() >= size_of::<T>() * len);
+    |
+
+warning: unnecessary qualification
+   --> LibAFL/libafl_bolts/src/shmem.rs:250:31
+    |
+250 | ...>= core:...::<T>() ...
+    |       ^^^^^...^^^^^
+    |
+help: remove the unnecessary path segments
+    |
+250 -         assert!(self.len() >= core::mem::size_of::<T>() * len);
+250 +         assert!(self.len() >= size_of::<T>() * len);
+    |
+
+warning: unnecessary qualification
+   --> LibAFL/libafl_bolts/src/shmem.rs:292:24
+    |
+292 | ...em(core:...::<T>())
+    |       ^^^^^...^^^^^
+    |
+help: remove the unnecessary path segments
+    |
+292 -         self.new_shmem(core::mem::size_of::<T>())
+292 +         self.new_shmem(size_of::<T>())
+    |
+
+warning: unnecessary qualification
+   --> LibAFL/libafl_bolts/src/shmem.rs:300:24
+    |
+300 | ...em(core:...::<T>() ...
+    |       ^^^^^...^^^^^
+    |
+help: remove the unnecessary path segments
+    |
+300 -         self.new_shmem(core::mem::size_of::<T>() * len)
+300 +         self.new_shmem(size_of::<T>() * len)
+    |
+
+warning: unnecessary qualification
+   --> LibAFL/libafl_bolts/src/shmem.rs:308:41
+    |
+308 | ...d, core:...::<T>())
+    |       ^^^^^...^^^^^
+    |
+help: remove the unnecessary path segments
+    |
+308 -         self.shmem_from_id_and_size(id, core::mem::size_of::<T>())
+308 +         self.shmem_from_id_and_size(id, size_of::<T>())
+    |
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+  --> LibAFL/libafl_bolts/src/ownedref.rs:73:5
+   |
+73 |     #[must_use]
+   |     ^^^^^^^^^^^
+   |
+   = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+   = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+   = note: `#[warn(unused_attributes)]` (part of `#[warn(unused)]`) on by default
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+  --> LibAFL/libafl_bolts/src/ownedref.rs:86:5
+   |
+86 |     #[must_use]
+   |     ^^^^^^^^^^^
+   |
+   = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+   = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+  --> LibAFL/libafl_bolts/src/ownedref.rs:94:5
+   |
+94 |     #[must_use]
+   |     ^^^^^^^^^^^
+   |
+   = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+   = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+   --> LibAFL/libafl_bolts/src/ownedref.rs:137:5
+    |
+137 |     #[must_use]
+    |     ^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+    = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+   --> LibAFL/libafl_bolts/src/ownedref.rs:147:5
+    |
+147 |     #[must_use]
+    |     ^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+    = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+   --> LibAFL/libafl_bolts/src/ownedref.rs:160:5
+    |
+160 |     #[must_use]
+    |     ^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+    = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+   --> LibAFL/libafl_bolts/src/ownedref.rs:168:5
+    |
+168 |     #[must_use]
+    |     ^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+    = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+   --> LibAFL/libafl_bolts/src/ownedref.rs:337:5
+    |
+337 |     #[must_use]
+    |     ^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+    = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+   --> LibAFL/libafl_bolts/src/ownedref.rs:351:5
+    |
+351 |     #[must_use]
+    |     ^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+    = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+   --> LibAFL/libafl_bolts/src/ownedref.rs:359:5
+    |
+359 |     #[must_use]
+    |     ^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+    = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+   --> LibAFL/libafl_bolts/src/ownedref.rs:521:5
+    |
+521 |     #[must_use]
+    |     ^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+    = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+   --> LibAFL/libafl_bolts/src/ownedref.rs:533:5
+    |
+533 |     #[must_use]
+    |     ^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+    = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+   --> LibAFL/libafl_bolts/src/ownedref.rs:547:5
+    |
+547 |     #[must_use]
+    |     ^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+    = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+   --> LibAFL/libafl_bolts/src/ownedref.rs:555:5
+    |
+555 |     #[must_use]
+    |     ^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+    = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+   --> LibAFL/libafl_bolts/src/ownedref.rs:660:5
+    |
+660 |     #[must_use]
+    |     ^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+    = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+   --> LibAFL/libafl_bolts/src/ownedref.rs:673:5
+    |
+673 |     #[must_use]
+    |     ^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+    = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+   --> LibAFL/libafl_bolts/src/ownedref.rs:681:5
+    |
+681 |     #[must_use]
+    |     ^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+    = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+   --> LibAFL/libafl_bolts/src/ownedref.rs:721:5
+    |
+721 |     #[must_use]
+    |     ^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+    = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+   --> LibAFL/libafl_bolts/src/ownedref.rs:743:5
+    |
+743 |     #[must_use]
+    |     ^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+    = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+   --> LibAFL/libafl_bolts/src/ownedref.rs:751:5
+    |
+751 |     #[must_use]
+    |     ^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+    = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+
+warning: struct `ipc_perm` is never constructed
+   --> LibAFL/libafl_bolts/src/shmem.rs:641:16
+    |
+641 | ...ct ipc_perm {
+    |       ^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: struct `shmid_ds` is never constructed
+   --> LibAFL/libafl_bolts/src/shmem.rs:658:16
+    |
+658 | ...ct shmid_ds {
+    |       ^^^^^^^^
+
+warning: creating a mutable reference to mutable static
+    --> LibAFL/libafl_bolts/src/llmp.rs:2270:55
+     |
+2270 | ...er(&mut ...STATE) } {
+     |       ^^^^^...^^^^^ mutable reference to mutable static
+     |
+     = note: mutable references to mutable statics are dangerous; it's undefined behavior if any other pointer to the static is used or if any other reference is created for the static while the mutable reference lives
+     = note: for more information, see <https://doc.rust-lang.org/edition-guide/rust-2024/static-mut-references.html>
+     = note: `#[warn(static_mut_refs)]` (part of `#[warn(rust_2024_compatibility)]`) on by default
+help: use `&raw mut` instead to create a raw pointer
+     |
+2270 |         if let Err(e) = unsafe { setup_signal_handler(&raw mut LLMP_SIGHANDLER_STATE) } {
+     |                                                        +++
+
+warning: direct cast of function item into an integer
+   --> LibAFL/libafl_bolts/src/os/unix_signals.rs:462:37
+    |
+462 | ...al as usize;
+    |       ^^^^^^^^
+    |
+    = note: `#[warn(function_casts_as_integer)]` on by default
+help: first cast to a pointer `as *const ()`
+    |
+462 |     sa.sa_sigaction = handle_signal as *const () as usize;
+    |                                     ++++++++++++
+
+warning: creating a shared reference to mutable static
+   --> LibAFL/libafl_bolts/src/serdeany.rs:105:26
+    |
+105 |                           *REGISTRY
+    |  __________________________^
+106 | |                             .deserializers
+    | |__________________________________________^ shared reference to mutable static
+...
+640 |   creat...eAny);
+    |   -----...----- in this macro invocation
+    |
+    = note: shared references to mutable statics are dangerous; it's undefined behavior if the static is mutated or if a mutable reference is created for it while the shared reference lives
+    = note: for more information, see <https://doc.rust-lang.org/edition-guide/rust-2024/static-mut-references.html>
+    = note: this warning originates in the macro `create_serde_registry_for_trait` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: creating a mutable reference to mutable static
+   --> LibAFL/libafl_bolts/src/serdeany.rs:165:25
+    |
+165 |                         REGISTRY.register::<T>();
+    |                         ^^^^^^^^ mutable reference to mutable static
+...
+640 | creat...eAny);
+    | -----...----- in this macro invocation
+    |
+    = note: mutable references to mutable statics are dangerous; it's undefined behavior if any other pointer to the static is used or if any other reference is created for the static while the mutable reference lives
+    = note: for more information, see <https://doc.rust-lang.org/edition-guide/rust-2024/static-mut-references.html>
+    = note: this warning originates in the macro `create_serde_registry_for_trait` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: creating a mutable reference to mutable static
+   --> LibAFL/libafl_bolts/src/serdeany.rs:176:25
+    |
+176 |                         REGISTRY.finalize();
+    |                         ^^^^^^^^ mutable reference to mutable static
+...
+640 | creat...eAny);
+    | -----...----- in this macro invocation
+    |
+    = note: mutable references to mutable statics are dangerous; it's undefined behavior if any other pointer to the static is used or if any other reference is created for the static while the mutable reference lives
+    = note: for more information, see <https://doc.rust-lang.org/edition-guide/rust-2024/static-mut-references.html>
+    = note: this warning originates in the macro `create_serde_registry_for_trait` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: creating a shared reference to mutable static
+   --> LibAFL/libafl_bolts/src/serdeany.rs:270:29
+    |
+270 | /                             REGISTRY
+271 | |                                 .deserializers
+    | |______________________________________________^ shared reference to mutable static
+...
+640 |   creat...eAny);
+    |   -----...----- in this macro invocation
+    |
+    = note: shared references to mutable statics are dangerous; it's undefined behavior if the static is mutated or if a mutable reference is created for it while the shared reference lives
+    = note: for more information, see <https://doc.rust-lang.org/edition-guide/rust-2024/static-mut-references.html>
+    = note: this warning originates in the macro `create_serde_registry_for_trait` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: creating a shared reference to mutable static
+   --> LibAFL/libafl_bolts/src/serdeany.rs:540:29
+    |
+540 | /                             REGISTRY
+541 | |                                 .deserializers
+    | |______________________________________________^ shared reference to mutable static
+...
+640 |   creat...eAny);
+    |   -----...----- in this macro invocation
+    |
+    = note: shared references to mutable statics are dangerous; it's undefined behavior if the static is mutated or if a mutable reference is created for it while the shared reference lives
+    = note: for more information, see <https://doc.rust-lang.org/edition-guide/rust-2024/static-mut-references.html>
+    = note: this warning originates in the macro `create_serde_registry_for_trait` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: unexpected `cfg` condition name: `nightly`
+  --> LibAFL/libafl/src/lib.rs:10:13
+   |
+10 | ...tr(nightly, f...
+   |       ^^^^^^^
+   |
+   = help: expected names are: `docsrs`, `feature`, and `test` and 32 more
+   = help: consider using a Cargo feature instead
+   = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:
+            [lints.rust]
+            unexpected_cfgs = { level = "warn", check-cfg = ['cfg(nightly)'] }
+   = help: or consider adding `println!("cargo::rustc-check-cfg=cfg(nightly)");` to the top of the `build.rs`
+   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+   = note: `#[warn(unexpected_cfgs)]` on by default
+
+warning: unexpected `cfg` condition name: `nightly`
+  --> LibAFL/libafl/src/lib.rs:12:13
+   |
+12 | ...tr(nightly, f...
+   |       ^^^^^^^
+   |
+   = help: consider using a Cargo feature instead
+   = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:
+            [lints.rust]
+            unexpected_cfgs = { level = "warn", check-cfg = ['cfg(nightly)'] }
+   = help: or consider adding `println!("cargo::rustc-check-cfg=cfg(nightly)");` to the top of the `build.rs`
+   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unnecessary qualification
+   --> LibAFL/libafl/src/monitors/tui/mod.rs:522:17
+    |
+522 | ...   core:...clone,
+    |       ^^^^^...^^^^^
+    |
+note: the lint level is defined here
+   --> LibAFL/libafl/src/lib.rs:39:5
+    |
+ 39 |     unuse...tions,
+    |     ^^^^^...^^^^^
+help: remove the unnecessary path segments
+    |
+522 -                 core::clone::Clone::clone,
+522 +                 Clone::clone,
+    |
+
+warning: unnecessary qualification
+   --> LibAFL/libafl/src/monitors/tui/mod.rs:620:16
+    |
+620 | ...if cross...:poll(ti...
+    |       ^^^^^...^^^^^
+    |
+help: remove the unnecessary path segments
+    |
+620 -             if crossterm::event::poll(timeout)? {
+620 +             if event::poll(timeout)? {
+    |
+
+warning: unexpected `cfg` condition value: `no_std`
+  --> LibAFL/libafl/src/observers/mod.rs:31:7
+   |
+31 | #[cfg(featu..._std")]
+   |       ^^^^^...^^^^^
+   |
+   = note: expected values for `feature` are: `adaptive_serialization`, `afl_exec_sec`, `agpl`, `async-std`, `backtrace`, `bincode`, `bitvec`, `casr`, `cli`, `cmin`, `concat-idents`, `concolic_mutation`, `corpus_btreemap`, `crossterm`, `default`, `derive`, `document-features`, `errors_backtrace`, `fork`, `frida_cli`, `futures`, `grammartec`, `gzip`, `introspection`, `libafl_derive`, `libcasr`, `llmp_bind_public`, `llmp_broker_timeouts`, `llmp_compression`, `llmp_debug`, `llmp_small_maps`, `nautilus`, `nix`, `prelude`, and `prometheus-client` and 23 more
+   = help: consider adding `no_std` as a feature in `Cargo.toml`
+   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition value: `no_std`
+   --> LibAFL/libafl/src/observers/mod.rs:419:11
+    |
+419 | ...fg(featu..._std")]
+    |       ^^^^^...^^^^^
+    |
+    = note: expected values for `feature` are: `adaptive_serialization`, `afl_exec_sec`, `agpl`, `async-std`, `backtrace`, `bincode`, `bitvec`, `casr`, `cli`, `cmin`, `concat-idents`, `concolic_mutation`, `corpus_btreemap`, `crossterm`, `default`, `derive`, `document-features`, `errors_backtrace`, `fork`, `frida_cli`, `futures`, `grammartec`, `gzip`, `introspection`, `libafl_derive`, `libcasr`, `llmp_bind_public`, `llmp_broker_timeouts`, `llmp_compression`, `llmp_debug`, `llmp_small_maps`, `nautilus`, `nix`, `prelude`, and `prometheus-client` and 23 more
+    = help: consider adding `no_std` as a feature in `Cargo.toml`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unnecessary qualification
+  --> LibAFL/libafl/src/observers/concolic/mod.rs:31:9
+   |
+31 | ...   core:...::fmt(&s...
+   |       ^^^^^...^^^^^
+   |
+help: remove the unnecessary path segments
+   |
+31 -         core::fmt::Debug::fmt(&self.0, f)
+31 +         Debug::fmt(&self.0, f)
+   |
+
+warning: unnecessary qualification
+  --> LibAFL/libafl/src/observers/concolic/mod.rs:37:9
+   |
+37 | ...   core:...::fmt(&s...
+   |       ^^^^^...^^^^^
+   |
+help: remove the unnecessary path segments
+   |
+37 -         core::fmt::Display::fmt(&self.0, f)
+37 +         Display::fmt(&self.0, f)
+   |
+
+warning: unnecessary qualification
+  --> LibAFL/libafl/src/observers/concolic/serialization_format.rs:96:17
+   |
+96 | ...   binco...d::Io(re...
+   |       ^^^^^...^^^^^
+   |
+help: remove the unnecessary path segments
+   |
+96 -                 bincode::ErrorKind::Io(ref io_err) => match io_err.kind() {
+96 +                 ErrorKind::Io(ref io_err) => match io_err.kind() {
+   |
+
+warning: unexpected `cfg` condition value: `no_std`
+   --> LibAFL/libafl/src/observers/mod.rs:461:19
+    |
+461 | ...fg(featu..._std")]
+    |       ^^^^^...^^^^^
+    |
+    = note: expected values for `feature` are: `adaptive_serialization`, `afl_exec_sec`, `agpl`, `async-std`, `backtrace`, `bincode`, `bitvec`, `casr`, `cli`, `cmin`, `concat-idents`, `concolic_mutation`, `corpus_btreemap`, `crossterm`, `default`, `derive`, `document-features`, `errors_backtrace`, `fork`, `frida_cli`, `futures`, `grammartec`, `gzip`, `introspection`, `libafl_derive`, `libcasr`, `llmp_bind_public`, `llmp_broker_timeouts`, `llmp_compression`, `llmp_debug`, `llmp_small_maps`, `nautilus`, `nix`, `prelude`, and `prometheus-client` and 23 more
+    = help: consider adding `no_std` as a feature in `Cargo.toml`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition value: `no_std`
+   --> LibAFL/libafl/src/observers/mod.rs:486:11
+    |
+486 | ...fg(featu..._std")]
+    |       ^^^^^...^^^^^
+    |
+    = note: expected values for `feature` are: `adaptive_serialization`, `afl_exec_sec`, `agpl`, `async-std`, `backtrace`, `bincode`, `bitvec`, `casr`, `cli`, `cmin`, `concat-idents`, `concolic_mutation`, `corpus_btreemap`, `crossterm`, `default`, `derive`, `document-features`, `errors_backtrace`, `fork`, `frida_cli`, `futures`, `grammartec`, `gzip`, `introspection`, `libafl_derive`, `libcasr`, `llmp_bind_public`, `llmp_broker_timeouts`, `llmp_compression`, `llmp_debug`, `llmp_small_maps`, `nautilus`, `nix`, `prelude`, and `prometheus-client` and 23 more
+    = help: consider adding `no_std` as a feature in `Cargo.toml`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition value: `no_std`
+   --> LibAFL/libafl/src/observers/mod.rs:504:11
+    |
+504 | ...fg(featu..._std")]
+    |       ^^^^^...^^^^^
+    |
+    = note: expected values for `feature` are: `adaptive_serialization`, `afl_exec_sec`, `agpl`, `async-std`, `backtrace`, `bincode`, `bitvec`, `casr`, `cli`, `cmin`, `concat-idents`, `concolic_mutation`, `corpus_btreemap`, `crossterm`, `default`, `derive`, `document-features`, `errors_backtrace`, `fork`, `frida_cli`, `futures`, `grammartec`, `gzip`, `introspection`, `libafl_derive`, `libcasr`, `llmp_bind_public`, `llmp_broker_timeouts`, `llmp_compression`, `llmp_debug`, `llmp_small_maps`, `nautilus`, `nix`, `prelude`, and `prometheus-client` and 23 more
+    = help: consider adding `no_std` as a feature in `Cargo.toml`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: use of deprecated module `core::intrinsics`: import this function via `std::mem` instead
+  --> LibAFL/libafl/src/executors/inprocess.rs:27:22
+   |
+27 | ...s::transmute;
+   |       ^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+   --> LibAFL/libafl/src/events/mod.rs:215:5
+    |
+215 |     #[must_use]
+    |     ^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+    = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+    = note: `#[warn(unused_attributes)]` (part of `#[warn(unused)]`) on by default
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+   --> LibAFL/libafl/src/events/mod.rs:222:5
+    |
+222 |     #[must_use]
+    |     ^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+    = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+   --> LibAFL/libafl/src/feedbacks/map.rs:287:5
+    |
+287 |     #[must_use]
+    |     ^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+    = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+   --> LibAFL/libafl/src/feedbacks/map.rs:295:5
+    |
+295 |     #[must_use]
+    |     ^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+    = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+  --> LibAFL/libafl/src/feedbacks/new_hash_feedback.rs:66:5
+   |
+66 |     #[must_use]
+   |     ^^^^^^^^^^^
+   |
+   = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+   = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+   --> LibAFL/libafl/src/inputs/encoded.rs:205:5
+    |
+205 |     #[must_use]
+    |     ^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+    = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+   --> LibAFL/libafl/src/inputs/encoded.rs:230:5
+    |
+230 |     #[must_use]
+    |     ^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+    = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+   --> LibAFL/libafl/src/inputs/encoded.rs:237:5
+    |
+237 |     #[must_use]
+    |     ^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+    = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+  --> LibAFL/libafl/src/inputs/gramatron.rs:47:5
+   |
+47 |     #[must_use]
+   |     ^^^^^^^^^^^
+   |
+   = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+   = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+  --> LibAFL/libafl/src/mutators/scheduled.rs:50:5
+   |
+50 |     #[must_use]
+   |     ^^^^^^^^^^^
+   |
+   = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+   = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+  --> LibAFL/libafl/src/mutators/scheduled.rs:57:5
+   |
+57 |     #[must_use]
+   |     ^^^^^^^^^^^
+   |
+   = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+   = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+   --> LibAFL/libafl/src/observers/map.rs:452:5
+    |
+452 |     #[must_use]
+    |     ^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+    = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+   --> LibAFL/libafl/src/observers/map.rs:463:5
+    |
+463 |     #[must_use]
+    |     ^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+    = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+    --> LibAFL/libafl/src/observers/map.rs:2301:5
+     |
+2301 |     #[must_use]
+     |     ^^^^^^^^^^^
+     |
+     = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+     = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+    --> LibAFL/libafl/src/observers/map.rs:2313:5
+     |
+2313 |     #[must_use]
+     |     ^^^^^^^^^^^
+     |
+     = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+     = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+  --> LibAFL/libafl/src/observers/cmp.rs:94:5
+   |
+94 |     #[must_use]
+   |     ^^^^^^^^^^^
+   |
+   = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+   = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+   --> LibAFL/libafl/src/observers/cmp.rs:103:5
+    |
+103 |     #[must_use]
+    |     ^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+    = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+   --> LibAFL/libafl/src/observers/cmp.rs:123:5
+    |
+123 |     #[must_use]
+    |     ^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+    = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+   --> LibAFL/libafl/src/observers/stacktrace.rs:180:5
+    |
+180 |     #[must_use]
+    |     ^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+    = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+   --> LibAFL/libafl/src/observers/stacktrace.rs:345:5
+    |
+345 |     #[must_use]
+    |     ^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+    = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+   --> LibAFL/libafl/src/stages/stats.rs:156:5
+    |
+156 |     #[must_use]
+    |     ^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+    = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+   --> LibAFL/libafl/src/stages/mod.rs:224:5
+    |
+224 |     #[must_use]
+    |     ^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+    = help: `#[must_use]` can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+
+warning: a method with this name may be added to the standard library in the future
+   --> LibAFL/libafl/src/executors/forkserver.rs:325:14
+    |
+325 | ...  .setsid()
+    |       ^^^^^^
+    |
+    = help: call with fully qualified syntax `ConfigTarget::setsid(...)` to keep using the current method
+    = warning: once this associated item is added to the standard library, the ambiguity may cause an error or change in behavior!
+    = note: for more information, see issue #48919 <https://github.com/rust-lang/rust/issues/48919>
+    = note: `#[warn(unstable_name_collisions)]` (part of `#[warn(future_incompatible)]`) on by default
+
+warning: specialization is experimental
+  --> LibAFL/libafl_bolts/src/tuples.rs:30:9
+   |
+30 | ...   default co...
+   |       ^^^^^^^
+   |
+   = note: see issue #31844 <https://github.com/rust-lang/rust/issues/31844> for more information
+   = warning: unstable syntax can change at any point in the future, causing a hard error!
+   = note: for more information, see issue #154045 <https://github.com/rust-lang/rust/issues/154045>
+
+warning: `libafl_bolts` (lib) generated 50 warnings (run `cargo fix --lib -p libafl_bolts` to apply 31 suggestions)
+warning: struct `NopExecutor` is never constructed
+   --> LibAFL/libafl/src/executors/mod.rs:155:8
+    |
+155 | ...ct NopExecutor<S> {
+    |       ^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+  --> LibAFL/libafl/src/corpus/testcase.rs:30:17
+   |
+30 | ...se(&self, id: CorpusId) -> Result<Ref<T...put>>, E...
+   |       ^^^^^                          ^^^^^...^^^^^ the same lifetime is hidden here
+   |       |
+   |       the lifetime is elided here
+   |
+   = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+   = note: `#[warn(mismatched_lifetime_syntaxes)]` on by default
+help: use `'_` for type paths
+   |
+30 |     fn testcase(&self, id: CorpusId) -> Result<Ref<'_, Testcase<<Self as UsesInput>::Input>>, Error>;
+   |                                                    +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+  --> LibAFL/libafl/src/corpus/testcase.rs:35:9
+   |
+35 | ...   &self,
+   |       ^^^^^ the lifetime is elided here
+36 | ...   id: CorpusId,
+37 | ... -> Result<RefMu...put>>, E...
+   |               ^^^^^...^^^^^ the same lifetime is hidden here
+   |
+   = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+   |
+37 |     ) -> Result<RefMut<'_, Testcase<<Self as UsesInput>::Input>>, Error>;
+   |                        +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+   --> LibAFL/libafl/src/corpus/inmemory.rs:401:9
+    |
+401 | ...   &self,
+    |       ^^^^^ the lifetime is elided here
+402 | ...   id: CorpusId,
+403 | ... -> Result<core:...put>>, E...
+    |               ^^^^^...^^^^^ the same lifetime is hidden here
+    |
+    = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+    |
+403 |     ) -> Result<core::cell::Ref<'_, Testcase<<Self as UsesInput>::Input>>, Error> {
+    |                                 +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+   --> LibAFL/libafl/src/corpus/inmemory.rs:408:9
+    |
+408 | ...   &self,
+    |       ^^^^^ the lifetime is elided here
+409 | ...   id: CorpusId,
+410 | ... -> Result<core:...put>>, E...
+    |               ^^^^^...^^^^^ the same lifetime is hidden here
+    |
+    = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+    |
+410 |     ) -> Result<core::cell::RefMut<'_, Testcase<<Self as UsesInput>::Input>>, Error> {
+    |                                    +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+   --> LibAFL/libafl/src/corpus/inmemory_ondisk.rs:180:9
+    |
+180 | ...   &self,
+    |       ^^^^^ the lifetime is elided here
+181 | ...   id: CorpusId,
+182 | ... -> Result<core:...put>>, E...
+    |               ^^^^^...^^^^^ the same lifetime is hidden here
+    |
+    = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+    |
+182 |     ) -> Result<core::cell::Ref<'_, Testcase<<Self as UsesInput>::Input>>, Error> {
+    |                                 +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+   --> LibAFL/libafl/src/corpus/inmemory_ondisk.rs:187:9
+    |
+187 | ...   &self,
+    |       ^^^^^ the lifetime is elided here
+188 | ...   id: CorpusId,
+189 | ... -> Result<core:...put>>, E...
+    |               ^^^^^...^^^^^ the same lifetime is hidden here
+    |
+    = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+    |
+189 |     ) -> Result<core::cell::RefMut<'_, Testcase<<Self as UsesInput>::Input>>, Error> {
+    |                                    +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+   --> LibAFL/libafl/src/corpus/ondisk.rs:157:9
+    |
+157 | ...   &self,
+    |       ^^^^^ the lifetime is elided here
+158 | ...   id: CorpusId,
+159 | ... -> Result<core:...put>>, E...
+    |               ^^^^^...^^^^^ the same lifetime is hidden here
+    |
+    = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+    |
+159 |     ) -> Result<core::cell::Ref<'_, Testcase<<Self as UsesInput>::Input>>, Error> {
+    |                                 +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+   --> LibAFL/libafl/src/corpus/ondisk.rs:164:9
+    |
+164 | ...   &self,
+    |       ^^^^^ the lifetime is elided here
+165 | ...   id: CorpusId,
+166 | ... -> Result<core:...put>>, E...
+    |               ^^^^^...^^^^^ the same lifetime is hidden here
+    |
+    = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+    |
+166 |     ) -> Result<core::cell::RefMut<'_, Testcase<<Self as UsesInput>::Input>>, Error> {
+    |                                    +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+   --> LibAFL/libafl/src/corpus/cached.rs:147:17
+    |
+147 | ...se(&self, id: CorpusId) -> Result<core:...put>>, E...
+    |       ^^^^^                          ^^^^^...^^^^^ the same lifetime is hidden here
+    |       |
+    |       the lifetime is elided here
+    |
+    = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+    |
+147 |     fn testcase(&self, id: CorpusId) -> Result<core::cell::Ref<'_, Testcase<Self::Input>>, Error> {
+    |                                                                +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+   --> LibAFL/libafl/src/corpus/cached.rs:152:9
+    |
+152 | ...   &self,
+    |       ^^^^^ the lifetime is elided here
+153 | ...   id: CorpusId,
+154 | ... -> Result<core:...put>>, E...
+    |               ^^^^^...^^^^^ the same lifetime is hidden here
+    |
+    = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+    |
+154 |     ) -> Result<core::cell::RefMut<'_, Testcase<Self::Input>>, Error> {
+    |                                    +++
+
+warning: creating a mutable reference to mutable static
+   --> LibAFL/libafl/src/events/simple.rs:486:60
+    |
+486 | ...er(&mut ...STATE) } {
+    |       ^^^^^...^^^^^ mutable reference to mutable static
+    |
+    = note: mutable references to mutable statics are dangerous; it's undefined behavior if any other pointer to the static is used or if any other reference is created for the static while the mutable reference lives
+    = note: for more information, see <https://doc.rust-lang.org/edition-guide/rust-2024/static-mut-references.html>
+    = note: `#[warn(static_mut_refs)]` (part of `#[warn(rust_2024_compatibility)]`) on by default
+help: use `&raw mut` instead to create a raw pointer
+    |
+486 |             if let Err(_e) = unsafe { setup_signal_handler(&raw mut EVENTMGR_SIGHANDLER_STATE) } {
+    |                                                             +++
+
+warning: creating a mutable reference to mutable static
+    --> LibAFL/libafl/src/events/llmp.rs:1262:60
+     |
+1262 | ...er(&mut ...STATE) } {
+     |       ^^^^^...^^^^^ mutable reference to mutable static
+     |
+     = note: mutable references to mutable statics are dangerous; it's undefined behavior if any other pointer to the static is used or if any other reference is created for the static while the mutable reference lives
+     = note: for more information, see <https://doc.rust-lang.org/edition-guide/rust-2024/static-mut-references.html>
+help: use `&raw mut` instead to create a raw pointer
+     |
+1262 |             if let Err(_e) = unsafe { setup_signal_handler(&raw mut EVENTMGR_SIGHANDLER_STATE) } {
+     |                                                             +++
+
+warning: creating a mutable reference to mutable static
+   --> LibAFL/libafl/src/executors/inprocess.rs:292:24
+    |
+292 | ... = &mut ...STATE;
+    |       ^^^^^...^^^^^ mutable reference to mutable static
+    |
+    = note: mutable references to mutable statics are dangerous; it's undefined behavior if any other pointer to the static is used or if any other reference is created for the static while the mutable reference lives
+    = note: for more information, see <https://doc.rust-lang.org/edition-guide/rust-2024/static-mut-references.html>
+help: use `&raw mut` instead to create a raw pointer
+    |
+292 |             let data = &raw mut GLOBAL_STATE;
+    |                         +++
+
+warning: creating a mutable reference to mutable static
+   --> LibAFL/libafl/src/executors/inprocess.rs:337:28
+    |
+337 | ...le(&mut ...t_ptr, p...
+    |       ^^^^^...^^^^^ mutable reference to mutable static
+    |
+    = note: mutable references to mutable statics are dangerous; it's undefined behavior if any other pointer to the static is used or if any other reference is created for the static while the mutable reference lives
+    = note: for more information, see <https://doc.rust-lang.org/edition-guide/rust-2024/static-mut-references.html>
+help: use `&raw mut` instead to create a raw pointer
+    |
+337 |             write_volatile(&raw mut GLOBAL_STATE.current_input_ptr, ptr::null());
+    |                             +++
+
+warning: creating a mutable reference to mutable static
+   --> LibAFL/libafl/src/executors/inprocess.rs:360:24
+    |
+360 | ... = &mut ...STATE;
+    |       ^^^^^...^^^^^ mutable reference to mutable static
+    |
+    = note: mutable references to mutable statics are dangerous; it's undefined behavior if any other pointer to the static is used or if any other reference is created for the static while the mutable reference lives
+    = note: for more information, see <https://doc.rust-lang.org/edition-guide/rust-2024/static-mut-references.html>
+help: use `&raw mut` instead to create a raw pointer
+    |
+360 |             let data = &raw mut GLOBAL_STATE;
+    |                         +++
+
+warning: creating a mutable reference to mutable static
+   --> LibAFL/libafl/src/executors/inprocess.rs:648:25
+    |
+648 | ... { &mut ...STATE };
+    |       ^^^^^...^^^^^ mutable reference to mutable static
+    |
+    = note: mutable references to mutable statics are dangerous; it's undefined behavior if any other pointer to the static is used or if any other reference is created for the static while the mutable reference lives
+    = note: for more information, see <https://doc.rust-lang.org/edition-guide/rust-2024/static-mut-references.html>
+help: use `&raw mut` instead to create a raw pointer
+    |
+648 |     let data = unsafe { &raw mut GLOBAL_STATE };
+    |                          +++
+
+warning: creating a mutable reference to mutable static
+    --> LibAFL/libafl/src/executors/inprocess.rs:1401:24
+     |
+1401 | ... = &mut ..._DATA;
+     |       ^^^^^...^^^^^ mutable reference to mutable static
+     |
+     = note: mutable references to mutable statics are dangerous; it's undefined behavior if any other pointer to the static is used or if any other reference is created for the static while the mutable reference lives
+     = note: for more information, see <https://doc.rust-lang.org/edition-guide/rust-2024/static-mut-references.html>
+help: use `&raw mut` instead to create a raw pointer
+     |
+1401 |             let data = &raw mut FORK_EXECUTOR_GLOBAL_DATA;
+     |                         +++
+
+warning: creating a mutable reference to mutable static
+    --> LibAFL/libafl/src/executors/inprocess.rs:1424:24
+     |
+1424 | ... = &mut ..._DATA;
+     |       ^^^^^...^^^^^ mutable reference to mutable static
+     |
+     = note: mutable references to mutable statics are dangerous; it's undefined behavior if any other pointer to the static is used or if any other reference is created for the static while the mutable reference lives
+     = note: for more information, see <https://doc.rust-lang.org/edition-guide/rust-2024/static-mut-references.html>
+help: use `&raw mut` instead to create a raw pointer
+     |
+1424 |             let data = &raw mut FORK_EXECUTOR_GLOBAL_DATA;
+     |                         +++
+
+warning: creating a mutable reference to mutable static
+    --> LibAFL/libafl/src/executors/inprocess.rs:1443:24
+     |
+1443 | ... = &mut ..._DATA;
+     |       ^^^^^...^^^^^ mutable reference to mutable static
+     |
+     = note: mutable references to mutable statics are dangerous; it's undefined behavior if any other pointer to the static is used or if any other reference is created for the static while the mutable reference lives
+     = note: for more information, see <https://doc.rust-lang.org/edition-guide/rust-2024/static-mut-references.html>
+help: use `&raw mut` instead to create a raw pointer
+     |
+1443 |             let data = &raw mut FORK_EXECUTOR_GLOBAL_DATA;
+     |                         +++
+
+warning: creating a mutable reference to mutable static
+    --> LibAFL/libafl/src/executors/inprocess.rs:1530:51
+     |
+1530 | ...t, &mut ..._DATA);
+     |       ^^^^^...^^^^^ mutable reference to mutable static
+     |
+     = note: mutable references to mutable statics are dangerous; it's undefined behavior if any other pointer to the static is used or if any other reference is created for the static while the mutable reference lives
+     = note: for more information, see <https://doc.rust-lang.org/edition-guide/rust-2024/static-mut-references.html>
+help: use `&raw mut` instead to create a raw pointer
+     |
+1530 |                     (func)(signal, info, context, &raw mut FORK_EXECUTOR_GLOBAL_DATA);
+     |                                                    +++
+
+warning: creating a mutable reference to mutable static
+    --> LibAFL/libafl/src/executors/inprocess.rs:1537:51
+     |
+1537 | ...t, &mut ..._DATA);
+     |       ^^^^^...^^^^^ mutable reference to mutable static
+     |
+     = note: mutable references to mutable statics are dangerous; it's undefined behavior if any other pointer to the static is used or if any other reference is created for the static while the mutable reference lives
+     = note: for more information, see <https://doc.rust-lang.org/edition-guide/rust-2024/static-mut-references.html>
+help: use `&raw mut` instead to create a raw pointer
+     |
+1537 |                     (func)(signal, info, context, &raw mut FORK_EXECUTOR_GLOBAL_DATA);
+     |                                                    +++
+
+warning: creating a mutable reference to mutable static
+   --> LibAFL/libafl/src/executors/inprocess.rs:725:28
+    |
+725 | ... = &mut ...STATE;
+    |       ^^^^^...^^^^^ mutable reference to mutable static
+    |
+    = note: mutable references to mutable statics are dangerous; it's undefined behavior if any other pointer to the static is used or if any other reference is created for the static while the mutable reference lives
+    = note: for more information, see <https://doc.rust-lang.org/edition-guide/rust-2024/static-mut-references.html>
+help: use `&raw mut` instead to create a raw pointer
+    |
+725 |                 let data = &raw mut GLOBAL_STATE;
+    |                             +++
+
+warning: creating a mutable reference to mutable static
+   --> LibAFL/libafl/src/executors/inprocess.rs:773:33
+    |
+773 | ... { &mut ...STATE };
+    |       ^^^^^...^^^^^ mutable reference to mutable static
+    |
+    = note: mutable references to mutable statics are dangerous; it's undefined behavior if any other pointer to the static is used or if any other reference is created for the static while the mutable reference lives
+    = note: for more information, see <https://doc.rust-lang.org/edition-guide/rust-2024/static-mut-references.html>
+help: use `&raw mut` instead to create a raw pointer
+    |
+773 |             let data = unsafe { &raw mut GLOBAL_STATE };
+    |                                  +++
+
+warning: creating a mutable reference to mutable static
+    --> LibAFL/libafl/src/executors/inprocess.rs:2111:33
+     |
+2111 | ... { &mut ..._DATA };
+     |       ^^^^^...^^^^^ mutable reference to mutable static
+     |
+     = note: mutable references to mutable statics are dangerous; it's undefined behavior if any other pointer to the static is used or if any other reference is created for the static while the mutable reference lives
+     = note: for more information, see <https://doc.rust-lang.org/edition-guide/rust-2024/static-mut-references.html>
+help: use `&raw mut` instead to create a raw pointer
+     |
+2111 |             let data = unsafe { &raw mut FORK_EXECUTOR_GLOBAL_DATA };
+     |                                  +++
+
+warning: creating a mutable reference to mutable static
+   --> LibAFL/libafl/src/executors/timeout.rs:468:28
+    |
+468 | ... = &mut ...STATE;
+    |       ^^^^^...^^^^^ mutable reference to mutable static
+    |
+    = note: mutable references to mutable statics are dangerous; it's undefined behavior if any other pointer to the static is used or if any other reference is created for the static while the mutable reference lives
+    = note: for more information, see <https://doc.rust-lang.org/edition-guide/rust-2024/static-mut-references.html>
+help: use `&raw mut` instead to create a raw pointer
+    |
+468 |                 let data = &raw mut GLOBAL_STATE;
+    |                             +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+   --> LibAFL/libafl/src/inputs/mod.rs:110:21
+    |
+110 | ...es(&self) -> Owned...e<u8> {
+    |       ^^^^^     ^^^^^...^^^^^ the same lifetime is hidden here
+    |       |
+    |       the lifetime is elided here
+    |
+    = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+    |
+110 |     fn target_bytes(&self) -> OwnedSlice<'_, u8> {
+    |                                          +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+   --> LibAFL/libafl/src/inputs/mod.rs:121:21
+    |
+121 | ...es(&self) -> Owned...e<u8>;
+    |       ^^^^^     ^^^^^...^^^^^ the same lifetime is hidden here
+    |       |
+    |       the lifetime is elided here
+    |
+    = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+    |
+121 |     fn target_bytes(&self) -> OwnedSlice<'_, u8>;
+    |                                          +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+  --> LibAFL/libafl/src/inputs/bytes.rs:79:21
+   |
+79 | ...es(&self) -> Owned...e<u8> {
+   |       ^^^^^     ^^^^^...^^^^^ the same lifetime is hidden here
+   |       |
+   |       the lifetime is elided here
+   |
+   = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+   |
+79 |     fn target_bytes(&self) -> OwnedSlice<'_, u8> {
+   |                                          +++
+
+warning: creating a shared reference to mutable static
+  --> LibAFL/libafl/src/observers/map.rs:58:13
+   |
+58 | ...f !COUNT...pty() {
+   |       ^^^^^...^^^^^ shared reference to mutable static
+   |
+   = note: shared references to mutable statics are dangerous; it's undefined behavior if the static is mutated or if a mutable reference is created for it while the shared reference lives
+   = note: for more information, see <https://doc.rust-lang.org/edition-guide/rust-2024/static-mut-references.html>
+
+warning: creating a shared reference to mutable static
+    --> LibAFL/libafl/src/observers/map.rs:1337:26
+     |
+1337 | ...= *COUNT...size);
+     |       ^^^^^...^^^^^ shared reference to mutable static
+     |
+     = note: shared references to mutable statics are dangerous; it's undefined behavior if the static is mutated or if a mutable reference is created for it while the shared reference lives
+     = note: for more information, see <https://doc.rust-lang.org/edition-guide/rust-2024/static-mut-references.html>
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+   --> LibAFL/libafl/src/state/mod.rs:390:17
+    |
+390 | ...se(&self, id: CorpusId) -> Result<Ref<T...put>>, E...
+    |       ^^^^^                          ^^^^^...^^^^^ the same lifetime is hidden here
+    |       |
+    |       the lifetime is elided here
+    |
+    = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+    |
+390 |     fn testcase(&self, id: CorpusId) -> Result<Ref<'_, Testcase<<Self as UsesInput>::Input>>, Error> {
+    |                                                    +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+   --> LibAFL/libafl/src/state/mod.rs:396:9
+    |
+396 | ...   &self,
+    |       ^^^^^ the lifetime is elided here
+397 | ...   id: CorpusId,
+398 | ... -> Result<RefMu...put>>, E...
+    |               ^^^^^...^^^^^ the same lifetime is hidden here
+    |
+    = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+    |
+398 |     ) -> Result<RefMut<'_, Testcase<<Self as UsesInput>::Input>>, Error> {
+    |                        +++
+
+warning: specialization is experimental
+   --> LibAFL/libafl/src/feedbacks/map.rs:409:5
+    |
+409 |     default fn...
+    |     ^^^^^^^
+    |
+    = note: see issue #31844 <https://github.com/rust-lang/rust/issues/31844> for more information
+    = warning: unstable syntax can change at any point in the future, causing a hard error!
+    = note: for more information, see issue #154045 <https://github.com/rust-lang/rust/issues/154045>
+
+warning: `libafl` (lib) generated 70 warnings (run `cargo fix --lib -p libafl` to apply 42 suggestions)
+   Compiling xfuzz v0.1.0 ($XFUZZ_DEMO_DIR/ccover)
+warning: creating a shared reference to mutable static
+  --> src/coverage.rs:70:14
+   |
+70 | ... { ICOVE...ref().un...
+   |       ^^^^^...^^^^^ shared reference to mutable static
+   |
+   = note: shared references to mutable statics are dangerous; it's undefined behavior if the static is mutated or if a mutable reference is created for it while the shared reference lives
+   = note: for more information, see <https://doc.rust-lang.org/edition-guide/rust-2024/static-mut-references.html>
+   = note: `#[warn(static_mut_refs)]` (part of `#[warn(rust_2024_compatibility)]`) on by default
+
+warning: creating a shared reference to mutable static
+  --> src/coverage.rs:74:14
+   |
+74 | ... { ICOVE...ref().un...
+   |       ^^^^^...^^^^^ shared reference to mutable static
+   |
+   = note: shared references to mutable statics are dangerous; it's undefined behavior if the static is mutated or if a mutable reference is created for it while the shared reference lives
+   = note: for more information, see <https://doc.rust-lang.org/edition-guide/rust-2024/static-mut-references.html>
+
+warning: creating a mutable reference to mutable static
+  --> src/coverage.rs:78:14
+   |
+78 | ... { ICOVE...mut().un...
+   |       ^^^^^...^^^^^ mutable reference to mutable static
+   |
+   = note: mutable references to mutable statics are dangerous; it's undefined behavior if any other pointer to the static is used or if any other reference is created for the static while the mutable reference lives
+   = note: for more information, see <https://doc.rust-lang.org/edition-guide/rust-2024/static-mut-references.html>
+
+warning: creating a shared reference to mutable static
+  --> src/coverage.rs:82:14
+   |
+82 | ... { ICOVE...ref().un...
+   |       ^^^^^...^^^^^ shared reference to mutable static
+   |
+   = note: shared references to mutable statics are dangerous; it's undefined behavior if the static is mutated or if a mutable reference is created for it while the shared reference lives
+   = note: for more information, see <https://doc.rust-lang.org/edition-guide/rust-2024/static-mut-references.html>
+
+warning: creating a shared reference to mutable static
+  --> src/harness.rs:48:30
+   |
+48 | ...nd(SIM_A...ter().cl...
+   |       ^^^^^...^^^^^ shared reference to mutable static
+   |
+   = note: shared references to mutable statics are dangerous; it's undefined behavior if the static is mutated or if a mutable reference is created for it while the shared reference lives
+   = note: for more information, see <https://doc.rust-lang.org/edition-guide/rust-2024/static-mut-references.html>
+
+warning: `xfuzz` (lib) generated 5 warnings
+    Finished `release` profile [optimized + debuginfo] target(s) in 5m 06s

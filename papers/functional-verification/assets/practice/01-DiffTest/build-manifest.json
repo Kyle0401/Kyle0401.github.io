@@ -1,0 +1,7 @@
+{
+  "dut": "OSCPU/NutShell",
+  "revision": "041f694965728ea183a0622daa1734002bf4621e",
+  "difftest_revision": "261b4413184c901fa45bb3387f8c40a702d56ebd",
+  "fault": "For the SUB operation only, flip result bit zero in the generated ALU RTL.",
+  "original_rtl_modified": false
+}

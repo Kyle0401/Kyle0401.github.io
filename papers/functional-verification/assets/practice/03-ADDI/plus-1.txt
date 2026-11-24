@@ -1,0 +1,61 @@
+Command: $MINJIE_DIR/results/difftest-learning/emu-good -i $MINJIE_DIR/results/addi-coverage-learning/run-uo7mtsbc/plus-1.bin --diff $MINJIE_DIR/NEMU-ref/build/riscv64-nemu-interpreter-so --ram-size 128MB -C 5000 -I 64 -b 0 -e 5000 --dump-commit-trace
+emu-good compiled at Nov 18 2026, 18:02:25
+Using simulated 32768B flash
+Using simulated 128MB RAM
+The image is $MINJIE_DIR/results/addi-coverage-learning/run-uo7mtsbc/plus-1.bin
+The reference model is $MINJIE_DIR/NEMU-ref/build/riscv64-nemu-interpreter-so
+The first instruction of core 0 has commited. Difftest enabled.
+nemu does not enable flash fetch!
+[00] commit pc 0000000080000000 inst 00000513 wen 1 dst 10 data 0000000000000000 idx 000
+[01] commit pc 0000000080000004 inst 00800293 wen 1 dst 05 data 0000000000000008 idx 000
+[02] commit pc 0000000080000008 inst 00128393 wen 1 dst 07 data 0000000000000009 idx 000
+[03] commit pc 000000008000000c inst 00000013 wen 0 dst 00 data 0000000000000009 idx 000
+[04] commit pc 0000000080000010 inst 00000013 wen 0 dst 00 data 0000000000000009 idx 000
+[05] commit pc 0000000080000014 inst 00000013 wen 0 dst 00 data 0000000000000009 idx 000
+Core 0: HIT GOOD TRAP at pc = 0x8000001c
+Core-0 instrCnt = 6, cycleCnt = 537, IPC = 0.011173
+======== PerfCnt =========
+                 537 <- Mcycle
+                   6 <- Minstret
+                   0 <- MultiCommit
+                 526 <- MimemStall
+                   7 <- MaluInstr
+                   0 <- MbruInstr
+                   0 <- MlsuInstr
+                   0 <- MmduInstr
+                   0 <- McsrInstr
+                   0 <- MloadInstr
+                   0 <- MmmioInstr
+                   0 <- MmulInstr
+                   0 <- MifuFlush
+                   0 <- MbpBRight
+                   0 <- MbpBWrong
+                   0 <- MbpJRight
+                   0 <- MbpJWrong
+                   0 <- MbpIRight
+                   0 <- MbpIWrong
+                   0 <- MbpRRight
+                   0 <- MbpRWrong
+                   0 <- Custom1
+                   0 <- Custom2
+                   0 <- Custom3
+                   0 <- Custom4
+                   0 <- Custom5
+                   0 <- Custom6
+                   0 <- Custom7
+                   0 <- Custom8
+                   0 <- MrawStall
+                   0 <- MexuBusy
+                   0 <- MloadStall
+                   0 <- MstoreStall
+                   8 <- ISUIssue
+======== PerfCntCSV =========
+
+Mcycle, Minstret, MultiCommit, MimemStall, MaluInstr, MbruInstr, MlsuInstr, MmduInstr, McsrInstr, MloadInstr, MmmioInstr, MmulInstr, MifuFlush, MbpBRight, MbpBWrong, MbpJRight, MbpJWrong, MbpIRight, MbpIWrong, MbpRRight, MbpRWrong, Custom1, Custom2, Custom3, Custom4, Custom5, Custom6, Custom7, Custom8, MrawStall, MexuBusy, MloadStall, MstoreStall, ISUIssue,
+
+
+                 537,                    6,                    0,                  526,                    7,                    0,                    0,                    0,                    0,                    0,                    0,                    0,                    0,                    0,                    0,                    0,                    0,                    0,                    0,                    0,                    0,                    0,                    0,                    0,                    0,                    0,                    0,                    0,                    0,                    0,                    0,                    0,                    0,                    8,
+
+
+Seed=0 Guest cycle spent: 540 (this will be different from cycleCnt if emu loads a snapshot)
+Host time spent: 440ms
