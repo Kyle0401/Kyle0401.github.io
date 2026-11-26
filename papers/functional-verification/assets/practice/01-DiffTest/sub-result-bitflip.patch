@@ -1,0 +1,11 @@
+--- normal/ALU.sv
++++ fault/ALU.sv
+@@ -244,7 +244,7 @@
+       ? ((&(io_cfIn_instr[1:0]))
+            ? {{25{io_cfIn_pc[38]}}, io_cfIn_pc} + 64'h4
+            : {{25{io_cfIn_pc[38]}}, io_cfIn_pc} + 64'h2)
+-      : io_in_bits_func[5] ? {{32{res[31]}}, res[31:0]} : res;	// src/main/scala/nutcore/backend/fu/ALU.scala:45:34, :62:31, :75:7, :108:{19,57}, :121:{29,35}, :132:{21,32,71,108}, src/main/scala/utils/BitUtils.scala:41:20, :42:46, src/main/scala/utils/LookupTree.scala:29:28
++      : io_in_bits_func[5] ? {{32{res[31]}}, res[31:0]} : (res ^ ((io_in_bits_func == 7'h08) ? 64'h1 : 64'h0));	// src/main/scala/nutcore/backend/fu/ALU.scala:45:34, :62:31, :75:7, :108:{19,57}, :121:{29,35}, :132:{21,32,71,108}, src/main/scala/utils/BitUtils.scala:41:20, :42:46, src/main/scala/utils/LookupTree.scala:29:28
+   assign io_redirect_target = io_redirect_target_0;	// src/main/scala/nutcore/backend/fu/ALU.scala:75:7, :124:28
+   assign io_redirect_valid = bpuUpdateReq_valid & predictWrong;	// src/main/scala/nutcore/backend/fu/ALU.scala:75:7, :120:25, :126:{30,39}
+   assign _WIRE_4__bore = _GEN_7;	// src/main/scala/nutcore/backend/fu/ALU.scala:75:7, :167:35

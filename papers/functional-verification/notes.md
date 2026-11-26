@@ -186,10 +186,12 @@ LightSSS 从**倒数第二份快照**重放，花约 **3 分钟**录下最后 **
 
 ## 8.1 从提交探针追到 DiffTest 报告
 
+四项实验的脚本、补丁和输入镜像可以一起下载。以下复跑命令从解压后的目录执行，使用 WSL Ubuntu 和对应版本的仿真器及参考库。 [下载实验文件 ZIP](./assets/practice/functional-verification-labs.zip) · [文件清单和运行说明](./assets/practice/README.txt)
+
 本节对应论文 §4.4 和 §5.1。实验环境是 WSL Ubuntu，使用单核顺序版 NutShell 的 Verilator RTL 仿真和 NEMU 参考库。先沿源码追踪一条指令如何提交，再用原来的减法小程序核对日志。 [论文 §4.4](https://jcst.ict.ac.cn/fileup/1000-9000/PDF/JCST-2023-4-2-3285-737.pdf#page=9) · [论文 §5.1、表 2](https://jcst.ict.ac.cn/fileup/1000-9000/PDF/JCST-2023-4-2-3285-737.pdf#page=11) · [实验版本](./assets/practice/01-DiffTest/build-manifest.json)
 
-1. **Chisel 端。** 顺序版的 `backend/seq/WBU.scala` 实例化 `DiffInstrCommit`，将 `valid` 接到这里的 `io.in.valid`，并传出 PC、指令编码和目标寄存器。乱序版在 `backend/ooo/ROB.scala` 根据退休条件报告提交。错误路径上的 `sub` 即使已经算完，也会在冲刷时被丢弃，因此不会作为有效提交推进参考模型。
-2. **Verilog 到 C++。** 生成的 `DummyDPICWrapper_InstrCommit.sv` 用 `io_valid & control_enable & ~reset` 生成 `enable`。`DiffExtInstrCommit.v` 在时钟上升沿且 `enable` 有效时调用 DPI-C 的 `v_difftest_InstrCommit(...)`。生成的 `difftest-dpic.cpp` 将 `io_pc`、`io_instr` 放进相应提交槽的 `packet->pc`、`packet->instr`。单核顺序版的 `difftest-state.h` 里是 `DifftestInstrCommit commit[1]`。写回值通过 `commit_data[1]` 传递，日志把它和 PC、指令、目的寄存器放在同一行供核对。
+1. **Chisel 端。** 顺序版的 `backend/seq/WBU.scala` 实例化 `DiffInstrCommit`，将 `valid` 接到这里的 `io.in.valid`，并传出 PC、指令编码和目标寄存器。乱序版在 `backend/ooo/ROB.scala` 根据退休条件报告提交。错误路径上的 `sub` 即使已经算完，也会在冲刷时被丢弃，因此不会作为有效提交推进参考模型。 [顺序版 WBU](https://github.com/OSCPU/NutShell/blob/041f694965728ea183a0622daa1734002bf4621e/src/main/scala/nutcore/backend/seq/WBU.scala#L48) · [乱序版 ROB](https://github.com/OSCPU/NutShell/blob/041f694965728ea183a0622daa1734002bf4621e/src/main/scala/nutcore/backend/ooo/ROB.scala#L500)
+2. **Verilog 到 C++。** 生成的 `DummyDPICWrapper_InstrCommit.sv` 用 `io_valid & control_enable & ~reset` 生成 `enable`。`DiffExtInstrCommit.v` 在时钟上升沿且 `enable` 有效时调用 DPI-C 的 `v_difftest_InstrCommit(...)`。生成的 `difftest-dpic.cpp` 将 `io_pc`、`io_instr` 放进相应提交槽的 `packet->pc`、`packet->instr`。单核顺序版的 `difftest-state.h` 里是 `DifftestInstrCommit commit[1]`。写回值通过 `commit_data[1]` 传递，日志把它和 PC、指令、目的寄存器放在同一行供核对。 [DPIC 包装器](./assets/practice/01-DiffTest/DummyDPICWrapper_InstrCommit.sv) · [Verilog 探针](./assets/DiffExtInstrCommit.v) · [生成的 DPI-C 源码](./assets/difftest-dpic.cpp) · [提交状态结构](./assets/difftest-state.h)
 3. **跑同一份程序。** `t1=8`，`t0=5`，在 PC `0x8000000c` 执行 `sub t2, t1, t0`。尾部放四条 `nop` 后结束。正常版通过差分并以 `GOOD TRAP` 退出（退出码 `0`）。故障版仅在生成的 `SUB` RTL 中翻转结果最低位，DiffTest 捕获 `t2` 不一致（退出码 `1`）。手算 `8−5=3`，与 NEMU 的参考值一致。 [测试镜像](./assets/practice/01-DiffTest/registers-drain.bin) · [正常日志](./assets/practice/01-DiffTest/good.txt) · [故障日志](./assets/practice/01-DiffTest/subfault.txt) · [差分报告](./assets/practice/01-DiffTest/report.json)
 
 ```text
@@ -199,18 +201,20 @@ t2 different at pc = 0x0080000014, right = 0x0000000000000003, wrong = 0x0000000
 
 第一行的 `0x8000000c` 是实际写错的 `sub` 的提交地址。第二行的 `0x80000014` 是检查器报告差异时使用的 DUT 上下文地址。定位写错的指令时，回到提交记录核对 PC、目标寄存器和写回数据。
 
-已有环境的复跑入口如下。该目录含已构建的两版 NutShell 仿真器和 NEMU 参考库。后面的实验也沿用这里的 `$minjie` 路径。
+`prepare_difftest_demo.py` 复用已构建的正常 NutShell，在单独目录中生成 `emu-good` 和 `emu-subfault`。设置 `DIFFTEST_BUILD_DIR` 为两版仿真器所在的目录，设置 `NEMU_REF` 为 NEMU 参考库的文件路径。运行脚本会重新生成测试镜像并保存两次运行的日志和报告。 [构建脚本](./assets/practice/01-DiffTest/prepare_difftest_demo.py) · [减法故障补丁](./assets/practice/01-DiffTest/sub-result-bitflip.patch) · [DiffTest 运行脚本](./assets/practice/01-DiffTest/difftest_demo.py)
 
 ```bash
-minjie="${MINJIE_DIR:?请先设置 MinJie 实验目录}"
-python3 "$minjie/difftest_demo.py"
+python3 01-DiffTest/difftest_demo.py \
+  --normal "${DIFFTEST_BUILD_DIR:?}/emu-good" \
+  --fault "$DIFFTEST_BUILD_DIR/emu-subfault" \
+  --reference "${NEMU_REF:?}"
 ```
 
 ## 8.2 LightSSS 快照重放与 FST 波形
 
-复用同一个减法教学故障，观察差分报错如何触发重放。第一次只给原有仿真器加 `--enable-fork`，主进程报错后子进程确实被唤醒，但日志提示 `Waveform not supported`。检查构建配置发现原仿真器未启用 trace，于是在 WSL 的独立构建目录中复用故障版生成的 RTL 和 DPI-C 文件，用 `EMU_TRACE=fst` 重建，再用 `--enable-fork` 跑同一镜像和 NEMU 参考库。 [论文 §4.6](https://jcst.ict.ac.cn/fileup/1000-9000/PDF/JCST-2023-4-2-3285-737.pdf#page=10)
+复用同一个减法故障示例，观察差分报错如何触发重放。第一次只给原有仿真器加 `--enable-fork`，主进程报错后子进程确实被唤醒，但日志提示 `Waveform not supported`。检查构建配置发现原仿真器未启用 trace，于是在 WSL 的独立构建目录中复用故障版生成的 RTL 和 DPI-C 文件，用 `EMU_TRACE=fst` 重建，再用 `--enable-fork` 跑同一镜像和 NEMU 参考库。 [论文 §4.6](https://jcst.ict.ac.cn/fileup/1000-9000/PDF/JCST-2023-4-2-3285-737.pdf#page=10)
 
-重新构建时，在原工作区加载 `nutshell_env.sh`。`build_dir` 指向已复制 `rtl/` 和 `generated-src/` 的独立构建目录。使用的构建命令如下。
+在配置好编译环境的 WSL 中，`NOOP_HOME` 指向 NutShell 源码目录。`build_dir` 指向已复制故障版 `rtl/` 和 `generated-src/` 的独立构建目录。使用的构建命令如下。
 
 ```bash
 make -C "$NOOP_HOME/difftest" emu BUILD_DIR="$build_dir" \
@@ -228,33 +232,31 @@ make -C "$NOOP_HOME/difftest" emu BUILD_DIR="$build_dir" \
 
 本地短程序的快照很早，重放覆盖了几乎整个测试。论文 §5.4 的双核香山 Redis 案例在超过 168 小时的仿真中发现异常，从倒数第二份快照带波形重放最后约 30,800 个模拟周期，耗时约 3 分钟。这两个时间分别对应论文中的首次发现和带波形重放。 [论文 §5.4](https://jcst.ict.ac.cn/fileup/1000-9000/PDF/JCST-2023-4-2-3285-737.pdf#page=13)
 
-在已有的 FST 仿真器仍在原 WSL 构建目录时，可以用以下命令复跑。波形写到该构建目录的 `build/` 下，预期 DiffTest 捕获教学故障并返回 `1`。
+设置 `LIGHTSSS_EMU` 为启用 FST 的故障版仿真器路径。脚本默认读取第 8.1 节的减法镜像，在临时输出目录中保存日志和波形。仿真器捕获受控故障并返回 `1` 后，脚本检查差分报告在重放中再次出现，且 FST 已生成。 [LightSSS 重放脚本](./assets/practice/02-LightSSS/run_lightsss_replay.sh)
 
 ```bash
-lightsss="${LIGHTSSS_BUILD_DIR:?请先设置 LightSSS 的 WSL 构建目录}"
-NOOP_HOME="$lightsss" "$lightsss/build/emu" \
-  -i "$minjie/results/difftest-learning/registers-drain.bin" \
-  --diff "$minjie/NEMU-ref/build/riscv64-nemu-interpreter-so" \
-  --ram-size 128MB -C 5000 -I 64 -b 0 -e 0 --enable-fork
+bash 02-LightSSS/run_lightsss_replay.sh "${LIGHTSSS_EMU:?}" "${NEMU_REF:?}"
 ```
 
-## 8.3 用 `addi` 教学分箱练习覆盖反馈
+## 8.3 用 `addi` 立即数分箱观察覆盖反馈
 
-继续用前面的正常 NutShell 仿真器和 NEMU 参考库。脚本生成四份固定镜像，每份先设置 `t0=8`，再在 `0x80000008` 执行 `addi t2, t0, imm`，最后经过四条 `nop` 和结束指令。开启 `--dump-commit-trace`，按 PC 选取实际提交的目标指令，将指令字高 12 位按有符号数解码，再归入正数、零、负数三个教学分箱。DiffTest 检查 DUT 和参考模型是否一致，脚本还单独核对 `x7` 写回是否等于 `8 + imm`。通过两项检查且首次命中新分箱的输入才进入种子集。 [覆盖反馈原理，论文 §4.5](https://jcst.ict.ac.cn/fileup/1000-9000/PDF/JCST-2023-4-2-3285-737.pdf#page=9)
+继续用前面的正常 NutShell 仿真器和 NEMU 参考库。脚本生成四份固定镜像，每份先设置 `t0=8`，再在 `0x80000008` 执行 `addi t2, t0, imm`，最后经过四条 `nop` 和结束指令。开启 `--dump-commit-trace`，按 PC 选取实际提交的目标指令，将指令字高 12 位按有符号数解码，再归入正数、零、负数三个立即数分箱。DiffTest 检查 DUT 和参考模型是否一致，脚本还单独核对 `x7` 写回是否等于 `8 + imm`。通过两项检查且首次命中新分箱的输入才进入种子集。 [覆盖反馈原理，论文 §4.5](https://jcst.ict.ac.cn/fileup/1000-9000/PDF/JCST-2023-4-2-3285-737.pdf#page=9)
 
-| 立即数 | 实际写回 `t2` | 教学分箱 | 累计覆盖 | 种子决策 |
+| 立即数 | 实际写回 `t2` | 分箱 | 累计覆盖 | 种子决策 |
 | ---: | ---: | --- | ---: | --- |
 | `+1` | 9 | 正数 | 1/3 | 初始种子 |
 | `+2` | 10 | 正数 | 1/3 | 该分箱已经命中 |
 | `0` | 8 | 零 | 2/3 | 保留，首次命中零 |
 | `−1` | 7 | 负数 | 3/3 | 保留，首次命中负数 |
 
-例如 `+1` 的提交记录里，`inst 00128393` 的立即数是 `0x001`，`wen 1 dst 07 data ...0009` 表示向 `t2` 写回 `9`。四个程序均通过 DiffTest，最终种子为 **`+1`、`0`、`−1`**。 `+2` 写回检查也通过了，但它和 `+1` 属于同一个教学分箱。 [结果报告](./assets/practice/03-ADDI/report.json) · [提交日志 `+1`](./assets/practice/03-ADDI/plus-1.txt) · [`+2`](./assets/practice/03-ADDI/plus-2.txt) · [`0`](./assets/practice/03-ADDI/zero.txt) · [`−1`](./assets/practice/03-ADDI/minus-1.txt)
+例如 `+1` 的提交记录里，`inst 00128393` 的立即数是 `0x001`，`wen 1 dst 07 data ...0009` 表示向 `t2` 写回 `9`。四个程序均通过 DiffTest，最终种子为 **`+1`、`0`、`−1`**。 `+2` 写回检查也通过了，但它和 `+1` 属于同一个分箱。 [结果报告](./assets/practice/03-ADDI/report.json) · [提交日志 `+1`](./assets/practice/03-ADDI/plus-1.txt) · [`+2`](./assets/practice/03-ADDI/plus-2.txt) · [`0`](./assets/practice/03-ADDI/zero.txt) · [`−1`](./assets/practice/03-ADDI/minus-1.txt)
 
-固定镜像归档为 [`+1`](./assets/practice/03-ADDI/plus-1.bin)、[`+2`](./assets/practice/03-ADDI/plus-2.bin)、[`0`](./assets/practice/03-ADDI/zero.bin)、[`−1`](./assets/practice/03-ADDI/minus-1.bin)。原工作区的脚本会重新生成镜像、运行并输出新的报告。
+脚本会重新生成镜像、运行并输出新的报告。第 8.4 节也会使用归档中的四个镜像。 [ADDI 实验脚本](./assets/practice/03-ADDI/addi_coverage_demo.py) · [镜像 `+1`](./assets/practice/03-ADDI/plus-1.bin) · [`+2`](./assets/practice/03-ADDI/plus-2.bin) · [`0`](./assets/practice/03-ADDI/zero.bin) · [`−1`](./assets/practice/03-ADDI/minus-1.bin)
 
 ```bash
-python3 "$minjie/addi_coverage_demo.py"
+python3 03-ADDI/addi_coverage_demo.py \
+  --emulator "${DIFFTEST_BUILD_DIR:?}/emu-good" \
+  --reference "${NEMU_REF:?}"
 ```
 
 ## 8.4 用官方 XFUZZ 测量实际 MUX 覆盖
@@ -290,12 +292,11 @@ Total Coverage:       44.965%
 | `0` | 8 | 634 | 634/1410 | 0 |
 | `−1` | 7 | 644 | 644/1410 | 10 |
 
-整组最终为 **644/1410（45.674%）**，同配置复跑的写回值和覆盖计数一致。教学分箱把 `0` 单独列为一个输入类别，所以它新增一个分箱。这里计数的是整个短程序运行期间发生过翻转的 MUX 选择条件，`0` 没有增添新的命中。`−1` 在这组输入中增加 10 个 MUX 覆盖点，日志给出的是计数，尚未定位这些点分别对应哪些电路。本地结果来自固定输入回放，论文 §5.2 评估的是自动生成测试。 [序列日志](./assets/practice/04-XFUZZ/sequence.txt) · [复跑日志](./assets/practice/04-XFUZZ/sequence-repeat.txt) · [结果报告](./assets/practice/04-XFUZZ/report.json) · [MUX 覆盖实现](https://github.com/OpenXiangShan/xfuzz/blob/901d963680c8e53115ac0e8b1e09039699bb6885/instrumentation/src/xfuzz/MuxCoverTransform.scala)
+整组最终为 **644/1410（45.674%）**，同配置复跑的写回值和覆盖计数一致。上一节把 `0` 单独列为一个输入类别，所以它新增一个分箱。这里计数的是整个短程序运行期间发生过翻转的 MUX 选择条件，`0` 没有增添新的命中。`−1` 在这组输入中增加 10 个 MUX 覆盖点，日志给出的是计数，尚未定位这些点分别对应哪些电路。本地结果来自固定输入回放，论文 §5.2 评估的是自动生成测试。 [序列日志](./assets/practice/04-XFUZZ/sequence.txt) · [复跑日志](./assets/practice/04-XFUZZ/sequence-repeat.txt) · [结果报告](./assets/practice/04-XFUZZ/report.json) · [MUX 覆盖实现](https://github.com/OpenXiangShan/xfuzz/blob/901d963680c8e53115ac0e8b1e09039699bb6885/instrumentation/src/xfuzz/MuxCoverTransform.scala)
 
-已有 WSL 环境使用下面的入口。脚本先单跑 `+1`，再跑两遍完整序列，将输入镜像放在 `--` 后的仿真参数之前。仿真端使用 `-s 0`、`-b 0 -e 5000`、`-C 5000 -I 64`、`--ram-size 128MB` 和 `--dump-commit-trace`。公开日志首行保留了 `fuzzer` 的调用参数，本机路径用目录变量表示。 [实际复跑命令](./assets/practice/04-XFUZZ/replay-command.txt)
+设置 `XFUZZ_DEMO_DIR` 为含 `build/fuzzer` 的 FuzzingNutShell 目录。固定输入脚本默认读取同一压缩包内 `03-ADDI/` 的四个镜像，先单跑 `+1`，再跑两遍完整序列。仿真端使用 `-s 0`、`-b 0 -e 5000`、`-C 5000 -I 64`、`--ram-size 128MB` 和 `--dump-commit-trace`。公开日志首行保留了 `fuzzer` 的调用参数。 [XFUZZ 固定输入运行脚本](./assets/practice/04-XFUZZ/run_fixed_addi.py) · [原实验的运行记录](./assets/practice/04-XFUZZ/replay-command.txt)
 
 ```bash
-xfuzz_lab="${XFUZZ_LAB_DIR:?请先设置 XFUZZ 实验目录}"
-demo="${XFUZZ_DEMO_DIR:?请先设置已构建的 FuzzingNutShell 目录}"
-python3 "$xfuzz_lab/run_fixed_addi.py" "$demo"
+python3 04-XFUZZ/run_fixed_addi.py "${XFUZZ_DEMO_DIR:?}" \
+  --reference "${NEMU_REF:?}"
 ```

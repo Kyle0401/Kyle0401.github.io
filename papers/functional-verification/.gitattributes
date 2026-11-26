@@ -1,3 +1,4 @@
 *.pdf binary
 *.fst binary
 *.bin binary
+*.zip binary
