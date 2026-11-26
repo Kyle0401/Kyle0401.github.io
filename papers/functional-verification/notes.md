@@ -186,7 +186,7 @@ LightSSS 从**倒数第二份快照**重放，花约 **3 分钟**录下最后 **
 
 ## 8.1 从提交探针追到 DiffTest 报告
 
-四项实验的脚本、补丁和输入镜像可以一起下载。以下复跑命令从解压后的目录执行，使用 WSL Ubuntu 和对应版本的仿真器及参考库。 [下载实验文件 ZIP](./assets/practice/functional-verification-labs.zip) · [文件清单和运行说明](./assets/practice/README.txt)
+四项实验的脚本、补丁和输入镜像收在同一个 ZIP 中。打开清单可逐个查看文件，也可以从预览页下载压缩包。以下复跑命令从解压后的目录执行，使用 WSL Ubuntu 和对应版本的仿真器及参考库。 [查看实验文件 ZIP](./assets/practice/functional-verification-labs.zip) · [文件清单和运行说明](./assets/practice/README.txt)
 
 本节对应论文 §4.4 和 §5.1。实验环境是 WSL Ubuntu，使用单核顺序版 NutShell 的 Verilator RTL 仿真和 NEMU 参考库。先沿源码追踪一条指令如何提交，再用原来的减法小程序核对日志。 [论文 §4.4](https://jcst.ict.ac.cn/fileup/1000-9000/PDF/JCST-2023-4-2-3285-737.pdf#page=9) · [论文 §5.1、表 2](https://jcst.ict.ac.cn/fileup/1000-9000/PDF/JCST-2023-4-2-3285-737.pdf#page=11) · [实验版本](./assets/practice/01-DiffTest/build-manifest.json)
 

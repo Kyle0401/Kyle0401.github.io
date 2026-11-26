@@ -726,6 +726,11 @@
     function enhanceLinks() {
         Array.prototype.forEach.call(content.querySelectorAll('a[href]'), function (link) {
             var href = link.getAttribute('href') || '';
+            if (href.startsWith('./assets/')) {
+                var query = new URLSearchParams({ file: href.slice(2), from: pages[currentPageIndex].route });
+                link.href = './preview.html?' + query.toString();
+                return;
+            }
             if (/^https?:\/\//i.test(href) || /(?:^|\/)paper(?:-zh)?\.pdf(?:[?#]|$)/i.test(href)) {
                 link.target = '_blank';
                 link.rel = 'noopener noreferrer';
@@ -1140,7 +1145,7 @@
     window.addEventListener('resize', updateReadingProgress);
     window.addEventListener('hashchange', routeFromHash);
 
-    fetch('./notes.md?v=20261126a')
+    fetch('./notes.md?v=20261126b')
         .then(function (response) {
             if (!response.ok) throw new Error('HTTP ' + response.status);
             return response.text();
