@@ -1,5 +1,7 @@
 # Structured DFT Development Approach for Chisel-Based High Performance RISC-V Processors
 
+[英文原文 PDF](https://talks-pubs.xiangshan.cc/publications/itcasia2023-chiseldft.pdf) · [中文译文 PDF](./paper-zh.pdf)
+
 DiffTest 用参考模型检查指令提交是否符合预期。即使 RTL 仿真通过，同一份设计制造出来的某颗芯片，仍可能有一个 SRAM 位写入 `1` 后读出 `0`。**DFT（可测试性设计）**就是**在设计时加入测试电路**，让这类缺陷能**在生产测试中**被发现。**MBIST（存储器内建自测试）** 会按规定顺序写入 SRAM，再把读回值与期望值比较。
 
 > [!TIP]

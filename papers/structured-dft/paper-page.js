@@ -1141,7 +1141,7 @@
     window.addEventListener('resize', updateReadingProgress);
     window.addEventListener('hashchange', routeFromHash);
 
-    fetch('./notes.md?v=structured-dft-1')
+    fetch('./notes.md?v=structured-dft-2')
         .then(function (response) {
             if (!response.ok) throw new Error('HTTP ' + response.status);
             return response.text();
