@@ -799,7 +799,7 @@ Qwen：  43 个 bin 命中 / 定义了 43 个 bin
 
 ## 1  Picker:通过 PyDUT 操作二进制加法器
 
-下面根据 [Picker 官方入门教程](https://github.com/XS-MLVP/picker/blob/master/doc/zh/tutorials/first-dut.md) 整理。它是配套教学代码，论文没有列出这段程序；我们先读懂，导出 PyDUT 后再实际运行。
+这是一个加法器示例，导出 PyDUT 后即可运行。示例代码根据 [Picker 官方入门教程](https://github.com/XS-MLVP/picker/blob/master/doc/zh/tutorials/first-dut.md) 整理。
 
 ```python
 from Adder import DUTAdder
@@ -1236,7 +1236,7 @@ async def run_cases(dut_class, variant):
     toffee.start_clock(dut)
     results = []
     for name, a, b, cin in CASES:
-        # 保留原有的独立规格参考计算，本课暂不引入 Model 类。
+        # 直接按规格独立计算预期结果。
         total = a + b + cin
         expected_sum, expected_cout = total & MASK, total >> WIDTH
         actual_sum, actual_cout = await agent.add(a, b, cin)
@@ -1517,7 +1517,7 @@ def main():
     if args.report:
         args.report.parent.mkdir(parents=True, exist_ok=True)
         args.report.write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
-    # 本课只报告覆盖缺口，不设覆盖率失败阈值；行为不符仍退出 1。
+    # 报告覆盖缺口。用例结果不符时退出 1。
     return 1 if report['failed'] else 0
 
 
@@ -1599,7 +1599,7 @@ bash run_toffee_coverage.sh --extended
 
 ```python
 #!/usr/bin/env python3
-"""VCLM 教学练习：分别检查标签结构、测试关联、采样命中和 DUT 输出。"""
+"""VCLM 加法器示例，分别检查标签结构、测试关联、采样命中和 DUT 输出。"""
 
 import argparse
 import json
@@ -1778,14 +1778,13 @@ bash run_vclm_adder.sh
 
 这次既有标签关联，也有实际采样命中，输出检查同样通过。
 
-检查规则写在 vclm_check.py (line 39)这是我们用于理解论文思路的小型教学 checker：
+示例中的检查规则见 `vclm_check.py` 第 39 行。
 
 ```python
-"""比较固定教学规格与 Toffee CovGroup.as_dict() 的 VCLM 标签。
+"""比较示例的检查点清单与 Toffee CovGroup.as_dict() 中的 VCLM 标签。
 
-这是本课程的小型教学检查器，不是 UCAgent 完整 checker 的复现。
-标签完整、关联存在和采样命中是三个独立条件；这些检查不能证明
-bin 条件、测试预期或 DUT 行为正确，也不能证明规格清单完备。
+示例检查器分别核对标签完整性、测试关联和采样命中。
+bin 条件、测试预期、DUT 行为与规格清单的完整性需要另行核对。
 """
 
 

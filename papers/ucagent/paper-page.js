@@ -1140,7 +1140,7 @@
     window.addEventListener('resize', updateReadingProgress);
     window.addEventListener('hashchange', routeFromHash);
 
-    fetch('./notes.md?v=20261118a')
+    fetch('./notes.md?v=20261126a')
         .then(function (response) {
             if (!response.ok) throw new Error('HTTP ' + response.status);
             return response.text();
